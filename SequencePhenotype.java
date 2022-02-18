@@ -87,7 +87,7 @@ public class SequencePhenotype implements Phenotype {
     }
 
     // returns a mutated copy, original SequencePhenotype is unharmed
-    public Phenotype mutate() {
+    public SequencePhenotype mutate() {
         int index = random();
         return new SequencePhenotype(this.sequence + NUCLEOBASES[index]);
     }
