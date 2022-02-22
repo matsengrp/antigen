@@ -10,12 +10,8 @@ public class SequencePhenotype implements Phenotype {
 
     // constructor
     public SequencePhenotype() {
-        this.sequence = "";
-        Random rand = new Random();
-        for (int i = 0; i < Parameters.sequence.length(); i++) {
-            int indexN = rand.nextInt(0, this.NUCLEOBASES.length - 1);
-            this.sequence += this.NUCLEOBASES[indexN];
-        }
+        int index = random();
+        this.sequence = NUCLEOBASES[index];
     }
     public SequencePhenotype(String sequence) {
         sequence = sequence.toUpperCase();
@@ -46,10 +42,9 @@ public class SequencePhenotype implements Phenotype {
         SequencePhenotype seqP = (SequencePhenotype) p;
 
         String seq2 = seqP.getSequence();
+
         // equal length validation
         if (this.sequence.length() != seq2.length()) {
-            System.out.println("s1 " + this.sequence);
-            System.out.println("s2 " + seq2.toString());
             throw new IllegalArgumentException("Sequence lengths are not equal!");
         }
 
@@ -67,14 +62,28 @@ public class SequencePhenotype implements Phenotype {
     // cross immunity between a virus phenotype and a host's immune history
     // here encoded more directly as risk of infection, which ranges from 0 to 1
     public double riskOfInfection(Phenotype[] history) {
-        double risk = 1;
-        for (Phenotype sequence : history) {
-            SequencePhenotype seq = (SequencePhenotype) sequence;
-            if(seq.getSequence().length() == this.sequence.length()) {
-                risk *= this.distance(seq);
+
+        // find closest phenotype in history
+        double closestDistance = 100.0;
+        if (history.length > 0) {
+            for (int i = 0; i < history.length; i++) {
+                double thisDistance = distance(history[i]);
+                if (thisDistance < closestDistance) {
+                    closestDistance = thisDistance;
+                }
+                if (thisDistance < 0.01) {
+                    break;
+                }
             }
         }
+
+        double risk = closestDistance * Parameters.smithConversion;
+        double minRisk = 1.0 - Parameters.homologousImmunity;
+        risk = Math.max(minRisk, risk);
+        risk = Math.min(1.0, risk);
+
         return risk;
+
     }
 
     // returns a mutated copy, original SequencePhenotype is unharmed
