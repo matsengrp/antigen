@@ -3,7 +3,6 @@ import java.lang.*;
 public class SequencePhenotype implements Phenotype {
 
     // constants
-    @SuppressWarnings("unchecked")
     public final String[] NUCLEOBASES = new String[]{"A", "C", "G", "T"};
 
     // fields
@@ -18,7 +17,7 @@ public class SequencePhenotype implements Phenotype {
         sequence = sequence.toUpperCase();
         for (int i = 0; i < sequence.length(); i++) {
             String sequenceChar = ("" + sequence.charAt(i));
-            boolean contains = Arrays.stream(NUCLEOBASES).anyMatch(sequenceChar::equals);
+            boolean contains = Arrays.asList(NUCLEOBASES).contains(sequenceChar);
             if (!contains) {
                 throw new IllegalArgumentException(sequenceChar + " is not a valid nucleobase!");
             }
@@ -57,7 +56,7 @@ public class SequencePhenotype implements Phenotype {
             }
         }
 
-        return (double) hammingDistance;
+        return hammingDistance;
     }
 
     // cross immunity between a virus phenotype and a host's immune history
@@ -67,8 +66,8 @@ public class SequencePhenotype implements Phenotype {
         // find closest phenotype in history
         double closestDistance = 100.0;
         if (history.length > 0) {
-            for (int i = 0; i < history.length; i++) {
-                double thisDistance = distance(history[i]);
+            for (Phenotype phenotype : history) {
+                double thisDistance = distance(phenotype);
                 if (thisDistance < closestDistance) {
                     closestDistance = thisDistance;
                 }
