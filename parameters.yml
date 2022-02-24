@@ -4,7 +4,7 @@
 
                                             # simulation parameters
 burnin: 0                                   # days to wait before logging output 
-endDay: 5000                                # number of days to simulate
+endDay: 400                                # number of days to simulate
 deltaT: 0.1                                 # number of days to move forward in a single timestep
 printStep: 10                               # print to out.timeseries every X days
 tipSamplingRate: 0.0002                     # store X samples per deme per day
@@ -12,7 +12,7 @@ tipSamplesPerDeme: 2000                     # cap number of samples per deme
 tipSamplingProportional: true               # whether to sample proportional to prevalence
 treeProportion: 0.1                         # proportion of tips to use in tree reconstruction
 diversitySamplingCount: 1000                # how many samples to draw to calculate diversity, netau and serial interval
-netauWindow: 100                            # window in days to calculate Ne*tau
+netauWindow: 300                            # window in days to calculate Ne*tau
 repeatSim: true                             # repeat simulation until endDay is reached?
 immunityReconstruction: false               # whether to print immunity reconstruction to out.immunity
 memoryProfiling: false                      # requires -javaagent:classmexer.jar to run
@@ -51,7 +51,7 @@ demeAmplitudes: [0.1, 0., 0.1]              # amplitude of seasonality
 demeOffsets: [0., 0., 0.5]                  # seasonal offset relative to the year
     
                                             # immune parameters  
-phenotypeSpace: "sequence"                 # options include: geometric, geometric3d, geometric10d, sequence
+phenotypeSpace: "sequence"                  # options include: geometric, geometric3d, geometric10d, sequence
 muPhenotype: 0.005                          # in mutations per individual per day
 waning: false                               # whether to allow waning of host immunity
 waningRate: 0.01                            # rate per day of a host removing a random phenotype from their immune history
@@ -63,4 +63,4 @@ meanStep: 0.3                               # mean mutation size
 sdStep: 0.3                                 # standard deviation of mutation size
 mut2D: false                                # whether to mutate in a full 360 degree arc
 fixedStep: false                            # whether to fix step size, i.e. ignore sdStep
-sequence: "AGTC"                            # sequence for initial host immunity
+sequence: "AAG"                            # sequence for initial host immunity
