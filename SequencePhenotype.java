@@ -3,23 +3,23 @@ import java.lang.*;
 public class SequencePhenotype implements Phenotype {
 
     // constants
-    public final String[] NUCLEOBASES = new String[]{"A", "C", "G", "T"};
+    public final String[] NUCLEOTIDES = new String[]{"A", "C", "G", "T"};
 
     // fields
     private String sequence;
 
     // constructor
     public SequencePhenotype() {
-        int indexSite = random();
-        this.sequence = NUCLEOBASES[indexSite];
+        int indexSite = random(NUCLEOTIDES.length);
+        this.sequence = NUCLEOTIDES[indexSite];
     }
     public SequencePhenotype(String sequence) {
         sequence = sequence.toUpperCase();
         for (int i = 0; i < sequence.length(); i++) {
             String sequenceChar = ("" + sequence.charAt(i));
-            boolean contains = Arrays.asList(NUCLEOBASES).contains(sequenceChar);
+            boolean contains = Arrays.asList(NUCLEOTIDES).contains(sequenceChar);
             if (!contains) {
-                throw new IllegalArgumentException(sequenceChar + " is not a valid nucleobase!");
+                throw new IllegalArgumentException(sequenceChar + " is not a valid nucleotide!");
             }
         }
         this.sequence = sequence;
@@ -63,7 +63,7 @@ public class SequencePhenotype implements Phenotype {
     // here encoded more directly as risk of infection, which ranges from 0 to 1
     public double riskOfInfection(Phenotype[] history) {
 
-        // find closest phenotype in history
+        // find the closest phenotype in history
         double closestDistance = 100.0;
         if (history.length > 0) {
             for (Phenotype phenotype : history) {
@@ -88,13 +88,12 @@ public class SequencePhenotype implements Phenotype {
 
     // returns a mutated copy, original SequencePhenotype is unharmed
     public Phenotype mutate() {
-        Random rand = new Random();
-        int indexSite = rand.nextInt(0, this.sequence.length() - 1);
-        int indexNucleotide = rand.nextInt(0, this.NUCLEOBASES.length - 1);
+        int indexSite = random(this.sequence.length());
+        int indexNucleotide = random(this.NUCLEOTIDES.length);
 
-        // substitute a random index of sequence with a random nucleobase
+        // substitute a random index of sequence with a random nucleotide
         StringBuilder mutated = new StringBuilder(this.sequence);
-        mutated.setCharAt(indexSite, this.NUCLEOBASES[indexNucleotide].charAt(0));
+        mutated.setCharAt(indexSite, this.NUCLEOTIDES[indexNucleotide].charAt(0));
 
         return new SequencePhenotype(mutated.toString());
     }
@@ -103,8 +102,8 @@ public class SequencePhenotype implements Phenotype {
         return this.sequence;
     }
 
-    private int random() {
+    private int random(int length) {
         Random random = new Random();
-        return random.nextInt(0, NUCLEOBASES.length - 1);
+        return random.nextInt(0, length - 1);
     }
 }
