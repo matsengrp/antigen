@@ -10,8 +10,8 @@ public class SequencePhenotype implements Phenotype {
 
     // constructor
     public SequencePhenotype() {
-        int index = random();
-        this.sequence = NUCLEOBASES[index];
+        int indexSite = random();
+        this.sequence = NUCLEOBASES[indexSite];
     }
     public SequencePhenotype(String sequence) {
         sequence = sequence.toUpperCase();
@@ -89,12 +89,12 @@ public class SequencePhenotype implements Phenotype {
     // returns a mutated copy, original SequencePhenotype is unharmed
     public Phenotype mutate() {
         Random rand = new Random();
-        int index = rand.nextInt(0, this.sequence.length() - 1);
-        int indexN = rand.nextInt(0, this.NUCLEOBASES.length - 1);
+        int indexSite = rand.nextInt(0, this.sequence.length() - 1);
+        int indexNucleotide = rand.nextInt(0, this.NUCLEOBASES.length - 1);
 
         // substitute a random index of sequence with a random nucleobase
         StringBuilder mutated = new StringBuilder(this.sequence);
-        mutated.setCharAt(index, this.NUCLEOBASES[indexN].charAt(0));
+        mutated.setCharAt(indexSite, this.NUCLEOBASES[indexNucleotide].charAt(0));
 
         return new SequencePhenotype(mutated.toString());
     }
