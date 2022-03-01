@@ -479,7 +479,7 @@ public class Simulation {
 	public void writeDataCSV() throws FileNotFoundException {
 		// Creates csv file from the most recent out.timeseries (i.e., not from example/out.timeseries)
 		Scanner input = new Scanner(new File("out.timeseries"));
-		PrintStream output = new PrintStream(new File("example/out_timeseries.csv"));
+		PrintStream output = new PrintStream(new File("out_timeseries.csv"));
 
 		// Check for next line
 		while(input.hasNextLine()) {
