@@ -1,25 +1,25 @@
 import java.util.*;
+import java.lang.*;
 public class SequencePhenotype implements Phenotype {
 
     // constants
-    @SuppressWarnings("unchecked")
-    public final String[] NUCLEOBASES = new String[]{"A", "C", "G", "T"};
+    public final String[] NUCLEOTIDES = new String[]{"A", "C", "G", "T"};
 
     // fields
     private String sequence;
 
     // constructor
     public SequencePhenotype() {
-        int index = random();
-        this.sequence = NUCLEOBASES[index];
+        int indexSite = random(NUCLEOTIDES.length);
+        this.sequence = NUCLEOTIDES[indexSite];
     }
     public SequencePhenotype(String sequence) {
         sequence = sequence.toUpperCase();
         for (int i = 0; i < sequence.length(); i++) {
             String sequenceChar = ("" + sequence.charAt(i));
-            boolean contains = Arrays.stream(NUCLEOBASES).anyMatch(sequenceChar::equals);
+            boolean contains = Arrays.asList(NUCLEOTIDES).contains(sequenceChar);
             if (!contains) {
-                throw new IllegalArgumentException(sequenceChar + " is not a valid nucleobase!");
+                throw new IllegalArgumentException(sequenceChar + " is not a valid nucleotide!");
             }
         }
         this.sequence = sequence;
@@ -56,18 +56,18 @@ public class SequencePhenotype implements Phenotype {
             }
         }
 
-        return (double) hammingDistance;
+        return hammingDistance;
     }
 
     // cross immunity between a virus phenotype and a host's immune history
     // here encoded more directly as risk of infection, which ranges from 0 to 1
     public double riskOfInfection(Phenotype[] history) {
 
-        // find closest phenotype in history
+        // find the closest phenotype in history
         double closestDistance = 100.0;
         if (history.length > 0) {
-            for (int i = 0; i < history.length; i++) {
-                double thisDistance = distance(history[i]);
+            for (Phenotype phenotype : history) {
+                double thisDistance = distance(phenotype);
                 if (thisDistance < closestDistance) {
                     closestDistance = thisDistance;
                 }
@@ -88,16 +88,23 @@ public class SequencePhenotype implements Phenotype {
 
     // returns a mutated copy, original SequencePhenotype is unharmed
     public Phenotype mutate() {
-        int index = random();
-        return new SequencePhenotype(this.sequence + NUCLEOBASES[index]);
+        int indexSite = random(this.sequence.length());
+        int indexNucleotide = random(this.NUCLEOTIDES.length);
+
+        // substitute a random index of sequence with a random nucleotide
+        StringBuilder mutated = new StringBuilder(this.sequence);
+        mutated.setCharAt(indexSite, this.NUCLEOTIDES[indexNucleotide].charAt(0));
+        Phenotype mutatedP = new SequencePhenotype(mutated.toString());
+        return mutatedP;
+
     }
 
     public String toString() {
         return this.sequence;
     }
 
-    private int random() {
+    private int random(int length) {
         Random random = new Random();
-        return random.nextInt(0, NUCLEOBASES.length - 1);
+        return random.nextInt(0, length - 1);
     }
 }
