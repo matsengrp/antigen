@@ -39,3 +39,8 @@ antigen.jar
 Icon?
 ehthumbs.db
 Thumbs.db
+
+# File cleanup
+/bin
+.project
+.classpath
