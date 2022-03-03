@@ -94,8 +94,8 @@ public class SequencePhenotype implements Phenotype {
         // substitute a random index of sequence with a random nucleotide
         StringBuilder mutated = new StringBuilder(this.sequence);
         mutated.setCharAt(indexSite, this.NUCLEOTIDES[indexNucleotide].charAt(0));
-
-        return new SequencePhenotype(mutated.toString());
+        Phenotype mutatedP = new SequencePhenotype(mutated.toString());
+        return mutatedP;
 
     }
 
