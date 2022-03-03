@@ -96,6 +96,7 @@ public class SequencePhenotype implements Phenotype {
         mutated.setCharAt(indexSite, this.NUCLEOTIDES[indexNucleotide].charAt(0));
 
         return new SequencePhenotype(mutated.toString());
+
     }
 
     public String toString() {
