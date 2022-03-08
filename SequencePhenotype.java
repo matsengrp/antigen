@@ -1,5 +1,8 @@
 import java.util.*;
 import java.lang.*;
+
+import static java.lang.Math.exp;
+
 public class SequencePhenotype implements Phenotype {
 
     // constants
@@ -17,7 +20,7 @@ public class SequencePhenotype implements Phenotype {
         sequence = sequence.toUpperCase();
         for (int i = 0; i < sequence.length(); i++) {
             String sequenceChar = ("" + sequence.charAt(i));
-            boolean contains = Arrays.asList(NUCLEOTIDES).contains(sequenceChar);
+            boolean contains = java.util.Arrays.asList(NUCLEOTIDES).contains(sequenceChar);
             if (!contains) {
                 throw new IllegalArgumentException(sequenceChar + " is not a valid nucleotide!");
             }
@@ -62,28 +65,30 @@ public class SequencePhenotype implements Phenotype {
     // cross immunity between a virus phenotype and a host's immune history
     // here encoded more directly as risk of infection, which ranges from 0 to 1
     public double riskOfInfection(Phenotype[] history) {
+        double fullImmuneRisk = 1.0;
 
-        // find the closest phenotype in history
-        double closestDistance = 100.0;
-        if (history.length > 0) {
-            for (Phenotype phenotype : history) {
-                double thisDistance = distance(phenotype);
-                if (thisDistance < closestDistance) {
-                    closestDistance = thisDistance;
-                }
-                if (thisDistance < 0.01) {
+        int minDistance = 0; // The lowest number of the range input.
+        int maxDistance = this.sequence.length(); // The largest number of the range input.
+        int minOutput = 0; // The lowest number of the range output.
+        int maxOutput = 1; // The largest number of the range output.
+
+        double slope = (double) (maxOutput - minOutput) / (maxDistance - minDistance);
+
+        for(Phenotype pHistory : history) {
+            double input = this.distance(pHistory); // hamming distance of this and pHistory
+            double output = minOutput + slope * (input - minDistance);
+
+            switch (Parameters.crossImmunity) {
+                case "linear":
+                    fullImmuneRisk = fullImmuneRisk * output;
                     break;
-                }
+                case "exponential":
+                    fullImmuneRisk = fullImmuneRisk * (1 - exp(-output));
+                    break;
             }
         }
 
-        double risk = closestDistance * Parameters.smithConversion;
-        double minRisk = 1.0 - Parameters.homologousImmunity;
-        risk = Math.max(minRisk, risk);
-        risk = Math.min(1.0, risk);
-
-        return risk;
-
+        return fullImmuneRisk;
     }
 
     // returns a mutated copy, original SequencePhenotype is unharmed
