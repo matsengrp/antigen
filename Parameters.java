@@ -16,14 +16,14 @@ public class Parameters {
 	// simulation parameters
 	public static int burnin = 0;
 	public static int endDay = 5000;
-	public static double deltaT = 0.1;                                 	// number of days to move forward in a single timestep	
+	public static double deltaT = 0.1;                                 	// number of days to move forward in a single timestep
 	public static int printStep = 10;									// print to out.timeseries every week
 	public static double tipSamplingRate = 0.0002;						// in samples per deme per day
 	public static int tipSamplesPerDeme = 1000;
 	public static boolean tipSamplingProportional = true;				// whether to sample proportional to prevalance
 	public static double treeProportion = 0.1;							// proportion of tips to use in tree reconstruction
 	public static int diversitySamplingCount = 1000;					// how many samples to draw to calculate diversity, Ne*tau, serial interval
-	public static int netauWindow = 100;								// window in days to calculate Ne*tau		
+	public static int netauWindow = 100;								// window in days to calculate Ne*tau
 	public static boolean repeatSim = true;								// repeat simulation until endDay is reached?
 	public static boolean immunityReconstruction = false;				// whether to print immunity reconstruction to out.immunity
 	public static boolean memoryProfiling = false;						// requires -javaagent:classmexer.jar to run
@@ -49,7 +49,7 @@ public class Parameters {
 	public static double initialPrR = 0.5; 						// as proportion of population
 	public static double beta = 0.36; // 0.3					// in contacts per individual per day
 	public static double nu = 0.2; //0.2						// in recoveries per individual per day
-	public static double betweenDemePro = 0.0005;				// relative to within-deme beta	
+	public static double betweenDemePro = 0.0005;				// relative to within-deme beta
 
 	// transcendental immunity
 	public static boolean transcendental = false;
@@ -75,6 +75,7 @@ public class Parameters {
 	public static double sdStep = 0.3;
 	public static boolean mut2D = false;						// whether to mutate in a full 360 degree arc
 	public static boolean fixedStep = false;					// whether to fix mutation step size
+	public static String crossImmunity = "linear";
 
 	// measured in years, starting at burnin
 	public static double getDate() {
@@ -99,7 +100,7 @@ public class Parameters {
 		urImmunity = PhenotypeFactory.makeHostPhenotype();
 	}
 
-	// load parameters.yml	
+	// load parameters.yml
 	public static void load() {
 
 		try {
@@ -252,6 +253,9 @@ public class Parameters {
 			}
 			if (map.get("fixedStep") != null) {
 				fixedStep = (boolean) map.get("fixedStep");
+			}
+			if (map.get("crossImmunity") != null) {
+				crossImmunity = (String) map.get("crossImmunity");
 			}
 
 		} catch (IOException e) {

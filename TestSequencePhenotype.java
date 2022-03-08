@@ -1,5 +1,6 @@
 import static org.junit.Assert.*;
 
+import EDU.oswego.cs.dl.util.concurrent.FJTask;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -97,8 +98,22 @@ public class TestSequencePhenotype {
 	 * Test riskOfInfection calculations.
 	 */
 	@Test
-	public void testRiskOfInfection() {
+	public void testRiskOfInfectionLinear() {
 		// Add this test after implementing a new (or old) CI function.
+		SequencePhenotype singlePheno = new SequencePhenotype("AGTC");
+
+		// hamming distances: 0, 1, 2, 4
+		Phenotype[] historyZero = {new SequencePhenotype("AGTC"), new SequencePhenotype("AATC"), new SequencePhenotype("CGTA"),  new SequencePhenotype("CTGA")};
+
+		// hamming distance: 4 (length of sequence)
+		Phenotype[] historyLength = {new SequencePhenotype("CTGA")};
+
+		// hamming distances: 1, 2, 4
+		Phenotype[] historyMultiple = {new SequencePhenotype("AATC"), new SequencePhenotype("CGTA"),  new SequencePhenotype("CTGA")};
+		
+		assertEquals(0.0, singlePheno.riskOfInfection(historyZero), 0.0001);
+		assertEquals(1.0, singlePheno.riskOfInfection(historyLength), 0.0001);
+		assertEquals(0.125, singlePheno.riskOfInfection(historyMultiple), 0.0001);
 	}
 
 	/**
