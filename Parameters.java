@@ -253,8 +253,11 @@ public class Parameters {
 			}
 			if (map.get("fixedStep") != null) {				
 				fixedStep = (boolean) map.get("fixedStep");	
-			}		
-		
+			}
+			if (map.get("sequence") != null) {
+				fixedStep = (boolean) map.get("sequence");
+			}
+
 		} catch (IOException e) {
 			System.out.println("Cannot load parameters.yml, using defaults");
 		}		
