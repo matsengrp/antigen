@@ -6,7 +6,7 @@ import java.io.*;
 public class VirusTree {
 
 	// fields
-	private static Virus root = Parameters.urVirus;	
+	private static Virus root = Parameters.urVirus;
 	private static List<Virus> tips = new ArrayList<Virus>();
 	
 	public static double xMin;
@@ -14,7 +14,7 @@ public class VirusTree {
 	public static double yMin;
 	public static double yMax;
 	public static double zMin;
-	public static double zMax;	
+	public static double zMax;
 	
 	static final Comparator<Virus> descendantOrder = (v1, v2) -> {
 		Integer descendantsV1 = getNumberOfDescendants(v1);
@@ -23,7 +23,7 @@ public class VirusTree {
 	};
 
 	// static methods
-	public static void add(Virus v) {		
+	public static void add(Virus v) {
 		tips.add(v);
 	}
 	public static void clear() {
@@ -84,7 +84,7 @@ public class VirusTree {
 		
 	// work backwards for each sample filling the children lists
 	public static void fillBackward() {
-	
+
 		for (Virus child : tips) {
 			Virus parent = child.getParent();
 			while (parent != null) {
@@ -761,6 +761,6 @@ public class VirusTree {
 			System.exit(0);
 		}
 		
-	}	
+	}
 		
 }
