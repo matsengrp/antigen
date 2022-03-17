@@ -2,7 +2,6 @@
 
 import java.util.*;
 import java.io.*;
-import static java.lang.Math.*;
 
 public class VirusTree {
 
@@ -17,14 +16,12 @@ public class VirusTree {
 	public static double zMin;
 	public static double zMax;	
 	
-	static final Comparator<Virus> descendantOrder = new Comparator<Virus>() {
-		public int compare(Virus v1, Virus v2) {
-			Integer descendantsV1 = new Integer(getNumberOfDescendants(v1));
-			Integer descendantsV2 = new Integer(getNumberOfDescendants(v2));
-			return descendantsV1.compareTo(descendantsV2);
-		}
-	};	
-		
+	static final Comparator<Virus> descendantOrder = (v1, v2) -> {
+		Integer descendantsV1 = getNumberOfDescendants(v1);
+		Integer descendantsV2 = getNumberOfDescendants(v2);
+		return descendantsV1.compareTo(descendantsV2);
+	};
+
 	// static methods
 	public static void add(Virus v) {		
 		tips.add(v);

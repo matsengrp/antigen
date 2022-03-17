@@ -75,7 +75,9 @@ public class Parameters {
 	public static double sdStep = 0.3;
 	public static boolean mut2D = false;						// whether to mutate in a full 360 degree arc
 	public static boolean fixedStep = false;					// whether to fix mutation step size
+	public static String sequence = "AGTC";
 	public static String crossImmunity = "linear";
+	public static double crossImmunityStrength = 1.0;
 
 	// measured in years, starting at burnin
 	public static double getDate() {
@@ -254,8 +256,14 @@ public class Parameters {
 			if (map.get("fixedStep") != null) {
 				fixedStep = (boolean) map.get("fixedStep");
 			}
+			if (map.get("sequence") != null) {
+				sequence = (String) map.get("sequence");
+			}
 			if (map.get("crossImmunity") != null) {
 				crossImmunity = (String) map.get("crossImmunity");
+			}
+			if (map.get("crossImmunityStrength") != null) {
+				crossImmunityStrength = (double) map.get("crossImmunityStrength");
 			}
 
 		} catch (IOException e) {
