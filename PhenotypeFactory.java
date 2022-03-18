@@ -35,7 +35,7 @@ public class PhenotypeFactory {
 			p = new GeometricPhenotype10D(traits); 
 		}
 		if (SEQUENCE.equals(Parameters.phenotypeSpace)) {
-			p = new SequencePhenotype(Parameters.sequence);
+			p = new SequencePhenotype(Parameters.startingSequence);
 		}
 		return p;
 	

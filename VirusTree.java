@@ -2,13 +2,12 @@
 
 import java.util.*;
 import java.io.*;
-import static java.lang.Math.*;
 
 public class VirusTree {
 
 	// fields
 	private static Virus root = Parameters.urVirus;	
-	private static List<Virus> tips = new ArrayList<Virus>();
+	private static List<Virus> tips = new ArrayList<>();
 	
 	public static double xMin;
 	public static double xMax;
@@ -17,13 +16,11 @@ public class VirusTree {
 	public static double zMin;
 	public static double zMax;	
 	
-	static final Comparator<Virus> descendantOrder = new Comparator<Virus>() {
-		public int compare(Virus v1, Virus v2) {
-			Integer descendantsV1 = new Integer(getNumberOfDescendants(v1));
-			Integer descendantsV2 = new Integer(getNumberOfDescendants(v2));
-			return descendantsV1.compareTo(descendantsV2);
-		}
-	};	
+	static final Comparator<Virus> descendantOrder = (v1, v2) -> {
+		Integer descendantsV1 = getNumberOfDescendants(v1);
+		Integer descendantsV2 = getNumberOfDescendants(v2);
+		return descendantsV1.compareTo(descendantsV2);
+	};
 		
 	// static methods
 	public static void add(Virus v) {		
@@ -57,7 +54,7 @@ public class VirusTree {
 	public static Virus getRandomTipFromTo(double from, double to) {
 	
 		// fill temporary list
-		List<Virus> select = new ArrayList<Virus>();
+		List<Virus> select = new ArrayList<>();
 		for (Virus v : tips) {
 			double x = v.getBirth();
 			if (x >= from && x < to) {
@@ -102,7 +99,7 @@ public class VirusTree {
 	
 	public static void dropTips() {
 	
-		List<Virus> reducedTips = new ArrayList<Virus>();
+		List<Virus> reducedTips = new ArrayList<>();
 		for (Virus v : tips) {
 			if (Random.nextBoolean(Parameters.treeProportion)) {
 				reducedTips.add(v);
@@ -139,7 +136,7 @@ public class VirusTree {
 	// prune tips
 	public static void pruneTips() {
 	
-		List<Virus> reducedTips = new ArrayList<Virus>();
+		List<Virus> reducedTips = new ArrayList<>();
 		for (int d = 0; d < Parameters.demeCount; d++) {
 			double keepProportion = (double) Parameters.tipSamplesPerDeme / (double) getDemeCount(d);
 			for (Virus v : tips) {
@@ -154,7 +151,7 @@ public class VirusTree {
 	
 	// returns virus v and all its descendents via a depth-first traversal
 	public static List<Virus> postOrderNodes(Virus v) {
-		List<Virus> vNodes = new ArrayList<Virus>();
+		List<Virus> vNodes = new ArrayList<>();
 		vNodes.add(v);
 		vNodes = postOrderChildren(vNodes);
 		return vNodes;
@@ -200,7 +197,7 @@ public class VirusTree {
 	public static void sortChildrenByDescendants(Virus v) {
 		
 		List<Virus> children = v.getChildren();
-		Collections.sort(children, descendantOrder);
+		children.sort(descendantOrder);
 		
 		for (Virus child : children) {
 			sortChildrenByDescendants(child);
@@ -299,7 +296,7 @@ public class VirusTree {
 	// rotate the 2d euclidean space using PCA, returning an x-axis with maximum variance
 	public static void rotate() {
 	
-		if (Parameters.phenotypeSpace == "geometric") {
+		if (Parameters.phenotypeSpace.equals("geometric")) {
 			
 			// load a 2d array with phenotypes
 			
@@ -335,7 +332,7 @@ public class VirusTree {
 
 		}	
 		
-		if (Parameters.phenotypeSpace == "geometric3d") {
+		if (Parameters.phenotypeSpace.equals("geometric3d")) {
 			
 			// load a 2d array with phenotypes
 			
@@ -380,7 +377,7 @@ public class VirusTree {
 	// flips the 2d euclidean space so that first sample is always to the left of the last sample
 	public static void flip() {
 	
-		if (Parameters.phenotypeSpace == "geometric") {
+		if (Parameters.phenotypeSpace.equals("geometric")) {
 
 			List<Virus> virusList = postOrderNodes();
 			int n = virusList.size();	
@@ -418,7 +415,7 @@ public class VirusTree {
 				for (int i = 0; i < n; i++) {
 					Virus v = virusList.get(i);
 					p = (GeometricPhenotype) v.getPhenotype();		
-					input[i] = p.getTraitA();;
+					input[i] = p.getTraitA();
 				}
 				
 				for (int i = 0; i < n; i++) {
@@ -432,7 +429,7 @@ public class VirusTree {
 			
 		}
 		
-		if (Parameters.phenotypeSpace == "geometric3d") {
+		if (Parameters.phenotypeSpace.equals("geometric3d")) {
 
 			List<Virus> virusList = postOrderNodes();
 			int n = virusList.size();	
@@ -470,7 +467,7 @@ public class VirusTree {
 				for (int i = 0; i < n; i++) {
 					Virus v = virusList.get(i);
 					p = (GeometricPhenotype3D) v.getPhenotype();		
-					input[i] = p.getTraitA();;
+					input[i] = p.getTraitA();
 				}
 				
 				for (int i = 0; i < n; i++) {
@@ -496,7 +493,7 @@ public class VirusTree {
 		zMin = 0.0;
 		zMax = 0.0;		
 	
-		if (Parameters.phenotypeSpace == "geometric") {
+		if (Parameters.phenotypeSpace.equals("geometric")) {
 			for (Virus v : postOrderNodes()) {
 			
 				GeometricPhenotype p = (GeometricPhenotype) v.getPhenotype();
@@ -510,7 +507,7 @@ public class VirusTree {
 			}
 		}
 		
-		if (Parameters.phenotypeSpace == "geometric3d") {
+		if (Parameters.phenotypeSpace.equals("geometric3d")) {
 			for (Virus v : postOrderNodes()) {
 			
 				GeometricPhenotype3D p = (GeometricPhenotype3D) v.getPhenotype();
@@ -560,9 +557,8 @@ public class VirusTree {
 			tipFile.createNewFile();
 			PrintStream tipStream = new PrintStream(tipFile);
 			tipStream.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", "name", "year", "trunk", "tip", "mark", "location", "layout", "ag1", "ag2");
-			for (int i = 0; i < tips.size(); i++) {
-				Virus v = tips.get(i);			
-				tipStream.printf("\"%s\",%.4f,%d,%d,%d,%d,%.4f,%s\n", v, v.getBirth(), v.isTrunk()?1:0, v.isTip()?1:0, v.isMarked()?1:0, v.getDeme(), v.getLayout(), v.getPhenotype());
+			for (Virus v : tips) {
+				tipStream.printf("\"%s\",%.4f,%d,%d,%d,%d,%.4f,%s\n", v, v.getBirth(), v.isTrunk() ? 1 : 0, v.isTip() ? 1 : 0, v.isMarked() ? 1 : 0, v.getDeme(), v.getLayout(), v.getPhenotype());
 			}
 			tipStream.close();
 		} catch(IOException ex) {
@@ -628,7 +624,7 @@ public class VirusTree {
 		
 		// if tip is encountered, print tip, return to parent
 		if (v.getNumberOfChildren() == 0) {
-			treeStream.print(v.toString());
+			treeStream.print(v);
 			printHeight = true;
 			returnVirus = v.getParent();		
 		}			
@@ -670,7 +666,7 @@ public class VirusTree {
 			treeFile.createNewFile();
 			PrintStream treeStream = new PrintStream(treeFile);
 			
-			List<Virus> visited = new ArrayList<Virus>();
+			List<Virus> visited = new ArrayList<>();
 				
 			// start at root
 			Virus v = root;
@@ -748,10 +744,10 @@ public class VirusTree {
 		
 		try {
 			PrintStream summaryStream = new PrintStream(new FileOutputStream("out.summary", true)); // append
-			double sideBranchMut = (double) sideBranchMutations();
+			double sideBranchMut = sideBranchMutations();
 			double sideBranchOpp = sideBranchOpportunity();
 			double sideBranchRate = sideBranchMut / sideBranchOpp;
-			double trunkMut = (double) trunkMutations();
+			double trunkMut = trunkMutations();
 			double trunkOpp = trunkOpportunity();	
 			double trunkRate = trunkMut / trunkOpp;		
 			double mkRatio = trunkRate / sideBranchRate;

@@ -41,7 +41,7 @@ public class SequencePhenotype implements Phenotype {
      */
     public SequencePhenotype() {
         this.sequence = "";
-        for (int i = 0; i < Parameters.sequence.length(); i++) {
+        for (int i = 0; i < Parameters.startingSequence.length(); i++) {
             int indexNucleotide = random(this.NUCLEOTIDES.length);
             this.sequence += this.NUCLEOTIDES[indexNucleotide];
         }

@@ -3,7 +3,6 @@
 /* A completely static class.  */
 
 import java.util.*;
-import static java.lang.Math.*;
 import java.io.*;
 
 public class Parameters {
@@ -75,11 +74,11 @@ public class Parameters {
 	public static double sdStep = 0.3; 
 	public static boolean mut2D = false;						// whether to mutate in a full 360 degree arc
 	public static boolean fixedStep = false;					// whether to fix mutation step size
-	public static String sequence = "AGTC";
+	public static String startingSequence = "AGTC";
 
 	// measured in years, starting at burnin
 	public static double getDate() {
-		return ((double) day - (double) burnin ) / 365.0;
+		return (day - (double) burnin ) / 365.0;
 	}
 	
 	public static boolean dayIsInteger() {
@@ -90,8 +89,7 @@ public class Parameters {
 		double baseline = demeBaselines[index];
 		double amplitude = demeAmplitudes[index];
 		double offset = demeOffsets[index];
-		double beta = baseline + amplitude * Math.cos(2*Math.PI*getDate() + 2*Math.PI*offset);
-		return beta;
+		return baseline + amplitude * Math.cos(2*Math.PI*getDate() + 2*Math.PI*offset);
 	}
 		
 	// initialize
@@ -106,7 +104,7 @@ public class Parameters {
 		try {
 		
 			org.yaml.snakeyaml.Yaml yaml = new org.yaml.snakeyaml.Yaml();
-			Map map = null;			
+			Map map;
 			InputStream input = new FileInputStream(new File("parameters.yml"));
 			map = (Map) yaml.load(input);
 			input.close();
@@ -254,8 +252,8 @@ public class Parameters {
 			if (map.get("fixedStep") != null) {				
 				fixedStep = (boolean) map.get("fixedStep");	
 			}
-			if (map.get("sequence") != null) {
-				sequence = (String) map.get("sequence");
+			if (map.get("startingSequence") != null) {
+				startingSequence = (String) map.get("startingSequence");
 			}
 
 		} catch (IOException e) {

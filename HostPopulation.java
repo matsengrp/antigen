@@ -10,9 +10,9 @@ public class HostPopulation {
 	private int deme;
 	private String name;	
 	private int cases;	
-	private List<Host> susceptibles = new ArrayList<Host>();
-	private List<Host> infecteds = new ArrayList<Host>();	
-	private List<Host> recovereds = new ArrayList<Host>();		// this is the transcendental class, immune to all forms of virus  
+	private List<Host> susceptibles = new ArrayList<>();
+	private List<Host> infecteds = new ArrayList<>();
+	private List<Host> recovereds = new ArrayList<>();		// this is the transcendental class, immune to all forms of virus
 	private double diversity;
 	private double tmrca;
 	private double netau;	
@@ -65,7 +65,7 @@ public class HostPopulation {
 	// construct checkpointed host population and infecting viruses
 	public HostPopulation(int d, boolean checkpoint) {
 	
-		if (checkpoint == true) {
+		if (checkpoint) {
 		
 			deme = d;
 			name = Parameters.demeNames[deme];
@@ -380,7 +380,7 @@ public class HostPopulation {
 				// get indices and objects
 				Host iH = hp.getRandomHostI();
 				int sndex = getRandomS();
-				Host sH = susceptibles.get(sndex);			
+				Host sH = susceptibles.get(sndex);
 				Virus v = iH.getInfection();
 				
 				// attempt infection
@@ -534,11 +534,11 @@ public class HostPopulation {
 				}
 			}	
 		
-			diversity /= (double) sampleCount;
+			diversity /= sampleCount;
 			tmrca /= 2.0;
-			antigenicDiversity /= (double) sampleCount;		
+			antigenicDiversity /= sampleCount;
 			netau = coalOpp / coalCount;
-			serialInterval /= (double) sampleCount;
+			serialInterval /= sampleCount;
 		
 		}
 		
