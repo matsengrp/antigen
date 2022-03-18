@@ -111,4 +111,18 @@ public class TestSequencePhenotype {
 		assertEquals("ACGT", simplePheno.toString());
 	}
 
+	/**
+	 * Test equals()
+	 */
+	@Test
+	public void testEquals() {
+		// Same SequencePhenotype objects are equal
+		assertTrue(emptyPheno.equals(emptyPheno));
+
+		SequencePhenotype simplePhenoTest = new SequencePhenotype("ACGT");
+
+		// SequencePhenotype objects with the same sequence are equal
+		assertTrue(simplePheno.equals(simplePhenoTest));
+	}
+
 }

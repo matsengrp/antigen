@@ -255,7 +255,7 @@ public class Parameters {
 				fixedStep = (boolean) map.get("fixedStep");	
 			}
 			if (map.get("sequence") != null) {
-				fixedStep = (boolean) map.get("sequence");
+				sequence = (String) map.get("sequence");
 			}
 
 		} catch (IOException e) {
