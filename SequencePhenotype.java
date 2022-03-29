@@ -12,7 +12,7 @@ public class SequencePhenotype implements Phenotype {
     /**
      * The valid letters that make up the sequence of this SequencePhenotype
      */
-    public final String[] NUCLEOTIDES = new String[]{"A", "C", "G", "T"};
+    public final String[] AMINO_ACIDS = new String[]{"A", "C", "G", "T"};
 
     /**
      * The sequence of this SequencePhenotype
@@ -42,8 +42,8 @@ public class SequencePhenotype implements Phenotype {
     public SequencePhenotype() {
         this.sequence = "";
         for (int i = 0; i < Parameters.startingSequence.length(); i++) {
-            int indexNucleotide = random(this.NUCLEOTIDES.length);
-            this.sequence += this.NUCLEOTIDES[indexNucleotide];
+            int indexNucleotide = random(this.AMINO_ACIDS.length);
+            this.sequence += this.AMINO_ACIDS[indexNucleotide];
         }
         checkRep();
     }
@@ -143,11 +143,11 @@ public class SequencePhenotype implements Phenotype {
      */
     public SequencePhenotype mutate() {
         int indexSite = random(this.sequence.length());
-        int indexNucleotide = random(this.NUCLEOTIDES.length);
+        int indexNucleotide = random(this.AMINO_ACIDS.length);
 
         // substitute a random index of sequence with a random nucleotide
         StringBuilder mutated = new StringBuilder(this.sequence);
-        mutated.setCharAt(indexSite, this.NUCLEOTIDES[indexNucleotide].charAt(0));
+        mutated.setCharAt(indexSite, this.AMINO_ACIDS[indexNucleotide].charAt(0));
 
         checkRep();
         return new SequencePhenotype(mutated.toString());
@@ -200,7 +200,7 @@ public class SequencePhenotype implements Phenotype {
 
             for (int i = 0; i < this.sequence.length(); i++) {
                 String sequenceChar = ("" + this.sequence.charAt(i));
-                boolean contains = java.util.Arrays.asList(this.NUCLEOTIDES).contains(sequenceChar);
+                boolean contains = java.util.Arrays.asList(this.AMINO_ACIDS).contains(sequenceChar);
                 assert (contains) : sequenceChar + " is not a valid nucleotide!";
             }
         }
