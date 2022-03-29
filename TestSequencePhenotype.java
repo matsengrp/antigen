@@ -119,10 +119,15 @@ public class TestSequencePhenotype {
 		// Same SequencePhenotype objects are equal
 		assertTrue(emptyPheno.equals(emptyPheno));
 
-		SequencePhenotype simplePhenoTest = new SequencePhenotype("ACGT");
+		SequencePhenotype simplePhenoSame = new SequencePhenotype("ACGT");
+		SequencePhenotype simplePhenoDifferent = new SequencePhenotype("CCGT");
+
 
 		// SequencePhenotype objects with the same sequence are equal
-		assertTrue(simplePheno.equals(simplePhenoTest));
+		assertTrue(simplePheno.equals(simplePhenoSame));
+
+		// SequencePhenotype objects with different sequences are bit equal
+		assertFalse(simplePheno.equals(simplePhenoDifferent));
 	}
 
 }
