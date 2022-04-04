@@ -64,15 +64,12 @@ public class TestSequencePhenotype {
 	}
 
 	/**
-	 * Test getter and setter methods.
+	 * Test getter method.
 	 */
 	@Test
-	public void testSetAndGetSequence() {
-		// Set sequence of testPheno to something different
-		simplePheno.setSequence("TCGA");
-
+	public void testGetSequence() {
 		// Assert the sequence was updated
-		assertEquals("TCGA", simplePheno.getSequence());
+		assertEquals("ACGT", simplePheno.getSequence());
 	}
 
 	/**
@@ -126,7 +123,7 @@ public class TestSequencePhenotype {
 		// SequencePhenotype objects with the same sequence are equal
 		assertTrue(simplePheno.equals(simplePhenoSame));
 
-		// SequencePhenotype objects with different sequences are bit equal
+		// SequencePhenotype objects with different sequences are not equal
 		assertFalse(simplePheno.equals(simplePhenoDifferent));
 	}
 

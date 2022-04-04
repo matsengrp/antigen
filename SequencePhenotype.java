@@ -12,7 +12,7 @@ public class SequencePhenotype implements Phenotype {
     /**
      * The valid letters that make up the sequence of this SequencePhenotype
      */
-    public final String[] AMINO_ACIDS = new String[]{"A", "C", "G", "T"};
+    public final char[] ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
 
     /**
      * The sequence of this SequencePhenotype
@@ -32,18 +32,18 @@ public class SequencePhenotype implements Phenotype {
     // Representation invariant for every SequencePhenotype:
     // s.sequence != null && s.sequence.length() > 0
     // for all indexSite such that s.sequence.charAt(i):
-    //     indexSite == 'A' || indexSite == 'G' || indexSite == 'T' || indexSite == 'C'
+    //     indexSite is a character in ALPHABET
 
     /**
      * Constructor that creates a new SequencePhenotype.
      *
-     * @spec.effects Constructs a new SequencePhenotype of length Parameters.sequence.length()
+     * @spec.effects Constructs a new random SequencePhenotype of length Parameters.sequence.length()
      */
     public SequencePhenotype() {
         this.sequence = "";
         for (int i = 0; i < Parameters.startingSequence.length(); i++) {
-            int indexNucleotide = random(this.AMINO_ACIDS.length);
-            this.sequence += this.AMINO_ACIDS[indexNucleotide];
+            int indexAlphabet = random(this.ALPHABET.length);
+            this.sequence += this.ALPHABET[indexAlphabet];
         }
         checkRep();
     }
@@ -68,18 +68,6 @@ public class SequencePhenotype implements Phenotype {
      */
     public String getSequence() {
         return this.sequence;
-    }
-
-    /**
-     * Sets the sequence of this SequencePhenotype to the given sequence
-     *
-     * @param sequence the sequence to set the sequence of this SequencePhenotype to
-     * @spec.requires sequence != null && sequence.length() > 0
-     * @spec.effects Changes the sequence of this SequencePhenotype
-     */
-    public void setSequence(String sequence) {
-        this.sequence = sequence;
-        checkRep();
     }
 
     /**
@@ -143,11 +131,11 @@ public class SequencePhenotype implements Phenotype {
      */
     public SequencePhenotype mutate() {
         int indexSite = random(this.sequence.length());
-        int indexNucleotide = random(this.AMINO_ACIDS.length);
+        int indexAlphabet = random(this.ALPHABET.length);
 
-        // substitute a random index of sequence with a random nucleotide
+        // substitute a random index of sequence with a random character in the ALPHABET
         StringBuilder mutated = new StringBuilder(this.sequence);
-        mutated.setCharAt(indexSite, this.AMINO_ACIDS[indexNucleotide].charAt(0));
+        mutated.setCharAt(indexSite, this.ALPHABET[indexAlphabet]);
 
         checkRep();
         return new SequencePhenotype(mutated.toString());
@@ -163,16 +151,16 @@ public class SequencePhenotype implements Phenotype {
         return this.sequence;
     }
 
-    private int random(int length) {
+    private int random(int maxRange) {
         Random random = new Random();
-        return random.nextInt(0, length - 1);
+        return random.nextInt(0, maxRange - 1);
     }
 
     /**
      * Standard equality operation.
      *
      * @param obj the object to be compared for equality
-     * @return true if and only if 'obj' is an instance of a Node and 'this' and 'obj' represent the same Node.
+     * @return true if and only if 'obj' is an instance of a Node and 'this' and 'obj' represent the same SequencePhenotype.
      */
     @Override
     public boolean equals(Object obj) {
@@ -197,12 +185,6 @@ public class SequencePhenotype implements Phenotype {
         if (DEBUG)  {
             assert (this.sequence != null) : "sequence should never be null.";
             assert (this.sequence.length() > 0) : "sequence should never be empty.";
-
-            for (int i = 0; i < this.sequence.length(); i++) {
-                String sequenceChar = ("" + this.sequence.charAt(i));
-                boolean contains = java.util.Arrays.asList(this.AMINO_ACIDS).contains(sequenceChar);
-                assert (contains) : sequenceChar + " is not a valid nucleotide!";
-            }
         }
     }
 }
