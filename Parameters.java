@@ -74,7 +74,9 @@ public class Parameters {
 	public static double sdStep = 0.3;
 	public static boolean mut2D = false;						// whether to mutate in a full 360 degree arc
 	public static boolean fixedStep = false;					// whether to fix mutation step size
-	public static String startingSequence = "AGTC";
+	public static String startingSequence = "AGTC";				// default starting sequence
+	public static String alphabetType = "nucleotides";          // default sequence to consist of nucleotides
+	public static String alphabet = "AGTC";                     // default valid letters to be nucleotides
 
 	// measured in years, starting at burnin
 	public static double getDate() {
@@ -252,11 +254,15 @@ public class Parameters {
 			if (map.get("fixedStep") != null) {
 				fixedStep = (boolean) map.get("fixedStep");
 			}
-			if (map.get("fixedStep") != null) {				
-				fixedStep = (boolean) map.get("fixedStep");	
-			}
 			if (map.get("startingSequence") != null) {
 				startingSequence = (String) map.get("startingSequence");
+			}
+			if (map.get("alphabetType") != null) {
+				alphabetType = (String) map.get("alphabetType");
+
+				if (alphabetType.equals("aminoAcids")) {
+					alphabet = "ARNDBCEQZGHILKMFPSTWYV";
+				}
 			}
 
 		} catch (IOException e) {
