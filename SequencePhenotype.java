@@ -1,38 +1,82 @@
-import java.util.*;
 import java.lang.*;
+
+/**
+ * <b>SequencePhenotype</b> represents a phenotype.
+ * SequencePhenotypes are identified by their data contents.
+ * SequencePhenotype permits all data, except for <b>""</b> and <b>null</b>.
+ *
+ * @author Thien Tran
+ */
 public class SequencePhenotype implements Phenotype {
 
-    // constants
-    public final String[] NUCLEOTIDES = new String[]{"A", "C", "G", "T"};
+    /**
+     * The valid letters that make up the sequence of this SequencePhenotype
+     */
+    public final char[] ALPHABET = "ARNDBCEQZGHILKMFPSTWYV".toCharArray();
 
-    // fields
+    /**
+     * The sequence of this SequencePhenotype
+     */
     private String sequence;
 
-    // constructor
+    /**
+     * Run expensive tests iff DEBUG == true.
+     */
+    public static final boolean DEBUG = false;
+
+    // Abstraction Function:
+    // A SequencePhenotype, s, is null if s.sequence = null, otherwise s.sequence = sequence
+    // for sequence.length() > 0
+    // s1.sequence and s2.sequence are allowed to be equal for two given SequencePhenotypes
+
+    // Representation invariant for every SequencePhenotype:
+    // s.sequence != null && s.sequence.length() > 0
+    // for all indexSite such that s.sequence.charAt(i):
+    //     indexSite is a character in ALPHABET
+
+    /**
+     * Constructor that creates a new SequencePhenotype.
+     *
+     * @spec.effects Constructs a new random SequencePhenotype of length Parameters.sequence.length()
+     */
     public SequencePhenotype() {
-        int indexSite = random(NUCLEOTIDES.length);
-        this.sequence = NUCLEOTIDES[indexSite];
-    }
-    public SequencePhenotype(String sequence) {
-        sequence = sequence.toUpperCase();
-        for (int i = 0; i < sequence.length(); i++) {
-            String sequenceChar = ("" + sequence.charAt(i));
-            boolean contains = Arrays.asList(NUCLEOTIDES).contains(sequenceChar);
-            if (!contains) {
-                throw new IllegalArgumentException(sequenceChar + " is not a valid nucleotide!");
-            }
+        this.sequence = "";
+        for (int i = 0; i < Parameters.startingSequence.length(); i++) {
+            int indexAlphabet = random(this.ALPHABET.length);
+            this.sequence += this.ALPHABET[indexAlphabet];
         }
-        this.sequence = sequence;
+        checkRep();
     }
 
+    /**
+     * Constructor that creates a new SequencePhenotype.
+     *
+     * @param sequence the sequence of the new SequencePhenotype
+     * @spec.requires sequence != null && sequence.length() > 0
+     * @spec.effects Constructs a new SequencePhenotype with the data content of the given parameter.
+     */
+    public SequencePhenotype(String sequence) {
+        sequence = sequence.toUpperCase();
+        this.sequence = sequence;
+        checkRep();
+    }
+
+    /**
+     * Returns the sequence of this SequencePhenotype
+     *
+     * @return the sequence of the SequencePhenotype represented by this.
+     */
     public String getSequence() {
         return this.sequence;
     }
 
-    public void setSequence(String sequence) {
-        this.sequence = sequence;
-    }
-
+    /**
+     * Compare phenotypes and report antigenic distance
+     *
+     * @param p the SequencePhenotype to find the hamming distance from this SequencePhenotype
+     * @spec.requires p.sequence != null && p.sequence.length() == this.sequence.length() && p instanceof SequencePhenotype
+     * @return the hamming distance of this SequencePhenotype and (SequencePhenotype) p
+     */
     public double distance(Phenotype p) {
         // String validation
         if (!(p instanceof SequencePhenotype)) {
@@ -40,11 +84,12 @@ public class SequencePhenotype implements Phenotype {
         }
 
         SequencePhenotype seqP = (SequencePhenotype) p;
-
         String seq2 = seqP.getSequence();
 
         // equal length validation
         if (this.sequence.length() != seq2.length()) {
+            System.out.println("s1 " + this.sequence);
+            System.out.println("s2 " + seq2);
             throw new IllegalArgumentException("Sequence lengths are not equal!");
         }
 
@@ -55,56 +100,91 @@ public class SequencePhenotype implements Phenotype {
                 hammingDistance++;
             }
         }
-
+        checkRep();
         return hammingDistance;
     }
 
-    // cross immunity between a virus phenotype and a host's immune history
-    // here encoded more directly as risk of infection, which ranges from 0 to 1
+    /**
+     * Provides the risk of infection (from 0 to 1) of a virus with this phenotype
+     * when contacting a Host with a List of Phenotypes forming their immune history
+     *
+     * @param history the SequencePhenotypes that have contacted a Host
+     * @spec.requires history[i] instanceof SequencePhenotype for all i in history.length
+     * @return the cross immunity between a virus phenotype and a host's immune history
+     *         here encoded more directly as risk of infection, which ranges from 0 to 1
+     */
     public double riskOfInfection(Phenotype[] history) {
-
-        // find the closest phenotype in history
-        double closestDistance = 100.0;
-        if (history.length > 0) {
-            for (Phenotype phenotype : history) {
-                double thisDistance = distance(phenotype);
-                if (thisDistance < closestDistance) {
-                    closestDistance = thisDistance;
-                }
-                if (thisDistance < 0.01) {
-                    break;
-                }
+        double risk = 1;
+        for (Phenotype sequence : history) {
+            SequencePhenotype seq = (SequencePhenotype) sequence;
+            if(seq.getSequence().length() == this.sequence.length()) {
+                risk *= this.distance(seq);
             }
         }
-
-        double risk = closestDistance * Parameters.smithConversion;
-        double minRisk = 1.0 - Parameters.homologousImmunity;
-        risk = Math.max(minRisk, risk);
-        risk = Math.min(1.0, risk);
-
         return risk;
-
     }
 
-    // returns a mutated copy, original SequencePhenotype is unharmed
-    public Phenotype mutate() {
+    /**
+     * Returns a mutated copy of this SequencePhenotype (point substitution), original SequencePhenotype is unharmed
+     *
+     * @return a mutated copy of this SequencePhenotype
+     */
+    public SequencePhenotype mutate() {
         int indexSite = random(this.sequence.length());
-        int indexNucleotide = random(this.NUCLEOTIDES.length);
+        int indexAlphabet = random(this.ALPHABET.length);
 
-        // substitute a random index of sequence with a random nucleotide
+        // substitute a random index of sequence with a random character in the ALPHABET
         StringBuilder mutated = new StringBuilder(this.sequence);
-        mutated.setCharAt(indexSite, this.NUCLEOTIDES[indexNucleotide].charAt(0));
-        Phenotype mutatedP = new SequencePhenotype(mutated.toString());
-        return mutatedP;
+        mutated.setCharAt(indexSite, this.ALPHABET[indexAlphabet]);
 
+        checkRep();
+        return new SequencePhenotype(mutated.toString());
     }
 
+    /**
+     * Returns the sequence of this SequencePhenotype (i.e. the String representation of the SequencePhenotype represented by this).
+     * Valid example outputs include "AGTC" and "AAGTCGTAGTCC" and "A" and "C."
+     *
+     * @return the String representation of the SequencePhenotype represented by this.
+     */
     public String toString() {
         return this.sequence;
     }
 
-    private int random(int length) {
+    private int random(int maxRange) {
         Random random = new Random();
-        return random.nextInt(0, length - 1);
+        return random.nextInt(0, maxRange - 1);
+    }
+
+    /**
+     * Standard equality operation.
+     *
+     * @param obj the object to be compared for equality
+     * @return true if and only if 'obj' is an instance of a Node and 'this' and 'obj' represent the same SequencePhenotype.
+     */
+    @Override
+    public boolean equals(Object obj) {
+        checkRep();
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj instanceof SequencePhenotype) {
+            SequencePhenotype other = (SequencePhenotype) obj;
+            checkRep();
+            return this.sequence.equals(other.sequence);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Throws an exception if the representation invariant is violated.
+     */
+    private void checkRep() {
+        if (DEBUG)  {
+            assert (this.sequence != null) : "sequence should never be null.";
+            assert (this.sequence.length() > 0) : "sequence should never be empty.";
+        }
     }
 }

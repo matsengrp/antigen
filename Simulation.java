@@ -8,35 +8,35 @@ import com.javamex.classmexer.*;
 public class Simulation {
 
 	// fields
-	private List<HostPopulation> demes = new ArrayList<HostPopulation>();
+	private List<HostPopulation> demes = new ArrayList<>();
 	private double diversity;
 	private double tmrca;
 	private double netau;
 	private double serialInterval;
 	private double antigenicDiversity;
 
-	private List<Double> diversityList = new ArrayList<Double>();
-	private List<Double> tmrcaList = new ArrayList<Double>();
-	private List<Double> netauList = new ArrayList<Double>();
-	private List<Double> serialIntervalList = new ArrayList<Double>();
-	private List<Double> antigenicDiversityList = new ArrayList<Double>();
-	private List<Double> nList = new ArrayList<Double>();
-	private List<Double> sList = new ArrayList<Double>();
-	private List<Double> iList = new ArrayList<Double>();
-	private List<Double> rList = new ArrayList<Double>();
-	private List<Double> casesList = new ArrayList<Double>();
+	private List<Double> diversityList = new ArrayList<>();
+	private List<Double> tmrcaList = new ArrayList<>();
+	private List<Double> netauList = new ArrayList<>();
+	private List<Double> serialIntervalList = new ArrayList<>();
+	private List<Double> antigenicDiversityList = new ArrayList<>();
+	private List<Double> nList = new ArrayList<>();
+	private List<Double> sList = new ArrayList<>();
+	private List<Double> iList = new ArrayList<>();
+	private List<Double> rList = new ArrayList<>();
+	private List<Double> casesList = new ArrayList<>();
 
 	// constructor
 	public Simulation() {
 		for (int i = 0; i < Parameters.demeCount; i++) {
+			HostPopulation hp;
 			if (Parameters.restartFromCheckpoint) {
-				HostPopulation hp = new HostPopulation(i, true);
-				demes.add(hp);
+				hp = new HostPopulation(i, true);
 			}
 			else {
-				HostPopulation hp = new HostPopulation(i);
-				demes.add(hp);
+				hp = new HostPopulation(i);
 			}
+			demes.add(hp);
 		}
 	}
 
@@ -300,9 +300,9 @@ public class Simulation {
 		double mean = 0;
 		if(!list.isEmpty()) {
 			for (Double item : list) {
-				mean += (double) item;
+				mean += item;
 			}
-			mean /= (double) list.size();
+			mean /= list.size();
 		}
 		return mean;
 	}
@@ -336,11 +336,11 @@ public class Simulation {
 			}
 		}
 
-		diversity /= (double) sampleCount;
+		diversity /= sampleCount;
 		tmrca /= 2.0;
 		netau = coalOpp / coalCount;
-		serialInterval /= (double) sampleCount;
-		antigenicDiversity /= (double) sampleCount;
+		serialInterval /= sampleCount;
+		antigenicDiversity /= sampleCount;
 
 	}
 
@@ -460,7 +460,7 @@ public class Simulation {
 			VirusTree.printNewick();
 
 			// immunity output
-			if (Parameters.phenotypeSpace == "geometric") {
+			if (Parameters.phenotypeSpace.equals("geometric")) {
 				VirusTree.updateRange();
 				VirusTree.printRange();
 				if (Parameters.immunityReconstruction) {
@@ -476,7 +476,7 @@ public class Simulation {
 		}
 	}
 
-	public void writeDataCSV() throws FileNotFoundException {
+	private void writeDataCSV() throws FileNotFoundException {
 		// Creates csv file from the most recent out.timeseries (i.e., not from example/out.timeseries)
 		Scanner input = new Scanner(new File("out.timeseries"));
 		PrintStream output = new PrintStream(new File("out_timeseries.csv"));

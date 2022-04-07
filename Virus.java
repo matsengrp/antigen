@@ -13,7 +13,7 @@ public class Virus {
 	// additional reconstruction fields
 	private boolean marked;
 	private boolean trunk;	// fill this at the end of the simulation
-	private List<Virus> children = new ArrayList<Virus>(0);	// will be void until simulation ends	
+	private List<Virus> children = new ArrayList<>(0);	// will be void until simulation ends
 	private double layout;
 	private int coverage;		// how many times this Virus has been covered in tracing the tree backwards
 	
@@ -102,7 +102,7 @@ public class Virus {
 		return children;
 	}	
 	public boolean isTip() {
-		return getNumberOfChildren() == 0 ? true : false;
+		return getNumberOfChildren() == 0;
 	}
 	
 	// returns a mutated copy, original virus left intact
@@ -168,7 +168,7 @@ public class Virus {
 
 		Virus lineageA = this;
 		Virus lineageB = virusB;
-		Set<Virus> ancestry = new HashSet<Virus>();	
+		Set<Virus> ancestry = new HashSet<>();
 		double success = 0.0;
 		
 		double startTime = lineageA.getBirth();

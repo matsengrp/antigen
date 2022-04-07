@@ -26,7 +26,7 @@ public class GeometricPhenotype implements Phenotype {
 	}
 	public double getTraitB() {
 		return traitB;
-	}	
+	}
 	
 	public void setTraitA(double tA) {
 		traitA = tA;
@@ -84,7 +84,7 @@ public class GeometricPhenotype implements Phenotype {
 			if (Random.nextBoolean(0.5)) { theta = 0; }
 			else { theta = Math.PI; }
 		}
-		
+
 		// size of mutation
 		double r = Parameters.meanStep;
 		if (!Parameters.fixedStep) {
@@ -92,15 +92,15 @@ public class GeometricPhenotype implements Phenotype {
 			double beta = (Parameters.sdStep * Parameters.sdStep) / Parameters.meanStep;
 			r = Random.nextGamma(alpha, beta);
 		}
-		
+
 		// create phenotype
 		double mutA = getTraitA() + r * Math.cos(theta);
 		double mutB = getTraitB() + r * Math.sin(theta);
 		Phenotype mutP = new GeometricPhenotype(mutA,mutB);
 		return mutP;
 				
-	}	
-	
+	}
+
 	public String toString() {
 		String fullString = String.format("%.4f,%.4f", traitA, traitB);
 		return fullString;

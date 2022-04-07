@@ -69,15 +69,12 @@ public class TestSequencePhenotype {
 	}
 
 	/**
-	 * Test getter and setter methods.
+	 * Test getter method.
 	 */
 	@Test
-	public void testSetAndGetSequence() {
-		// Set sequence of testPheno to something different
-		simplePheno.setSequence("TCGA");
-
+	public void testGetSequence() {
 		// Assert the sequence was updated
-		assertEquals("TCGA", simplePheno.getSequence());
+		assertEquals("ACGT", simplePheno.getSequence());
 	}
 
 	/**
@@ -108,6 +105,25 @@ public class TestSequencePhenotype {
 	@Test
 	public void testToString() {
 		assertEquals("ACGT", simplePheno.toString());
+	}
+
+	/**
+	 * Test equals()
+	 */
+	@Test
+	public void testEquals() {
+		// Same SequencePhenotype objects are equal
+		assertTrue(emptyPheno.equals(emptyPheno));
+
+		SequencePhenotype simplePhenoSame = new SequencePhenotype("ACGT");
+		SequencePhenotype simplePhenoDifferent = new SequencePhenotype("CCGT");
+
+
+		// SequencePhenotype objects with the same sequence are equal
+		assertTrue(simplePheno.equals(simplePhenoSame));
+
+		// SequencePhenotype objects with different sequences are not equal
+		assertFalse(simplePheno.equals(simplePhenoDifferent));
 	}
 
 }

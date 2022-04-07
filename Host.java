@@ -1,6 +1,5 @@
 /* A human individual that harbors viruses and immunity */
 
-import java.util.*;
 import java.io.*;
 import java.util.regex.*;
 
@@ -34,12 +33,12 @@ public class Host {
 		if (!sHist.equals("n")) {
 			Pattern rsc = Pattern.compile(";");
     		String[] phenotypeList = rsc.split(sHist);
-    		for (int i = 0; i < phenotypeList.length; i++) {
+			for (String s : phenotypeList) {
 				Pattern rc = Pattern.compile(",");
-    			String[] traitList = rc.split(phenotypeList[i]);
-    			double x = Double.parseDouble(traitList[0]);
-    			double y = Double.parseDouble(traitList[1]);
-				Phenotype p = PhenotypeFactory.makeArbitaryPhenotype(x,y);
+				String[] traitList = rc.split(s);
+				double x = Double.parseDouble(traitList[0]);
+				double y = Double.parseDouble(traitList[1]);
+				Phenotype p = PhenotypeFactory.makeArbitaryPhenotype(x, y);
 				addToHistory(p);
 			}
 		}
@@ -56,9 +55,7 @@ public class Host {
 
 	public void addToHistory(Phenotype p) {
 		Phenotype[] newHistory = new Phenotype[immuneHistory.length + 1];
-		for (int i = 0; i < immuneHistory.length; i++) {
-			newHistory[i] = immuneHistory[i];
-		}
+		System.arraycopy(immuneHistory, 0, newHistory, 0, immuneHistory.length);
 		newHistory[immuneHistory.length] = p;
 		immuneHistory = newHistory;
 	}
@@ -70,18 +67,13 @@ public class Host {
 	}
 
 	public boolean isInfected() {
-		boolean infected = false;
-		if (infection != null) {
-			infected = true;
-		}
-		return infected;
+		return infection != null;
 	}
 	public Virus getInfection() {
 		return infection;
 	}
 	public void infect(Virus pV, int d) {
-		Virus nV = new Virus(pV, d);
-		infection = nV;
+		infection = new Virus(pV, d);
 	}
 	public void clearInfection() {
 		Phenotype p = infection.getPhenotype();
@@ -94,8 +86,7 @@ public class Host {
 
 	// make a new virus with the mutated phenotype
 	public void mutate() {
-		Virus mutV = infection.mutate();
-		infection = mutV;
+		infection = infection.mutate();
 	}
 
 	// remove random phenotype from host's immune profile, do nothing if empty
@@ -121,8 +112,8 @@ public class Host {
 	}
 
 	public void printHistory() {
-		for (int i = 0; i < immuneHistory.length; i++) {
-			System.out.println(immuneHistory[i]);
+		for (Phenotype phenotype : immuneHistory) {
+			System.out.println(phenotype);
 		}
 	}
 
