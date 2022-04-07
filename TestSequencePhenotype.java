@@ -3,6 +3,7 @@ import static org.junit.Assert.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import java.util.Random;
 
 /**
  * @author zorian15
@@ -15,6 +16,7 @@ public class TestSequencePhenotype {
 	// Private fields
 	private SequencePhenotype emptyPheno; // Default constructor
 	private SequencePhenotype simplePheno; // Give a specific sequence
+	
 
 	/**
 	 * Define variables needed for multiple tests.
@@ -22,6 +24,9 @@ public class TestSequencePhenotype {
 	 */
 	@Before
 	public void setUp() throws Exception {
+		Random r = new Random();
+		long seed = 5;
+		r.setSeed(seed);
 		emptyPheno = new SequencePhenotype();
 		simplePheno = new SequencePhenotype("ACGT");
 		// Create a small history of Sequence phenotypes
@@ -79,15 +84,9 @@ public class TestSequencePhenotype {
 	 */
 	@Test
 	public void testMutate() {
-		// For now, test Thien's original version.
-		SequencePhenotype mutantPheno = simplePheno.mutate();
-		assertNotEquals(simplePheno.getSequence(), mutantPheno.getSequence());
-		assertNotEquals(simplePheno.getSequence().length(), mutantPheno.getSequence().length());
-
-		SequencePhenotype subPheno = simplePheno.mutate();
+		// Test new substitution mutate.
+		SequencePhenotype subPheno = (SequencePhenotype) simplePheno.mutate();
 		assertNotEquals(simplePheno.getSequence(), subPheno.getSequence());
-
-		// Test that will fail until the substitution is put in.
 		assertEquals(simplePheno.getSequence().length(), subPheno.getSequence().length());
 	}
 

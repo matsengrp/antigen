@@ -6,20 +6,20 @@ import java.util.regex.*;
 public class Host {
 
 	// fields
-	private Virus infection;												
+	private Virus infection;
 	private Phenotype[] immuneHistory = new Phenotype[0];
-	
+
 	// naive host
 	public Host() {
-		initializeHistory();		
+		initializeHistory();
 	}
-	
+
 	// initial infected host
 	public Host(Virus v) {
 		infection = v;
 		initializeHistory();
 	}
-	
+
 	// checkpointed host
 	public Host(int d, String sVirus, String sHist) {
 		if (!sVirus.equals("n")) {
@@ -41,31 +41,31 @@ public class Host {
 				Phenotype p = PhenotypeFactory.makeArbitaryPhenotype(x, y);
 				addToHistory(p);
 			}
-		}		
+		}
 	}
-	
-	// sometimes start with immunity	
+
+	// sometimes start with immunity
 	public void initializeHistory() {
 		double chanceOfSuccess = Parameters.initialPrR;
-		if (Random.nextBoolean(chanceOfSuccess)) {	
+		if (Random.nextBoolean(chanceOfSuccess)) {
 			Phenotype p = Parameters.urImmunity;
 			addToHistory(p);
 		}
 	}
-	
+
 	public void addToHistory(Phenotype p) {
 		Phenotype[] newHistory = new Phenotype[immuneHistory.length + 1];
 		System.arraycopy(immuneHistory, 0, newHistory, 0, immuneHistory.length);
 		newHistory[immuneHistory.length] = p;
 		immuneHistory = newHistory;
 	}
-	
+
 	// infection methods
 	public void reset() {
 		infection = null;
 		immuneHistory = new Phenotype[0];
 	}
-	
+
 	public boolean isInfected() {
 		return infection != null;
 	}
@@ -83,12 +83,12 @@ public class Host {
 	public int getHistoryLength() {
 		return immuneHistory.length;
 	}
-	
+
 	// make a new virus with the mutated phenotype
 	public void mutate() {
 		infection = infection.mutate();
 	}
-	
+
 	// remove random phenotype from host's immune profile, do nothing if empty
 	public void waneImmunity() {
 		int length = immuneHistory.length;
@@ -105,12 +105,12 @@ public class Host {
 			immuneHistory = newHistory;
 		}
 	}
-	
+
 	// history methods
 	public Phenotype[] getHistory() {
 		return immuneHistory;
-	}	
-	
+	}
+
 	public void printHistory() {
 		for (Phenotype phenotype : immuneHistory) {
 			System.out.println(phenotype);
@@ -125,7 +125,7 @@ public class Host {
 			stream.print("n");
 		}
 	}
-	
+
 	public void printHistory(PrintStream stream) {
 		if (immuneHistory.length > 0) {
 			stream.print(immuneHistory[0]);
@@ -136,10 +136,10 @@ public class Host {
 		else {
 			stream.print("n");
 		}
-	}	
-		
+	}
+
 	public String toString() {
 		return Integer.toHexString(this.hashCode());
-	}	
-	
+	}
+
 }
