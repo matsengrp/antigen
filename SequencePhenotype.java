@@ -12,7 +12,7 @@ public class SequencePhenotype implements Phenotype {
     /**
      * The valid letters that make up the sequence of this SequencePhenotype
      */
-    public final char[] ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
+    public final char[] ALPHABET = "ARNDBCEQZGHILKMFPSTWYV".toCharArray();
 
     /**
      * The sequence of this SequencePhenotype
