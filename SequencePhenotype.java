@@ -1,6 +1,8 @@
 import java.lang.*;
 import java.util.Arrays;
 
+import static java.lang.Math.*;
+
 /**
  * <b>SequencePhenotype</b> represents a phenotype.
  * SequencePhenotypes are identified by their data contents.
@@ -117,14 +119,30 @@ public class SequencePhenotype implements Phenotype {
      *         here encoded more directly as risk of infection, which ranges from 0 to 1
      */
     public double riskOfInfection(Phenotype[] history) {
-        double risk = 1;
-        for (Phenotype sequence : history) {
-            SequencePhenotype seq = (SequencePhenotype) sequence;
-            if(seq.getSequence().length() == this.sequence.length()) {
-                risk *= this.distance(seq);
+        double fullImmuneRisk = 1.0;
+
+        int minInput = 0; // The lowest number of the range input.
+        int maxInput = this.sequence.length(); // The largest number of the range input.
+        int minOutput = 0; // The lowest number of the range output.
+        int maxOutput = 1; // The largest number of the range output.
+
+        double slope = (double) (maxOutput - minOutput) / (maxInput - minInput);
+
+        for(Phenotype pHistory : history) {
+            double inputDistance = this.distance(pHistory); // hamming distance of this and pHistory
+            double output = minOutput + slope * (inputDistance - minInput);
+
+            switch (Parameters.crossImmunity) {
+                case "linear":
+                    fullImmuneRisk = fullImmuneRisk * output;
+                    break;
+                case "exponential":
+                    fullImmuneRisk = fullImmuneRisk * (1 - exp(-output));
+                    break;
             }
         }
-        return risk;
+
+        return pow(fullImmuneRisk, Parameters.crossImmunityStrength);
     }
 
     /**
