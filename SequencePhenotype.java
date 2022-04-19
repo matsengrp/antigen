@@ -70,7 +70,6 @@ public class SequencePhenotype implements Phenotype {
      * @return the sequence of the SequencePhenotype represented by this.
      */
     public String getSequence() {
-        System.out.println(this.sequence);
         return this.sequence;
     }
 
