@@ -1,4 +1,5 @@
 import java.lang.*;
+import java.util.Arrays;
 
 /**
  * <b>SequencePhenotype</b> represents a phenotype.
@@ -10,9 +11,11 @@ import java.lang.*;
 public class SequencePhenotype implements Phenotype {
 
     /**
-     * The valid letters that make up the sequence of this SequencePhenotype
+     * The valid letters that make up the sequence of this SequencePhenotype.
+     *
+     * Valid letters depend on the representation of the sequence (nucleotides or amino acids)
      */
-    public final char[] ALPHABET = "ARNDBCEQZGHILKMFPSTWYV".toCharArray();
+    public final char[] ALPHABET = Parameters.alphabet.toCharArray();
 
     /**
      * The sequence of this SequencePhenotype
@@ -22,7 +25,7 @@ public class SequencePhenotype implements Phenotype {
     /**
      * Run expensive tests iff DEBUG == true.
      */
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     // Abstraction Function:
     // A SequencePhenotype, s, is null if s.sequence = null, otherwise s.sequence = sequence
@@ -185,6 +188,15 @@ public class SequencePhenotype implements Phenotype {
         if (DEBUG)  {
             assert (this.sequence != null) : "sequence should never be null.";
             assert (this.sequence.length() > 0) : "sequence should never be empty.";
+
+            for (int i = 0; i < sequence.length(); i++) {
+                String [] alphabetString = new String(ALPHABET).split("");
+                String sequenceChar = ("" + sequence.charAt(i));
+                boolean contains = Arrays.stream(alphabetString).anyMatch(sequenceChar::equals);
+                if (!contains) {
+                    throw new IllegalArgumentException(sequenceChar + " is not a valid character!");
+                }
+            }
         }
     }
 }

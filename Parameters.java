@@ -7,6 +7,21 @@ import java.io.*;
 
 public class Parameters {
 
+	public enum AlphabetType {
+		NUCLEOTIDES("AGTC"),
+		AMINO_ACIDS("ARNDBCEQZGHILKMFPSTWYV");
+
+		private final String validCharacters;
+
+		AlphabetType(String validCharacters) {
+			this. validCharacters = validCharacters;
+		}
+
+		public String getValidCharacters() {
+			return validCharacters;
+		}
+	}
+
 	// global parameters
 	public static double day = 0;
 	public static Virus urVirus = null;
@@ -74,7 +89,9 @@ public class Parameters {
 	public static double sdStep = 0.3;
 	public static boolean mut2D = false;						// whether to mutate in a full 360 degree arc
 	public static boolean fixedStep = false;					// whether to fix mutation step size
-	public static String startingSequence = "AGTC";
+	public static String startingSequence = "AGTC";				// default starting sequence
+	public static String alphabetType = "nucleotides";          // default sequence to consist of nucleotides
+	public static String alphabet = AlphabetType.NUCLEOTIDES.getValidCharacters();                     // default valid letters to be nucleotides
 
 	// measured in years, starting at burnin
 	public static double getDate() {
@@ -252,11 +269,15 @@ public class Parameters {
 			if (map.get("fixedStep") != null) {
 				fixedStep = (boolean) map.get("fixedStep");
 			}
-			if (map.get("fixedStep") != null) {				
-				fixedStep = (boolean) map.get("fixedStep");	
-			}
 			if (map.get("startingSequence") != null) {
 				startingSequence = (String) map.get("startingSequence");
+			}
+			if (map.get("alphabetType") != null) {
+				alphabetType = (String) map.get("alphabetType");
+
+				if (alphabetType.equals("aminoAcids")) {
+					alphabet = AlphabetType.AMINO_ACIDS.getValidCharacters();
+				}
 			}
 
 		} catch (IOException e) {
