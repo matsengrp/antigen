@@ -63,7 +63,7 @@ meanStep: 0.3                               # mean mutation size
 sdStep: 0.3                                 # standard deviation of mutation size
 mut2D: false                                # whether to mutate in a full 360 degree arc
 fixedStep: false                            # whether to fix step size, i.e. ignore sdStep
-startingSequence: "AGTC"                    # sequence for initial host immunity
-crossImmunity: "exponential"
-crossImmunityStrength: 0.5
+startingSequence: "RNHILKMFPSTWDQZ"         # sequence for initial host immunity
+crossImmunity: "exponentialSimplified"      # options include: linear, exponential, exponentialSimplified
+crossImmunityStrength: 1.0
 alphabetType: "aminoAcids"                  # options include: nucleotides, aminoAcids

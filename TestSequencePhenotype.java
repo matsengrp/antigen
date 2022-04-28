@@ -1,6 +1,5 @@
 import static org.junit.Assert.*;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import java.util.Random;
@@ -171,7 +170,6 @@ public class TestSequencePhenotype {
 
 		// hamming distances: 1, 2, 4
 		Phenotype[] historyMultiple = {new SequencePhenotype("AATC"), new SequencePhenotype("CGTA"),  new SequencePhenotype("CTGA")};
-
 		assertEquals(0.0, singlePheno.riskOfInfection(historyZero), 0.0001);
 		assertEquals(1.0, singlePheno.riskOfInfection(historyLength), 0.0001);
 		assertEquals(0.125, singlePheno.riskOfInfection(historyMultiple), 0.0001);

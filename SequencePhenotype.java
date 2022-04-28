@@ -27,7 +27,7 @@ public class SequencePhenotype implements Phenotype {
     /**
      * Run expensive tests iff DEBUG == true.
      */
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     // Abstraction Function:
     // A SequencePhenotype, s, is null if s.sequence = null, otherwise s.sequence = sequence
@@ -132,14 +132,21 @@ public class SequencePhenotype implements Phenotype {
             double inputDistance = this.distance(pHistory); // hamming distance of this and pHistory
             double output = minOutput + slope * (inputDistance - minInput);
 
+            double localImmuneRisk = 0.0;
+
             switch (Parameters.crossImmunity) {
                 case "linear":
-                    fullImmuneRisk = fullImmuneRisk * output;
+                    localImmuneRisk = output;
                     break;
                 case "exponential":
-                    fullImmuneRisk = fullImmuneRisk * (1 - exp(-output));
+                    localImmuneRisk = (1 - exp(-output)); // ((pow(2, inputDistance / maxInput) - 1 ) / (pow(2, inputDistance / maxInput - 1))); //
+                    break;
+                case "exponentialSimplified":
+                    localImmuneRisk = 1 - exp(-inputDistance / Parameters.crossImmunityStrength);
                     break;
             }
+
+            fullImmuneRisk *= localImmuneRisk;
         }
 
         return pow(fullImmuneRisk, Parameters.crossImmunityStrength);
