@@ -90,7 +90,7 @@ public class Parameters {
 	public static boolean mut2D = false;						// whether to mutate in a full 360 degree arc
 	public static boolean fixedStep = false;					// whether to fix mutation step size
 	public static String startingSequence = "AGTC";
-	public static String crossImmunity = "linear";
+	public static String crossImmunityFunction = "exponential";
 	public static double crossImmunityStrength = 1.0;		    // default starting sequence
 	public static String alphabetType = "nucleotides";          // default sequence to consist of nucleotides
 	public static String alphabet = AlphabetType.NUCLEOTIDES.getValidCharacters();                     // default valid letters to be nucleotides
@@ -274,8 +274,8 @@ public class Parameters {
 			if (map.get("startingSequence") != null) {
 				startingSequence = (String) map.get("startingSequence");
 			}
-			if (map.get("crossImmunity") != null) {
-				crossImmunity = (String) map.get("crossImmunity");
+			if (map.get("crossImmunityFunction") != null) {
+				crossImmunityFunction = (String) map.get("crossImmunityFunction");
 			}
 			if (map.get("crossImmunityStrength") != null) {
 				crossImmunityStrength = (double) map.get("crossImmunityStrength");

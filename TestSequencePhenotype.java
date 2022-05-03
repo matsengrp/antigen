@@ -19,10 +19,9 @@ public class TestSequencePhenotype {
 
 	/**
 	 * Define variables needed for multiple tests.
-	 * @throws java.lang.Exception
 	 */
 	@Before
-	public void setUp() throws Exception {
+	public void setUp() {
 		Random r = new Random();
 		long seed = 5;
 		r.setSeed(seed);
@@ -130,8 +129,7 @@ public class TestSequencePhenotype {
 
 	/**
 	 * Test mutate function.
-	 * Original implementation adds a random base to the end of the sequence.
-	 * Another version will mutate a base at random.
+	 * Current implementation will mutate a base at random.
 	 */
 	@Test
 	public void testMutate() {
@@ -158,21 +156,48 @@ public class TestSequencePhenotype {
 	 * Test riskOfInfection calculations.
 	 */
 	@Test
-	public void testRiskOfInfectionLinear() {
+	public void testRiskOfInfection() {
 		// Add this test after implementing a new (or old) CI function.
 		SequencePhenotype singlePheno = new SequencePhenotype("AGTC");
 
 		// hamming distances: 0, 1, 2, 4
 		Phenotype[] historyZero = {new SequencePhenotype("AGTC"), new SequencePhenotype("AATC"), new SequencePhenotype("CGTA"),  new SequencePhenotype("CTGA")};
 
-		// hamming distance: 4 (length of sequence)
-		Phenotype[] historyLength = {new SequencePhenotype("CTGA")};
-
 		// hamming distances: 1, 2, 4
 		Phenotype[] historyMultiple = {new SequencePhenotype("AATC"), new SequencePhenotype("CGTA"),  new SequencePhenotype("CTGA")};
-		assertEquals(0.0, singlePheno.riskOfInfection(historyZero), 0.0001);
-		assertEquals(1.0, singlePheno.riskOfInfection(historyLength), 0.0001);
-		assertEquals(0.125, singlePheno.riskOfInfection(historyMultiple), 0.0001);
+
+		// hamming distance: 2 (half the length of sequence)
+		Phenotype[] historyHalfLength = {new SequencePhenotype("CGTA")};
+
+		// hamming distance: 4 (length of sequence)
+		Phenotype[] historyFullLength = {new SequencePhenotype("CTGA")};
+
+		String[] crossImmunityFunctions = new String[]{"linear", "exponential", "exponentialSimplified"};
+
+		for (String crossImmunityFunction : crossImmunityFunctions) {
+			Parameters.crossImmunityFunction = crossImmunityFunction;
+
+			switch (Parameters.crossImmunityFunction) {
+				case "linear":
+					assertEquals(0.0, singlePheno.riskOfInfection(historyZero), 0.0001);
+					assertEquals(0.125, singlePheno.riskOfInfection(historyMultiple), 0.0001);
+					assertEquals(0.5, singlePheno.riskOfInfection(historyHalfLength), 0.0001);
+					assertEquals(1.0, singlePheno.riskOfInfection(historyFullLength), 0.0001);
+					break;
+				case "exponential":
+					assertEquals(0, singlePheno.riskOfInfection(historyZero), 0.0001);
+					assertEquals(0.05501668234, singlePheno.riskOfInfection(historyMultiple), 0.0001);
+					assertEquals(0.39346934028, singlePheno.riskOfInfection(historyHalfLength), 0.0001);
+					assertEquals(0.63212055882, singlePheno.riskOfInfection(historyFullLength), 0.0001);
+					break;
+				case "exponentialSimplified":
+					assertEquals(0, singlePheno.riskOfInfection(historyZero), 0.0001);
+					assertEquals(0.53656152228, singlePheno.riskOfInfection(historyMultiple), 0.0001);
+					assertEquals(0.86466471676, singlePheno.riskOfInfection(historyHalfLength), 0.0001);
+					assertEquals(0.98168436111, singlePheno.riskOfInfection(historyFullLength), 0.0001);
+					break;
+			}
+		}
 	}
 
 	/**

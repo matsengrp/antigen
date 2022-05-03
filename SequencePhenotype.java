@@ -121,25 +121,23 @@ public class SequencePhenotype implements Phenotype {
     public double riskOfInfection(Phenotype[] history) {
         double fullImmuneRisk = 1.0;
 
-        int minInput = 0; // The lowest number of the range input.
         int maxInput = this.sequence.length(); // The largest number of the range input.
-        int minOutput = 0; // The lowest number of the range output.
         int maxOutput = 1; // The largest number of the range output.
 
-        double slope = (double) (maxOutput - minOutput) / (maxInput - minInput);
+        double slope = (double) (maxOutput) / (maxInput);
 
         for(Phenotype pHistory : history) {
             double inputDistance = this.distance(pHistory); // hamming distance of this and pHistory
-            double output = minOutput + slope * (inputDistance - minInput);
+            double output = slope * (inputDistance);
 
             double localImmuneRisk = 0.0;
 
-            switch (Parameters.crossImmunity) {
+            switch (Parameters.crossImmunityFunction) {
                 case "linear":
                     localImmuneRisk = output;
                     break;
                 case "exponential":
-                    localImmuneRisk = (1 - exp(-output)); // ((pow(2, inputDistance / maxInput) - 1 ) / (pow(2, inputDistance / maxInput - 1))); //
+                    localImmuneRisk =  (1 - exp(-output));
                     break;
                 case "exponentialSimplified":
                     localImmuneRisk = 1 - exp(-inputDistance / Parameters.crossImmunityStrength);
