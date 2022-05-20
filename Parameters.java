@@ -46,6 +46,8 @@ public class Parameters {
 	public static boolean reducedOutput = false;						// whether to output only out.summary and out.timeseries
 	public static boolean detailedOutput = false;						// whether to output out.hosts and out.viruses files enabling checkpointing
 	public static boolean restartFromCheckpoint = false;				// whether to load population from out.hosts
+	public static String outPath = "output/";							// path to dump output files.
+	public static String outPrefix = "run-";							// suffix for output files.
 
 	// metapopulation parameters
 	public static int demeCount = 3;
@@ -89,6 +91,8 @@ public class Parameters {
 	public static double sdStep = 0.3;
 	public static boolean mut2D = false;						// whether to mutate in a full 360 degree arc
 	public static boolean fixedStep = false;					// whether to fix mutation step size
+
+	// parameters specific to SequencePhenotype
 	public static String startingSequence = "AGTC";
 	public static String crossImmunityFunction = "exponential";
 	public static double crossImmunityStrength = 1.0;		    // default starting sequence
@@ -286,6 +290,12 @@ public class Parameters {
 				if (alphabetType.equals("aminoAcids")) {
 					alphabet = AlphabetType.AMINO_ACIDS.getValidCharacters();
 				}
+			}
+			if (map.get("outPath") != null){
+				outPath = (String) map.get("outPath");
+			}
+			if (map.get("outPrefix") != null){
+				outPrefix= (String) map.get("outPrefix");
 			}
 
 		} catch (IOException e) {

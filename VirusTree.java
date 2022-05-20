@@ -23,7 +23,7 @@ public class VirusTree {
 	};
 
 	// file name stems.
-	public static String filenameStem = Parameters.crossImmunityFunction + "_" + Parameters.muPhenotype;
+	public static String filenameStem = Parameters.outPath + Parameters.outPrefix;
 		
 	// static methods
 	public static void add(Virus v) {		
