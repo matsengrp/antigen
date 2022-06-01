@@ -42,3 +42,12 @@ Thumbs.db
 /bin/
 /.classpath
 /.project
+
+# IntelliJ generated files #
+*.iml
+/.idea
+
+# Output files #
+#################
+out*/
+out*
