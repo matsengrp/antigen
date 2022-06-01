@@ -1,6 +1,8 @@
 import java.lang.*;
 import java.util.Arrays;
 
+import static java.lang.Math.*;
+
 /**
  * <b>SequencePhenotype</b> represents a phenotype.
  * SequencePhenotypes are identified by their data contents.
@@ -25,7 +27,7 @@ public class SequencePhenotype implements Phenotype {
     /**
      * Run expensive tests iff DEBUG == true.
      */
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     // Abstraction Function:
     // A SequencePhenotype, s, is null if s.sequence = null, otherwise s.sequence = sequence
@@ -117,14 +119,35 @@ public class SequencePhenotype implements Phenotype {
      *         here encoded more directly as risk of infection, which ranges from 0 to 1
      */
     public double riskOfInfection(Phenotype[] history) {
-        double risk = 1;
-        for (Phenotype sequence : history) {
-            SequencePhenotype seq = (SequencePhenotype) sequence;
-            if(seq.getSequence().length() == this.sequence.length()) {
-                risk *= this.distance(seq);
+        double fullImmuneRisk = 1.0;
+
+        int maxInput = this.sequence.length(); // The largest number of the range input.
+        int maxOutput = 1; // The largest number of the range output.
+
+        double slope = (double) (maxOutput) / (maxInput);
+
+        for(Phenotype pHistory : history) {
+            double inputDistance = this.distance(pHistory); // hamming distance of this and pHistory
+            double output = slope * (inputDistance);
+
+            double localImmuneRisk = 0.0;
+
+            switch (Parameters.crossImmunityFunction) {
+                case "linear":
+                    localImmuneRisk = output;
+                    break;
+                case "exponential":
+                    localImmuneRisk =  (1 - exp(-output));
+                    break;
+                case "exponentialSimplified":
+                    localImmuneRisk = 1 - exp(-inputDistance / Parameters.crossImmunityStrength);
+                    break;
             }
+
+            fullImmuneRisk *= localImmuneRisk;
         }
-        return risk;
+
+        return pow(fullImmuneRisk, Parameters.crossImmunityStrength);
     }
 
     /**
