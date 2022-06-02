@@ -6,7 +6,7 @@
 burnin: 0                                   # days to wait before logging output 
 endDay: 5000                                # number of days to simulate
 deltaT: 0.1                                 # number of days to move forward in a single timestep
-printStep: 10                               # print to out.timeseries every X days
+printStep: 50                               # print to out.timeseries every X days
 tipSamplingRate: 0.0002                     # store X samples per deme per day
 tipSamplesPerDeme: 2000                     # cap number of samples per deme
 tipSamplingProportional: true               # whether to sample proportional to prevalence
@@ -21,6 +21,8 @@ pcaSamples: false                           # whether to rotate and flip virus t
 reducedOutput: false                        # whether to output only out.summary and out.timeseries
 detailedOutput: false                       # whether to output out.hosts and out.viruses files enabling checkpointing
 restartFromCheckpoint: false                # whether to load population from out.hosts
+outPath: "output/"
+outPrefix: 'run-'
 
 # metapopulation parameters
 demeCount: 3                                # number of demes
@@ -65,5 +67,5 @@ mut2D: false                                # whether to mutate in a full 360 de
 fixedStep: false                            # whether to fix step size, i.e. ignore sdStep
 startingSequence: "AGGTCAGAGTCTC"         # sequence for initial host immunity
 crossImmunityFunction: "exponential"        # options include: linear, exponential, exponentialSimplified
-crossImmunityStrength: 0.5
+crossImmunityStrength: 0.15
 alphabetType: "nucleotides"                  # options include: nucleotides, aminoAcids

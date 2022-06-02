@@ -21,6 +21,9 @@ public class VirusTree {
 		Integer descendantsV2 = getNumberOfDescendants(v2);
 		return descendantsV1.compareTo(descendantsV2);
 	};
+
+	// file name stems.
+	public static String filenameStem = Parameters.outPath + Parameters.outPrefix;
 		
 	// static methods
 	public static void add(Virus v) {		
@@ -536,7 +539,7 @@ public class VirusTree {
 	public static void printRange() {
 		
 		try {
-			File rangeFile = new File("out.range");
+			File rangeFile = new File(filenameStem + "out.range");
 			rangeFile.delete();
 			rangeFile.createNewFile();
 			PrintStream rangeStream = new PrintStream(rangeFile);
@@ -552,7 +555,7 @@ public class VirusTree {
 	public static void printTips() {
 		
 		try {
-			File tipFile = new File("out.tips");
+			File tipFile = new File(filenameStem + "out.tips");
 			tipFile.delete();
 			tipFile.createNewFile();
 			PrintStream tipStream = new PrintStream(tipFile);
@@ -571,7 +574,7 @@ public class VirusTree {
 	public static void printBranches() {
 		
 		try {
-			File branchFile = new File("out.branches");
+			File branchFile = new File(filenameStem + "out.branches");
 			branchFile.delete();
 			branchFile.createNewFile();
 			PrintStream branchStream = new PrintStream(branchFile);
@@ -661,7 +664,7 @@ public class VirusTree {
 	public static void printNewick() {
 	
 		try {
-			File treeFile = new File("out.trees");
+			File treeFile = new File(filenameStem + "out.trees");
 			treeFile.delete();
 			treeFile.createNewFile();
 			PrintStream treeStream = new PrintStream(treeFile);
@@ -743,7 +746,7 @@ public class VirusTree {
 	public static void printMKSummary() {
 		
 		try {
-			PrintStream summaryStream = new PrintStream(new FileOutputStream("out.summary", true)); // append
+			PrintStream summaryStream = new PrintStream(new FileOutputStream(filenameStem + "out.summary", true)); // append
 			double sideBranchMut = sideBranchMutations();
 			double sideBranchOpp = sideBranchOpportunity();
 			double sideBranchRate = sideBranchMut / sideBranchOpp;
