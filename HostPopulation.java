@@ -17,7 +17,8 @@ public class HostPopulation {
 	private double tmrca;
 	private double netau;	
 	private double serialInterval;
-	private double antigenicDiversity;		
+	private double antigenicDiversity;
+	private double genePi;
 	
 	private int newContacts;
 	private int newRecoveries;
@@ -206,8 +207,12 @@ public class HostPopulation {
 	
 	public double getAntigenicDiversity() {
 		return antigenicDiversity;
-	}			
-	
+	}
+
+	public double getGenePi() {
+		return genePi;
+	}
+
 	public void removeSusceptible(int i) {
 		int lastIndex = getS() - 1;
 		Host lastHost = susceptibles.get(lastIndex);
@@ -510,6 +515,7 @@ public class HostPopulation {
 		antigenicDiversity = 0.0;		
 		netau = 0.0;
 		serialInterval = 0.0;
+		genePi = 0.0;
 		
 		if (getI()>1) { 
 		
@@ -523,6 +529,7 @@ public class HostPopulation {
 				Virus vB = getRandomInfection();
 				if (vA != null && vB != null) {
 					double dist = vA.distance(vB);
+					double ageDist = Math.abs(vA.getBirth() - vB.getBirth());
 					diversity += dist;
 					if (dist > tmrca) {
 						tmrca = dist;
@@ -531,10 +538,12 @@ public class HostPopulation {
 					coalOpp += coalWindow;
 					coalCount += vA.coalescence(vB, coalWindow);
 					serialInterval += vA.serialInterval();
+					genePi += ageDist;
 				}
 			}	
 		
 			diversity /= sampleCount;
+			genePi /= sampleCount;
 			tmrca /= 2.0;
 			antigenicDiversity /= sampleCount;
 			netau = coalOpp / coalCount;
@@ -546,11 +555,11 @@ public class HostPopulation {
 		
 	public void printState(PrintStream stream) {
 		updateDiversity();
-		stream.printf("\t%.4f\t%.4f\t%.4f\t%.5f\t%.4f\t%d\t%d\t%d\t%d\t%d", getDiversity(), getTmrca(), getNetau(), getSerialInterval(), getAntigenicDiversity(), getN(), getS(), getI(), getR(), getCases());
+		stream.printf("\t%.4f\t%.4f\t%.4f\t%.5f\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d", getDiversity(), getTmrca(), getNetau(), getSerialInterval(), getAntigenicDiversity(), getGenePi(), getN(), getS(), getI(), getR(), getCases());
 	}	
 	
 	public void printHeader(PrintStream stream) {
-		stream.printf("\t%sDiversity\t%sTmrca\t%sNetau\t%sSerialInterval\t%sAntigenicDiversity\t%sN\t%sS\t%sI\t%sR\t%sCases", name, name, name, name, name, name, name, name, name, name);
+		stream.printf("\t%sDiversity\t%sTmrca\t%sNetau\t%sSerialInterval\t%sAntigenicDiversity\t%sGenealogicalPi\t%sN\t%sS\t%sI\t%sR\t%sCases", name, name, name, name, name, name, name, name, name, name, name);
 	}
 	
 	// reset population to factory condition

@@ -2,6 +2,7 @@
 
 import java.util.*;
 import java.io.*;
+import java.lang.Math;
 
 import com.javamex.classmexer.*;
 
@@ -14,12 +15,14 @@ public class Simulation {
 	private double netau;
 	private double serialInterval;
 	private double antigenicDiversity;
+	private double genePi;
 
 	private List<Double> diversityList = new ArrayList<>();
 	private List<Double> tmrcaList = new ArrayList<>();
 	private List<Double> netauList = new ArrayList<>();
 	private List<Double> serialIntervalList = new ArrayList<>();
 	private List<Double> antigenicDiversityList = new ArrayList<>();
+	private List<Double> genealogicalPiList = new ArrayList<>();
 	private List<Double> nList = new ArrayList<>();
 	private List<Double> sList = new ArrayList<>();
 	private List<Double> iList = new ArrayList<>();
@@ -105,6 +108,10 @@ public class Simulation {
 
 	public double getAntigenicDiversity() {
 		return antigenicDiversity;
+	}
+
+	public double getGenePi(){
+		return genePi;
 	}
 
 	// proportional to infecteds in each deme
@@ -226,8 +233,7 @@ public class Simulation {
 	}
 
 	public void printState() {
-
-		System.out.printf("%d\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%d\t%d\t%d\t%d\t%d\n", (int) Parameters.day, getDiversity(), getTmrca(),  getNetau(), getSerialInterval(), getAntigenicDiversity(), getN(), getS(), getI(), getR(), getCases());
+		System.out.printf("%d\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%.3f\t%d\t%d\t%d\t%d\t%d\n", (int) Parameters.day, getDiversity(), getTmrca(),  getNetau(), getSerialInterval(), getAntigenicDiversity(), getGenePi(), getN(), getS(), getI(), getR(), getCases());
 
 		if (Parameters.memoryProfiling && Parameters.day % 10 == 0) {
 			long noBytes = MemoryUtil.deepMemoryUsageOf(this);
@@ -251,7 +257,7 @@ public class Simulation {
 	}
 
 	public void printHeader(PrintStream stream) {
-		stream.print("date\tdiversity\ttmrca\tnetau\tserialInterval\tantigenicDiversity\ttotalN\ttotalS\ttotalI\ttotalR\ttotalCases");
+		stream.print("date\tdiversity\ttmrca\tnetau\tserialInterval\tantigenicDiversity\tgenealogicalPi\ttotalN\ttotalS\ttotalI\ttotalR\ttotalCases");
 		for (int i = 0; i < Parameters.demeCount; i++) {
 			HostPopulation hp = demes.get(i);
 			hp.printHeader(stream);
@@ -260,7 +266,7 @@ public class Simulation {
 	}
 
 	public void printState(PrintStream stream) {
-		stream.printf("%.4f\t%.4f\t%.4f\t%.4f\t%.5f\t%.4f\t%d\t%d\t%d\t%d\t%d", Parameters.getDate(), getDiversity(), getTmrca(), getNetau(), getSerialInterval(), getAntigenicDiversity(), getN(), getS(), getI(), getR(), getCases());
+		stream.printf("%.4f\t%.4f\t%.4f\t%.4f\t%.5f\t%.4f\t%.4f\t%d\t%d\t%d\t%d\t%d", Parameters.getDate(), getDiversity(), getTmrca(), getNetau(), getSerialInterval(), getAntigenicDiversity(), getGenePi(), getN(), getS(), getI(), getR(), getCases());
 		for (int i = 0; i < Parameters.demeCount; i++) {
 			HostPopulation hp = demes.get(i);
 			hp.printState(stream);
@@ -282,6 +288,7 @@ public class Simulation {
 			summaryStream.printf("netau\t%.4f\n", mean(netauList));
 			summaryStream.printf("serialInterval\t%.5f\n", mean(serialIntervalList));
 			summaryStream.printf("antigenicDiversity\t%.4f\n", mean(antigenicDiversityList));
+			summaryStream.printf("genealogicalPi\t%.4f\n", mean(genealogicalPiList));
 			summaryStream.printf("N\t%.4f\n", mean(nList));
 			summaryStream.printf("S\t%.4f\n", mean(sList));
 			summaryStream.printf("I\t%.4f\n", mean(iList));
@@ -314,6 +321,7 @@ public class Simulation {
 		antigenicDiversity = 0.0;
 		netau = 0.0;
 		serialInterval = 0.0;
+		genePi = 0.0;
 
 		double coalCount = 0.0;
 		double coalOpp = 0.0;
@@ -325,6 +333,7 @@ public class Simulation {
 			Virus vB = getRandomInfection();
 			if (vA != null && vB != null) {
 				double dist = vA.distance(vB);
+				double ageDist = Math.abs(vA.getBirth() - vB.getBirth());
 				diversity += dist;
 				if (dist > tmrca) {
 					tmrca = dist;
@@ -333,10 +342,12 @@ public class Simulation {
 				coalOpp += coalWindow;
 				coalCount += vA.coalescence(vB, coalWindow);
 				serialInterval += vA.serialInterval();
+				genePi += ageDist;
 			}
 		}
 
 		diversity /= sampleCount;
+		genePi /= sampleCount;
 		tmrca /= 2.0;
 		netau = coalOpp / coalCount;
 		serialInterval /= sampleCount;
@@ -346,6 +357,7 @@ public class Simulation {
 
 	public void pushLists() {
 		diversityList.add(diversity);
+		genealogicalPiList.add(genePi);
 		tmrcaList.add(tmrca);
 		netauList.add(netau);
 		serialIntervalList.add(serialInterval);
@@ -391,7 +403,7 @@ public class Simulation {
 			seriesFile.delete();
 			seriesFile.createNewFile();
 			PrintStream seriesStream = new PrintStream(seriesFile);
-			System.out.println("day\tdiversity\ttmrca\tnetau\tserialInterval\tantigenicDiversity\tN\tS\tI\tR\tcases");
+			System.out.println("day\tdiversity\ttmrca\tnetau\tserialInterval\tantigenicDiversity\tgenealogicalPi\tN\tS\tI\tR\tcases");
 			printHeader(seriesStream);
 
 			while (Parameters.day < (double) Parameters.endDay) {
