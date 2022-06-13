@@ -333,8 +333,44 @@ public class VirusTree {
 				p.setTraitB(y);					
 			}
 
-		}	
-		
+		}
+
+		if (Parameters.phenotypeSpace.equals("geometricSeq")) {
+
+			// load a 2d array with phenotypes
+
+			List<Virus> virusList = postOrderNodes();
+			int n = virusList.size();
+			int m = 2;
+
+			double[][] input = new double[n][m];
+
+			for (int i = 0; i < n; i++) {
+				Virus v = virusList.get(i);
+				GeometricSeqPhenotype p = (GeometricSeqPhenotype) v.getPhenotype();
+				double x = p.getTraitA();
+				double y = p.getTraitB();
+				input[i][0] = x;
+				input[i][1] = y;
+			}
+
+			// project this array
+
+			double[][] projected = SimplePCA.project(input);
+
+			// reset phenotypes based on projection
+
+			for (int i = 0; i < n; i++) {
+				Virus v = virusList.get(i);
+				GeometricPhenotype p = (GeometricPhenotype) v.getPhenotype();
+				double x = projected[i][0];
+				double y = projected[i][1];
+				p.setTraitA(x);
+				p.setTraitB(y);
+			}
+
+		}
+
 		if (Parameters.phenotypeSpace.equals("geometric3d")) {
 			
 			// load a 2d array with phenotypes
@@ -431,6 +467,58 @@ public class VirusTree {
 			}
 			
 		}
+
+		if (Parameters.phenotypeSpace.equals("geometricSeq")) {
+
+			List<Virus> virusList = postOrderNodes();
+			int n = virusList.size();
+
+			// find first and last virus
+			Virus firstVirus = virusList.get(0);
+			Virus lastVirus = virusList.get(0);
+			double firstDate = firstVirus.getBirth();
+			double lastDate = lastVirus.getBirth();
+
+			for (Virus v : virusList) {
+				if (v.getBirth() < firstDate) {
+					firstDate = v.getBirth();
+					firstVirus = v;
+				}
+				if (v.getBirth() > lastDate) {
+					lastDate = v.getBirth();
+					lastVirus = v;
+				}
+			}
+
+			// is the x-value of first virus greater than the x-value of last virus?
+			// if so, flip
+
+			GeometricPhenotype p = (GeometricPhenotype) firstVirus.getPhenotype();
+			double firstX = p.getTraitA();
+			p = (GeometricPhenotype) lastVirus.getPhenotype();
+			double lastX = p.getTraitA();
+
+			if (firstX > lastX) {
+
+				// I think that postOrderNodes() has replicates in it, need to go through some hoops because of this
+				double[] input = new double[n];
+
+				for (int i = 0; i < n; i++) {
+					Virus v = virusList.get(i);
+					p = (GeometricPhenotype) v.getPhenotype();
+					input[i] = p.getTraitA();
+				}
+
+				for (int i = 0; i < n; i++) {
+					Virus v = virusList.get(i);
+					p = (GeometricPhenotype) v.getPhenotype();
+					double x = -1*input[i];
+					p.setTraitA(x);
+				}
+
+			}
+
+		}
 		
 		if (Parameters.phenotypeSpace.equals("geometric3d")) {
 
@@ -507,6 +595,20 @@ public class VirusTree {
 				if (yMin > y) { yMin = y; }
 				if (yMax < y) { yMax = y; }	
 			
+			}
+		}
+
+		if (Parameters.phenotypeSpace.equals("geometricSeq")) {
+			for (Virus v : postOrderNodes()) {
+
+				GeometricSeqPhenotype p = (GeometricSeqPhenotype) v.getPhenotype();
+				double x = p.getTraitA();
+				double y = p.getTraitB();
+				if (xMin > x) { xMin = x; }
+				if (xMax < x) { xMax = x; }
+				if (yMin > y) { yMin = y; }
+				if (yMax < y) { yMax = y; }
+
 			}
 		}
 		
