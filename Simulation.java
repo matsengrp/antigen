@@ -7,6 +7,91 @@ import com.javamex.classmexer.*;
 
 public class Simulation {
 
+	public static Map<String, String> codonMap = new HashMap<>() {{
+		put("TTT", "F");
+		put("TTC", "F");
+		put("TTA", "L");
+		put("TTG", "L");
+
+		put("CTT", "L");
+		put("CTC", "L");
+		put("CTA", "L");
+		put("CTG", "L");
+
+		put("ATT", "I");
+		put("ATC", "I");
+		put("ATA", "I");
+		put("ATG", "M");
+
+		put("GTT", "V");
+		put("GTC", "V");
+		put("GTA", "V");
+		put("GTG", "V");
+
+
+		put("TCT", "S");
+		put("TCC", "S");
+		put("TCA", "S");
+		put("TCG", "S");
+
+		put("CCT", "P");
+		put("CCC", "P");
+		put("CCA", "P");
+		put("CCG", "P");
+
+		put("ACT", "T");
+		put("ACC", "T");
+		put("ACA", "T");
+		put("ACG", "T");
+
+		put("GCT", "A");
+		put("GCC", "A");
+		put("GCA", "A");
+		put("GCG", "A");
+
+
+		put("TAT", "Y");
+		put("TAC", "Y");
+		//put("TAA", "STOP");
+		//put("TAG", "STOP");
+
+		put("CAT", "H");
+		put("CAC", "H");
+		put("CAA", "Q");
+		put("CAG", "Q");
+
+		put("AAT", "N");
+		put("AAC", "N");
+		put("AAA", "K");
+		put("AAG", "K");
+
+		put("GAT", "D");
+		put("GAC", "D");
+		put("GAA", "E");
+		put("GAG", "E");
+
+
+		put("TGT", "C");
+		put("TGC", "C");
+		//put("TGA", "STOP");
+		put("TGG", "W");
+
+		put("CGT", "R");
+		put("CGC", "R");
+		put("CGA", "R");
+		put("CGG", "R");
+
+		put("AGT", "S");
+		put("AGC", "S");
+		put("AGA", "T");
+		put("AGG", "T");
+
+		put("GGT", "G");
+		put("GGC", "G");
+		put("GGA", "G");
+		put("GGG", "G");
+	}};
+
 	// fields
 	private List<HostPopulation> demes = new ArrayList<>();
 	private double diversity;

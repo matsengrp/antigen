@@ -1,23 +1,78 @@
+import org.biojava.nbio.core.sequence.transcription.*;
+
+/**
+ * <b>GeometricSeqPhenotype</b> represents a phenotype.
+ * GeometricSeqPhenotypes are identified by their data contents. Each instance has a GeometricPhenotype.
+ * GeometricSeqPhenotypes permit all data, except for <b>""</b> and <b>null</b>.
+ *
+ * @author Thien Tran
+ */
 public class GeometricSeqPhenotype implements Phenotype {
-    public final char[] ALPHABET = Parameters.alphabet.toCharArray();
-    public GeometricPhenotype correspondingGeometricPhenotype;
+    /**
+     * The valid letters that make up the sequence of this SequencePhenotype.
+     *
+     * Valid letters depend on the representation of the sequence (nucleotides or amino acids)
+     */
+    private final char[] ALPHABET = Parameters.alphabet.toCharArray();
 
-    private String sequence;
+    /**
+     * The corresponding GeometricPhenotype of this GeometricSeqPhenotype
+     */
+    private GeometricPhenotype correspondingGeometricPhenotype;
 
+    /**
+     * The sequence of this SequencePhenotype
+     */
+    private String nucleotideSequence;
+
+    private String aminoAcidSequence;
+
+    /**
+     * Constructor that creates a new GeometricSeqPhenotype.
+     *
+     * @spec.requires sequence != null && sequence.length() > 0
+     * @spec.effects Constructs a new GeometricSeqPhenotype that has a random starting sequence of length Parameters.sequence.length()
+     * and GeometricPhenotype
+     */
     public GeometricSeqPhenotype() {
         this.correspondingGeometricPhenotype = new GeometricPhenotype();
-        this.sequence = startingSequenceGenerator();
+        this.nucleotideSequence = startingSequenceGenerator();
+
+        this.aminoAcidSequence = translateSequenceToAminoAcids(this.nucleotideSequence);
     }
 
+    /**
+     * Constructor that creates a new GeometricSeqPhenotype.
+     *
+     * @param tA
+     * @param tB
+     * @spec.requires sequence != null && sequence.length() > 0
+     * @spec.effects Constructs a new GeometricSeqPhenotype that has a random starting sequence of length Parameters.sequence.length()
+     * and GeometricPhenotype with the data content of the given parameters.
+     */
     public GeometricSeqPhenotype(double tA, double tB) {
-        this();
         this.correspondingGeometricPhenotype = new GeometricPhenotype(tA, tB);
+
+        this.aminoAcidSequence = translateSequenceToAminoAcids(this.nucleotideSequence);
     }
 
+    /**
+     * Constructor that creates a new GeometricSeqPhenotype.
+     *
+     * @param tA
+     * @param tB
+     * @param startingSequence
+     * @spec.requires startingSequence != null && sequence.length() > 0
+     * @spec.effects Constructs a new GeometricSeqPhenotype that has a starting sequence
+     * and GeometricPhenotype with the data content of the given parameters.
+     */
     public GeometricSeqPhenotype(double tA, double tB, String startingSequence) {
-        this(tA, tB);
+        this.correspondingGeometricPhenotype = new GeometricPhenotype(tA, tB);
+
         startingSequence = startingSequence.toUpperCase();
-        this.sequence = startingSequence;
+        this.nucleotideSequence = startingSequence;
+
+        this.aminoAcidSequence = translateSequenceToAminoAcids(this.nucleotideSequence);
     }
 
     /*
@@ -28,6 +83,7 @@ public class GeometricSeqPhenotype implements Phenotype {
     }
     */
 
+    // Generates a random sequence of nucleotides or amino acids of length Parameters.startingSequence.length()
     private String startingSequenceGenerator() {
         String startingSequence = "";
         for (int i = 0; i < Parameters.startingSequence.length(); i++) {
@@ -54,7 +110,7 @@ public class GeometricSeqPhenotype implements Phenotype {
     }
 
     public String getSequence() {
-        return this.sequence;
+        return this.nucleotideSequence;
     }
 
     public GeometricPhenotype getCorrespondingGeometricPhenotype() {
@@ -75,14 +131,19 @@ public class GeometricSeqPhenotype implements Phenotype {
     }
 
     public Phenotype mutate() {
-        int indexSite = random(this.sequence.length());
+        int indexSite = random(this.nucleotideSequence.length());
         int indexAlphabet = random(this.ALPHABET.length);
 
         // substitute a random index of sequence with a random character in the ALPHABET
-        StringBuilder mutated = new StringBuilder(this.sequence);
+        StringBuilder mutated = new StringBuilder(this.nucleotideSequence);
         mutated.setCharAt(indexSite, this.ALPHABET[indexAlphabet]);
 
+        this.nucleotideSequence = mutated.toString();
+        this.aminoAcidSequence = translateSequenceToAminoAcids(this.nucleotideSequence);
+
         GeometricPhenotype mutatedCorrespondingGeometricPhenotype = (GeometricPhenotype) correspondingGeometricPhenotype.mutate();
+
+        System.out.println(this.aminoAcidSequence + "       " + this.nucleotideSequence);
 
         // TODO: GeometricSeqPhenotype(String startingSequence, Phenotype correspondingGeometricPhenotype) instead?
         return new GeometricSeqPhenotype(mutatedCorrespondingGeometricPhenotype.getTraitA(),
@@ -95,7 +156,19 @@ public class GeometricSeqPhenotype implements Phenotype {
     }
 
     public String toString() {
-        return this.sequence;
+        return this.nucleotideSequence;
+    }
+
+    private String translateSequenceToAminoAcids(String nucleotideSequence) {
+        StringBuilder translatedSequence = new StringBuilder();
+        for (int i = 0; i < nucleotideSequence.length(); i += 3) {
+            String triplet = nucleotideSequence.substring(i, i+3);
+            String translatedAminoAcid = Simulation.codonMap.get(triplet);
+
+            translatedSequence.append(translatedAminoAcid);
+        }
+
+        return translatedSequence.toString();
     }
 
 }

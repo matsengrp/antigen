@@ -9,7 +9,7 @@ public class Parameters {
 
 	public enum AlphabetType {
 		NUCLEOTIDES("AGTC"),
-		AMINO_ACIDS("ARNDBCEQZGHILKMFPSTWYV");
+		AMINO_ACIDS("ACDEFGHIKLMNPQRSTWYV");
 
 		private final String validCharacters;
 
