@@ -63,5 +63,5 @@ meanStep: 0.3                               # mean mutation size
 sdStep: 0.3                                 # standard deviation of mutation size
 mut2D: false                                # whether to mutate in a full 360 degree arc
 fixedStep: false                            # whether to fix step size, i.e. ignore sdStep
-startingSequence: "AGTC"                    # sequence for initial host immunity
-alphabetType: "aminoAcids"                  # options include: nucleotides, aminoAcids
+startingSequence: "AGAGTCAGTCTC"                    # sequence for initial host immunity
+alphabetType: "nucleotides"                  # options include: nucleotides, aminoAcids
