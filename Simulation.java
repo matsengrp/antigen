@@ -3,6 +3,7 @@
 import java.util.*;
 import java.io.*;
 
+import EDU.oswego.cs.dl.util.concurrent.FJTask;
 import com.javamex.classmexer.*;
 
 public class Simulation {
@@ -52,8 +53,8 @@ public class Simulation {
 
 		put("TAT", "Y");
 		put("TAC", "Y");
-		//put("TAA", "STOP");
-		//put("TAG", "STOP");
+		put("TAA", "STOP");
+		put("TAG", "STOP");
 
 		put("CAT", "H");
 		put("CAC", "H");
@@ -73,7 +74,7 @@ public class Simulation {
 
 		put("TGT", "C");
 		put("TGC", "C");
-		//put("TGA", "STOP");
+		put("TGA", "STOP");
 		put("TGG", "W");
 
 		put("CGT", "R");
@@ -111,6 +112,9 @@ public class Simulation {
 	private List<Double> rList = new ArrayList<>();
 	private List<Double> casesList = new ArrayList<>();
 
+	public static int matrixSize = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
+	public static double[][][] siteMutationVectors = new double[matrixSize][matrixSize][];
+
 	// constructor
 	public Simulation() {
 		for (int i = 0; i < Parameters.demeCount; i++) {
@@ -123,6 +127,61 @@ public class Simulation {
 			}
 			demes.add(hp);
 		}
+
+		for (int siteNumber = 0; siteNumber < Parameters.startingSequence.length(); siteNumber++) {
+			for(int i = 0; i < matrixSize ; i++) {
+				for(int j = 0; j < matrixSize; j++) {
+					if(j < i) {
+						// direction of mutation
+						double theta = 0;
+						if (Parameters.mut2D) {
+							theta = Random.nextDouble(0,2*Math.PI);
+						} else {
+							if (Random.nextBoolean(0.5)) {
+								theta = 0;
+							}
+							else { theta = Math.PI; }
+						}
+
+						// size of mutation
+						double r = Parameters.meanStep;
+						if (!Parameters.fixedStep) {
+							double alpha = (Parameters.meanStep *  Parameters.meanStep) / (Parameters.sdStep * Parameters.sdStep);
+							double beta = (Parameters.sdStep * Parameters.sdStep) / Parameters.meanStep;
+							r = Random.nextGamma(alpha, beta);
+						}
+
+						// create phenotype
+						double mutA = r * Math.cos(theta);
+						double mutB = r * Math.sin(theta);
+
+						double[] mutations = new double[] {mutA, mutB};
+
+						siteMutationVectors[i][j] = mutations;
+
+						mutA = -r * Math.cos(theta);
+						mutB = -r * Math.sin(theta);
+
+						mutations = new double[] {mutA, mutB};
+
+						siteMutationVectors[j][i] = mutations;
+					} else {
+						siteMutationVectors[i][j] = new double[] {0.0, 0.0};;
+					}
+				}
+			}
+		}
+
+
+//		for (int siteNumber = 0; siteNumber < Parameters.startingSequence.length(); siteNumber++) {
+//			for (int i = 0; i < matrixSize; i++) {
+//				for (int j = 0; j < matrixSize; j++) {
+//					double[] mutations = siteMutationVectors[i][j];
+//					System.out.print("(" + mutations[0] + ", " + mutations[1]+ ")      ");
+//				}
+//				System.out.println();
+//			}
+//		}
 	}
 
 	// methods

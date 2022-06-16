@@ -362,7 +362,7 @@ public class VirusTree {
 
 			for (int i = 0; i < n; i++) {
 				Virus v = virusList.get(i);
-				GeometricPhenotype p = (GeometricPhenotype) v.getPhenotype();
+				GeometricSeqPhenotype p = (GeometricSeqPhenotype) v.getPhenotype();
 				double x = projected[i][0];
 				double y = projected[i][1];
 				p.setTraitA(x);
@@ -493,9 +493,9 @@ public class VirusTree {
 			// is the x-value of first virus greater than the x-value of last virus?
 			// if so, flip
 
-			GeometricPhenotype p = (GeometricPhenotype) firstVirus.getPhenotype();
+			GeometricSeqPhenotype p = (GeometricSeqPhenotype) firstVirus.getPhenotype();
 			double firstX = p.getTraitA();
-			p = (GeometricPhenotype) lastVirus.getPhenotype();
+			p = (GeometricSeqPhenotype) lastVirus.getPhenotype();
 			double lastX = p.getTraitA();
 
 			if (firstX > lastX) {
@@ -505,13 +505,13 @@ public class VirusTree {
 
 				for (int i = 0; i < n; i++) {
 					Virus v = virusList.get(i);
-					p = (GeometricPhenotype) v.getPhenotype();
+					p = (GeometricSeqPhenotype) v.getPhenotype();
 					input[i] = p.getTraitA();
 				}
 
 				for (int i = 0; i < n; i++) {
 					Virus v = virusList.get(i);
-					p = (GeometricPhenotype) v.getPhenotype();
+					p = (GeometricSeqPhenotype) v.getPhenotype();
 					double x = -1*input[i];
 					p.setTraitA(x);
 				}
