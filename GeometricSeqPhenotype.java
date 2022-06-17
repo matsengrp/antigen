@@ -1,5 +1,3 @@
-import org.biojava.nbio.core.sequence.transcription.*;
-
 /**
  * <b>GeometricSeqPhenotype</b> represents a phenotype.
  * GeometricSeqPhenotypes are identified by their data contents. Each instance has a GeometricPhenotype.
@@ -38,7 +36,7 @@ public class GeometricSeqPhenotype implements Phenotype {
         this.correspondingGeometricPhenotype = new GeometricPhenotype(1, 1);
         this.nucleotideSequence = startingSequenceGenerator();
 
-        this.aminoAcidSequence = translateSequenceToAminoAcids(this.nucleotideSequence);
+        translateSequenceToAminoAcids();
     }
 
     /**
@@ -54,7 +52,7 @@ public class GeometricSeqPhenotype implements Phenotype {
         this.correspondingGeometricPhenotype = new GeometricPhenotype(tA, tB);
 
         this.nucleotideSequence = startingSequenceGenerator();
-        this.aminoAcidSequence = translateSequenceToAminoAcids(this.nucleotideSequence);
+        translateSequenceToAminoAcids();
     }
 
     /**
@@ -73,16 +71,20 @@ public class GeometricSeqPhenotype implements Phenotype {
         startingSequence = startingSequence.toUpperCase();
         this.nucleotideSequence = startingSequence;
 
-        this.aminoAcidSequence = translateSequenceToAminoAcids(this.nucleotideSequence);
+        translateSequenceToAminoAcids();
     }
 
-    /*
-    public GeometricSeqPhenotype(String startingSequence, Phenotype correspondingGeometricPhenotype) {
-        startingSequence = startingSequence.toUpperCase();
-        this.sequence = startingSequence;
-        this.correspondingGeometricPhenotype = (GeometricPhenotype) correspondingGeometricPhenotype;
+    private void translateSequenceToAminoAcids() {
+        StringBuilder translatedSequence = new StringBuilder();
+        for (int i = 0; i < nucleotideSequence.length(); i += 3) {
+            String triplet = nucleotideSequence.substring(i, i+3);
+            String translatedAminoAcid = Simulation.codonMap.get(triplet);
+
+            translatedSequence.append(translatedAminoAcid);
+        }
+
+        this.aminoAcidSequence = translatedSequence.toString();
     }
-    */
 
     // Generates a random sequence of nucleotides or amino acids of length Parameters.startingSequence.length()
     private String startingSequenceGenerator() {
@@ -132,73 +134,89 @@ public class GeometricSeqPhenotype implements Phenotype {
     }
 
     public Phenotype mutate() {
-        int indexSite = random(this.nucleotideSequence.length());
+        int mutationIndexSite = random(this.nucleotideSequence.length());
         int indexAlphabet = random(this.ALPHABET.length);
 
-        int tripletStartIndex = 3 * (indexSite / 3);
+        int tripletStartIndex = 3 * (mutationIndexSite / 3);
 
         String originalAminoAcid = Simulation.codonMap.get(this.nucleotideSequence.substring(tripletStartIndex, tripletStartIndex + 3));
 
-                // substitute a random index of sequence with a random character in the ALPHABET
+        // substitute a random index of sequence with a random character in the ALPHABET
         StringBuilder mutated = new StringBuilder(this.nucleotideSequence);
-        mutated.setCharAt(indexSite, this.ALPHABET[indexAlphabet]);
+        mutated.setCharAt(mutationIndexSite, this.ALPHABET[indexAlphabet]);
 
         String mutatedNucleotideSequence = mutated.toString();
 
-        if (!mutatedNucleotideSequence.substring(tripletStartIndex, tripletStartIndex + 3).equals("STOP")) {
-            this.nucleotideSequence = mutatedNucleotideSequence;
-            this.aminoAcidSequence = translateSequenceToAminoAcids(this.nucleotideSequence);
-        }
+        this.nucleotideSequence = mutatedNucleotideSequence;
+        String mutatedAminoAcid = translateTripleSequenceToAminoAcids(mutationIndexSite);
 
-        String mutatedAminoAcid = Simulation.codonMap.get(this.nucleotideSequence.substring(tripletStartIndex, tripletStartIndex + 3));
+        int mSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(originalAminoAcid);
+        int nSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(mutatedAminoAcid);
 
-        if (!originalAminoAcid.equals(mutatedAminoAcid)) {
-            int mSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(originalAminoAcid);
-            int nSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(mutatedAminoAcid);
+        double[] mutations = Simulation.siteMutationVectors.get(mutationIndexSite)[mSiteMutationVectors][nSiteMutationVectors];
 
-            double[] mutations = Simulation.siteMutationVectors[mSiteMutationVectors][nSiteMutationVectors];
-
-            this.correspondingGeometricPhenotype = new GeometricPhenotype(this.correspondingGeometricPhenotype.getTraitA() + mutations[0], this.correspondingGeometricPhenotype.getTraitB() + mutations[1]);
-        }
+        this.correspondingGeometricPhenotype = new GeometricPhenotype(this.correspondingGeometricPhenotype.getTraitA() + mutations[0], this.correspondingGeometricPhenotype.getTraitB() + mutations[1]);
 
         return new GeometricSeqPhenotype(this.correspondingGeometricPhenotype.getTraitA(), this.correspondingGeometricPhenotype.getTraitB(), this.nucleotideSequence);
+    }
+
+    public String toString() {
+        String fullString = String.format("%s, %.4f,%.4f", this.nucleotideSequence, this.correspondingGeometricPhenotype.getTraitA(),
+                                          this.correspondingGeometricPhenotype.getTraitB());
+        return fullString;
+    }
+
+    /**
+     * Translates a codon, a sequence of three DNA or RNA nucleotides, to its corresponding amino acid
+     * until it's not a stop signal.
+     *
+     * @param mutationIndexSite the overall index of the nucleotide to be mutated
+     * @return the specified protein after mutating the nucleotide at mutationIndexSite in nucleotideSequence
+     */
+    private String translateTripleSequenceToAminoAcids(int mutationIndexSite) {
+        int mutationAminoAcidSiteNumber = mutationIndexSite / 3;
+        int mutationTripleStartIndex = mutationIndexSite % 3;
+
+        String codon = this.nucleotideSequence.substring(mutationAminoAcidSiteNumber * 3, (mutationAminoAcidSiteNumber * 3) + 3);
+        String translatedAminoAcidFromTriplet = Simulation.codonMap.get(codon);
+
+        boolean nucleotideSequenceChanged = false;
+
+        // Mutate the nucleotide at the original mutationIndexSite until the amino acid is not "STOP"
+        while (translatedAminoAcidFromTriplet.equals("STOP")) {
+            int indexAlphabet = random(this.ALPHABET.length);
+
+            StringBuilder mutated = new StringBuilder(codon);
+            mutated.setCharAt(mutationTripleStartIndex, this.ALPHABET[indexAlphabet]);
+
+            codon = mutated.toString();
+            translatedAminoAcidFromTriplet = Simulation.codonMap.get(codon);
+            nucleotideSequenceChanged = true;
+        }
+
+        // If translatedAminoAcidFromTriplet was ever "STOP" then update this.nucleotideSequence
+        if (nucleotideSequenceChanged) {
+            if (mutationAminoAcidSiteNumber == 0) {
+                // first site
+                this.nucleotideSequence = codon + this.nucleotideSequence.substring(3);
+            } else if (mutationAminoAcidSiteNumber == (this.nucleotideSequence.length() / 3) - 1) {
+                // last site
+                this.nucleotideSequence = this.nucleotideSequence.substring(0, mutationAminoAcidSiteNumber * 3) + codon;
+            } else {
+                this.nucleotideSequence = this.nucleotideSequence.substring(0, 3) + codon + this.nucleotideSequence.substring((mutationAminoAcidSiteNumber + 1) * 3);
+            }
+        }
+
+        StringBuilder updatedAminoAcids = new StringBuilder(this.aminoAcidSequence);
+        updatedAminoAcids.setCharAt(mutationAminoAcidSiteNumber, translatedAminoAcidFromTriplet.charAt(0));
+
+        this.aminoAcidSequence = updatedAminoAcids.toString();
+
+        return translatedAminoAcidFromTriplet;
     }
 
     private int random(int maxRange) {
         Random random = new Random();
         return random.nextInt(0, maxRange - 1);
     }
-
-    public String toString() {
-        return this.nucleotideSequence;
-    }
-
-    private String translateSequenceToAminoAcids(String nucleotideSequence) {
-        StringBuilder translatedSequence = new StringBuilder();
-        for (int i = 0; i < nucleotideSequence.length(); i += 3) {
-            String triplet = nucleotideSequence.substring(i, i+3);
-            String translatedAminoAcid = Simulation.codonMap.get(triplet);
-
-            while (translatedAminoAcid.equals("STOP")) {
-                int indexSite = random(3);
-                int indexAlphabet = random(this.ALPHABET.length);
-
-                int tripletStartIndex = 3 * (indexSite / 3);
-
-                StringBuilder mutated = new StringBuilder(this.nucleotideSequence.substring(tripletStartIndex, tripletStartIndex + 3));
-                mutated.setCharAt(indexSite, this.ALPHABET[indexAlphabet]);
-
-                String mutatedNucleotideSequence = mutated.toString();
-
-                this.nucleotideSequence = this.nucleotideSequence.substring(0, i) + mutatedNucleotideSequence + this.nucleotideSequence.substring(i+3);
-
-                translatedAminoAcid = Simulation.codonMap.get(mutatedNucleotideSequence);
-            }
-
-            translatedSequence.append(translatedAminoAcid);
-        }
-
-        return translatedSequence.toString();
-    }
-
 }
