@@ -115,7 +115,7 @@ public class Simulation {
 	public static Map<Integer, double[][][]> siteMutationVectors = new HashMap<>();
 
 	// constructor
-	public Simulation() {
+	public Simulation() throws FileNotFoundException {
 		for (int i = 0; i < Parameters.demeCount; i++) {
 			HostPopulation hp;
 			if (Parameters.restartFromCheckpoint) {
@@ -126,13 +126,21 @@ public class Simulation {
 			demes.add(hp);
 		}
 
+		initializeSiteMutationVectors();
+
+	}
+
+	private void initializeSiteMutationVectors() throws FileNotFoundException {
+		String aa = "ACDEFGHIKLMNPQRSTWYV";
 		for (int siteNumber = 0; siteNumber < Parameters.startingSequence.length(); siteNumber++) {
+			PrintStream output = new PrintStream("site" + siteNumber + ".csv");
+			output.println("mutation,r,theta");
 			double[][][] currentSiteMutationMatrix = new double[matrixSize][matrixSize][];
-			for (int i = 0; i < matrixSize; i++) {
-				for (int j = 0; j < matrixSize; j++) {
-					if (j < i) {
+			for (int wildTypeIndex = 0; wildTypeIndex < matrixSize; wildTypeIndex++) {
+				for (int mutationIndex = 0; mutationIndex < matrixSize; mutationIndex++) {
+					if (mutationIndex < wildTypeIndex) { // update lower and upper triangle in this branch.
 						// direction of mutation
-						double theta = 0;
+						double theta;
 						if (Parameters.mut2D) {
 							theta = Random.nextDouble(0, 2 * Math.PI);
 						} else {
@@ -157,16 +165,15 @@ public class Simulation {
 
 						double[] mutations = new double[]{mutA, mutB};
 
-						currentSiteMutationMatrix[i][j] = mutations;
+						currentSiteMutationMatrix[wildTypeIndex][mutationIndex] = mutations;
 
-						mutA = -r * Math.cos(theta);
-						mutB = -r * Math.sin(theta);
+						mutations = new double[]{-1 * mutA, -1 * mutB};
 
-						mutations = new double[]{mutA, mutB};
-
-						currentSiteMutationMatrix[j][i] = mutations;
-					} else {
-						currentSiteMutationMatrix[i][j] = new double[]{0.0, 0.0};
+						currentSiteMutationMatrix[mutationIndex][wildTypeIndex] = mutations;
+						output.println("" + aa.charAt(wildTypeIndex) + siteNumber + aa.charAt(mutationIndex) + "," + r + "," + theta);
+						//output.println("" + aa.charAt(mutationIndex) + siteNumber + aa.charAt(wildTypeIndex) + "," + -r + "," + theta);
+					} else if (mutationIndex == wildTypeIndex) {
+						currentSiteMutationMatrix[wildTypeIndex][mutationIndex] = new double[]{0.0, 0.0};
 					}
 				}
 			}
