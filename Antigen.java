@@ -3,7 +3,7 @@
 import java.io.FileNotFoundException;
 
 class Antigen {
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) {
 
 		// initialize random number generator
 		cern.jet.random.AbstractDistribution.makeDefaultGenerator();

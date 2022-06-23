@@ -115,7 +115,7 @@ public class Simulation {
 	public static Map<Integer, double[][][]> siteMutationVectors = new HashMap<>();
 
 	// constructor
-	public Simulation() throws FileNotFoundException {
+	public Simulation() {
 		for (int i = 0; i < Parameters.demeCount; i++) {
 			HostPopulation hp;
 			if (Parameters.restartFromCheckpoint) {
@@ -130,11 +130,8 @@ public class Simulation {
 
 	}
 
-	private void initializeSiteMutationVectors() throws FileNotFoundException {
-		String aa = "ACDEFGHIKLMNPQRSTWYV";
+	private void initializeSiteMutationVectors() {
 		for (int siteNumber = 0; siteNumber < Parameters.startingSequence.length(); siteNumber++) {
-			PrintStream output = new PrintStream("site" + siteNumber + ".csv");
-			output.println("mutation,r,theta");
 			double[][][] currentSiteMutationMatrix = new double[matrixSize][matrixSize][];
 			for (int wildTypeIndex = 0; wildTypeIndex < matrixSize; wildTypeIndex++) {
 				for (int mutationIndex = 0; mutationIndex < matrixSize; mutationIndex++) {
@@ -170,8 +167,6 @@ public class Simulation {
 						mutations = new double[]{-1 * mutA, -1 * mutB};
 
 						currentSiteMutationMatrix[mutationIndex][wildTypeIndex] = mutations;
-						output.println("" + aa.charAt(wildTypeIndex) + siteNumber + aa.charAt(mutationIndex) + "," + r + "," + theta);
-						//output.println("" + aa.charAt(mutationIndex) + siteNumber + aa.charAt(wildTypeIndex) + "," + -r + "," + theta);
 					} else if (mutationIndex == wildTypeIndex) {
 						currentSiteMutationMatrix[wildTypeIndex][mutationIndex] = new double[]{0.0, 0.0};
 					}
