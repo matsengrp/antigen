@@ -1,17 +1,17 @@
 /**
  * <b>GeometricSeqPhenotype</b> represents a phenotype.
- * GeometricSeqPhenotypes are identified by their data contents. Each instance has a GeometricPhenotype.
- * GeometricSeqPhenotypes permit all data, except for <b>""</b> and <b>null</b>.
+ * Distance and cross-immunity can be calculated between two GeometricSeqPhenotypes.
+ * Multiple Viruses can reference a single GeometricSeqPhenotype which is identified by its data contents.
  *
  * @author Thien Tran
  */
 public class GeometricSeqPhenotype implements Phenotype {
     /**
-     * The valid letters that make up the sequence of this SequencePhenotype.
+     * The valid letters that make up the nucleotide sequence of this GeometricSeqPhenotype.
      *
-     * Valid letters depend on the representation of the sequence (nucleotides or amino acids)
+     * Valid letters are {A, G, T , C}
      */
-    private final char[] ALPHABET = Parameters.alphabet.toCharArray();
+    private final char[] ALPHABET = Parameters.AlphabetType.NUCLEOTIDES.getValidCharacters().toCharArray();
 
     /**
      * The corresponding GeometricPhenotype of this GeometricSeqPhenotype
@@ -19,24 +19,35 @@ public class GeometricSeqPhenotype implements Phenotype {
     private GeometricPhenotype correspondingGeometricPhenotype;
 
     /**
-     * The sequence of this SequencePhenotype
+     * The nucleotide sequence of this GeometricSeqPhenotype
      */
     private String nucleotideSequence;
 
+    /**
+     * The amino acid sequence of this GeometricSeqPhenotype
+     */
     private String aminoAcidSequence;
 
     /**
      * Constructor that creates a new GeometricSeqPhenotype.
      *
-     * @spec.requires sequence != null && sequence.length() > 0
      * @spec.effects Constructs a new GeometricSeqPhenotype that has a random starting sequence of length Parameters.sequence.length()
      * and GeometricPhenotype
      */
     public GeometricSeqPhenotype() {
         this.correspondingGeometricPhenotype = new GeometricPhenotype(1, 1);
-        this.nucleotideSequence = startingSequenceGenerator();
 
+        this.nucleotideSequence = startingSequenceGenerator();
         translateSequenceToAminoAcids();
+
+        while (this.aminoAcidSequence.contains("STOP")) {
+            this.nucleotideSequence = startingSequenceGenerator();
+            translateSequenceToAminoAcids();
+        }
+
+        if (this.aminoAcidSequence.contains("STOP")) {
+            System.out.println("hdjfaf" + this.aminoAcidSequence);
+        }
     }
 
     /**
@@ -44,7 +55,7 @@ public class GeometricSeqPhenotype implements Phenotype {
      *
      * @param tA
      * @param tB
-     * @spec.requires sequence != null && sequence.length() > 0
+     * @spec.requires nucleotideSequence != null && nucleotideSequence.length() > 0 && nucleotideSequence.length() % 3 == 0
      * @spec.effects Constructs a new GeometricSeqPhenotype that has a random starting sequence of length Parameters.sequence.length()
      * and GeometricPhenotype with the data content of the given parameters.
      */
@@ -53,6 +64,15 @@ public class GeometricSeqPhenotype implements Phenotype {
 
         this.nucleotideSequence = startingSequenceGenerator();
         translateSequenceToAminoAcids();
+
+        while (this.aminoAcidSequence.contains("STOP")) {
+            this.nucleotideSequence = startingSequenceGenerator();
+            translateSequenceToAminoAcids();
+        }
+
+        if (this.aminoAcidSequence.contains("STOP")) {
+            System.out.println("hdjfaf" + this.aminoAcidSequence);
+        }
     }
 
     /**
@@ -70,7 +90,6 @@ public class GeometricSeqPhenotype implements Phenotype {
 
         startingSequence = startingSequence.toUpperCase();
         this.nucleotideSequence = startingSequence;
-
         translateSequenceToAminoAcids();
     }
 
@@ -135,23 +154,28 @@ public class GeometricSeqPhenotype implements Phenotype {
 
     public Phenotype mutate() {
         int mutationIndexSite = random(this.nucleotideSequence.length());
-        int indexAlphabet = random(this.ALPHABET.length);
+        char originalNucleotide = this.nucleotideSequence.charAt(mutationIndexSite);
+        char randomNucleotide = getRandomMutatedNucleotide(originalNucleotide, mutationIndexSite);
+
 
         int tripletStartIndex = 3 * (mutationIndexSite / 3);
-
         String originalAminoAcid = Simulation.codonMap.get(this.nucleotideSequence.substring(tripletStartIndex, tripletStartIndex + 3));
 
         // substitute a random index of sequence with a random character in the ALPHABET
-        StringBuilder mutated = new StringBuilder(this.nucleotideSequence);
-        mutated.setCharAt(mutationIndexSite, this.ALPHABET[indexAlphabet]);
+        StringBuilder mutatedNucleotideSequence = new StringBuilder(this.nucleotideSequence);
+        mutatedNucleotideSequence.setCharAt(mutationIndexSite, randomNucleotide);
+        this.nucleotideSequence = mutatedNucleotideSequence.toString();
 
-        String mutatedNucleotideSequence = mutated.toString();
 
-        this.nucleotideSequence = mutatedNucleotideSequence;
         String mutatedAminoAcid = translateTripleSequenceToAminoAcids(mutationIndexSite);
 
         int mSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(originalAminoAcid);
         int nSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(mutatedAminoAcid);
+
+        if (mSiteMutationVectors == -1 || nSiteMutationVectors == -1) {
+            System.out.println(originalAminoAcid);
+            System.out.println(mutatedAminoAcid);
+        }
 
         double[] mutations = Simulation.siteMutationVectors.get(mutationIndexSite)[mSiteMutationVectors][nSiteMutationVectors];
 
@@ -175,37 +199,9 @@ public class GeometricSeqPhenotype implements Phenotype {
      */
     private String translateTripleSequenceToAminoAcids(int mutationIndexSite) {
         int mutationAminoAcidSiteNumber = mutationIndexSite / 3;
-        int mutationTripleStartIndex = mutationIndexSite % 3;
 
         String codon = this.nucleotideSequence.substring(mutationAminoAcidSiteNumber * 3, (mutationAminoAcidSiteNumber * 3) + 3);
         String translatedAminoAcidFromTriplet = Simulation.codonMap.get(codon);
-
-        boolean nucleotideSequenceChanged = false;
-
-        // Mutate the nucleotide at the original mutationIndexSite until the amino acid is not "STOP"
-        while (translatedAminoAcidFromTriplet.equals("STOP")) {
-            int indexAlphabet = random(this.ALPHABET.length);
-
-            StringBuilder mutated = new StringBuilder(codon);
-            mutated.setCharAt(mutationTripleStartIndex, this.ALPHABET[indexAlphabet]);
-
-            codon = mutated.toString();
-            translatedAminoAcidFromTriplet = Simulation.codonMap.get(codon);
-            nucleotideSequenceChanged = true;
-        }
-
-        // If translatedAminoAcidFromTriplet was ever "STOP" then update this.nucleotideSequence
-        if (nucleotideSequenceChanged) {
-            if (mutationAminoAcidSiteNumber == 0) {
-                // first site
-                this.nucleotideSequence = codon + this.nucleotideSequence.substring(3);
-            } else if (mutationAminoAcidSiteNumber == (this.nucleotideSequence.length() / 3) - 1) {
-                // last site
-                this.nucleotideSequence = this.nucleotideSequence.substring(0, mutationAminoAcidSiteNumber * 3) + codon;
-            } else {
-                this.nucleotideSequence = this.nucleotideSequence.substring(0, 3) + codon + this.nucleotideSequence.substring((mutationAminoAcidSiteNumber + 1) * 3);
-            }
-        }
 
         StringBuilder updatedAminoAcids = new StringBuilder(this.aminoAcidSequence);
         updatedAminoAcids.setCharAt(mutationAminoAcidSiteNumber, translatedAminoAcidFromTriplet.charAt(0));
@@ -213,6 +209,31 @@ public class GeometricSeqPhenotype implements Phenotype {
         this.aminoAcidSequence = updatedAminoAcids.toString();
 
         return translatedAminoAcidFromTriplet;
+    }
+
+    private char getRandomMutatedNucleotide(char originalNucleotide, int mutationIndexSite) {
+        int indexAlphabet = random(this.ALPHABET.length);
+        char randomMutatedNucleotide = this.ALPHABET[indexAlphabet];
+
+        int mutationAminoAcidSiteNumber = mutationIndexSite / 3;
+
+        String codon = this.nucleotideSequence.substring(mutationAminoAcidSiteNumber * 3, (mutationAminoAcidSiteNumber * 3) + 3);
+
+        StringBuilder newCodon = new StringBuilder(codon);
+        newCodon.setCharAt(mutationIndexSite % 3, randomMutatedNucleotide);
+
+        String translatedAminoAcidFromTriplet = Simulation.codonMap.get(newCodon.toString());
+
+        while (originalNucleotide == randomMutatedNucleotide || translatedAminoAcidFromTriplet.equals("STOP")) {
+            indexAlphabet = random(this.ALPHABET.length);
+            randomMutatedNucleotide = this.ALPHABET[indexAlphabet];
+
+            newCodon.setCharAt(mutationIndexSite % 3, randomMutatedNucleotide);
+
+            translatedAminoAcidFromTriplet = Simulation.codonMap.get(newCodon.toString());
+        }
+
+        return randomMutatedNucleotide;
     }
 
     private int random(int maxRange) {

@@ -1,7 +1,9 @@
 /* Implements an individual-based model in which the infection's genealogical history is tracked through time */
 
+import java.io.FileNotFoundException;
+
 class Antigen {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
 
 		// initialize random number generator
 		cern.jet.random.AbstractDistribution.makeDefaultGenerator();
