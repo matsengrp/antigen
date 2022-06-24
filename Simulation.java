@@ -6,6 +6,25 @@ import java.io.*;
 import com.javamex.classmexer.*;
 
 public class Simulation {
+	public static PrintStream mutations;
+
+	static {
+		try {
+			mutations = new PrintStream("mutation.csv");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static Map<Character, double[]> transitionTranversionProbability = new HashMap<>()  {{
+		// key: nucleotide
+		// value: int array of probability that key will mutate to the letter in the corresponding index
+		// {A, G, T, C}
+		put('A', new double[]{0, 0.5, 0.75, 1.0});
+		put('G', new double[]{0.5, 0.5, 0.75, 1.0});
+		put('T', new double[]{0.25, 0.5, 0.5, 1.0});
+		put('C', new double[]{0.25, 0.5, 1.0, 1.0});
+	}};
 
 	public static Map<String, String> codonMap = new HashMap<>() {{
 		put("TTT", "F");
@@ -616,7 +635,7 @@ public class Simulation {
 	private void writeDataCSV() throws FileNotFoundException {
 		// Creates csv file from the most recent out.timeseries (i.e., not from example/out.timeseries)
 		Scanner input = new Scanner(new File("out.timeseries"));
-		PrintStream output = new PrintStream(new File("out_timeseries.csv"));
+		PrintStream output = new PrintStream("out_timeseries.csv");
 
 		// Check for next line
 		while(input.hasNextLine()) {

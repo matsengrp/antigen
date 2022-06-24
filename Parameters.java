@@ -271,6 +271,10 @@ public class Parameters {
 			}
 			if (map.get("startingSequence") != null) {
 				startingSequence = (String) map.get("startingSequence");
+
+				if (phenotypeSpace.equals("geometricSeq")) {
+					assert(startingSequence.length() % 3 == 0) : "startingSequence length should be a multiple of 3";
+				}
 			}
 			if (map.get("alphabetType") != null) {
 				alphabetType = (String) map.get("alphabetType");
