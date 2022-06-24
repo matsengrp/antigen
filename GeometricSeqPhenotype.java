@@ -92,7 +92,7 @@ public class GeometricSeqPhenotype implements Phenotype {
     }
 
     private String translateSequenceToAminoAcids() {
-        StringBuilder translatedSequence = new StringBuilder();
+        StringBuffer translatedSequence = new StringBuffer();
         for (int i = 0; i < this.nucleotideSequence.length(); i += 3) {
             String triplet = this.nucleotideSequence.substring(i, i+3);
             String translatedAminoAcid = Simulation.codonMap.get(triplet);
@@ -159,15 +159,41 @@ public class GeometricSeqPhenotype implements Phenotype {
     }
 
     public Phenotype mutate() {
-        // index of sequence to mutate
-        int mutationIndexSiteSequence = random(this.nucleotideSequence.length());
+        String originalAminoAcid = "", mutatedAminoAcid = "";
+        int mutationIndexSiteSequence = -1;
+        char randomMutatedNucleotide = 'Z';
 
+        while (mutatedAminoAcid.equals("") || mutatedAminoAcid.equals("STOP")) {
+            mutationIndexSiteSequence = random(this.nucleotideSequence.length());
 
-        int codonStartIndex = 3 * (mutationIndexSiteSequence / 3);
-        String originalCodon = this.nucleotideSequence.substring(codonStartIndex, codonStartIndex + 3);
-        String originalAminoAcid = Simulation.codonMap.get(originalCodon);
+            int codonStartIndex = 3 * (mutationIndexSiteSequence / 3);
+            String originalCodon = this.nucleotideSequence.substring(codonStartIndex, codonStartIndex + 3);
+            originalAminoAcid = Simulation.codonMap.get(originalCodon);
 
-        String mutatedAminoAcid = getRandomMutatedNucleotide(originalCodon, mutationIndexSiteSequence);
+            int mutationIndexSiteCodon = mutationIndexSiteSequence % 3;
+            char originalNucleotideToMutate = this.nucleotideSequence.charAt(mutationIndexSiteSequence);
+            double[] transitionTransversion = Simulation.transitionTranversionProbability.get(originalNucleotideToMutate);
+
+            double randomNum = Math.random();
+            int indexAlphabet = 0;
+            for (int i = 0; i < 4;i++) {
+                if (randomNum < transitionTransversion[i]) {
+                    indexAlphabet = i;
+                    break;
+                }
+            }
+
+            randomMutatedNucleotide = Parameters.AlphabetType.NUCLEOTIDES.getValidCharacters().charAt(indexAlphabet);
+            StringBuffer mutatedCodon = new StringBuffer(originalCodon);
+            mutatedCodon.setCharAt(mutationIndexSiteCodon, randomMutatedNucleotide);
+            mutatedAminoAcid = Simulation.codonMap.get(mutatedCodon.toString());
+        }
+
+        StringBuffer mutatedNucleotideSequence = new StringBuffer(this.nucleotideSequence);
+        mutatedNucleotideSequence.setCharAt(mutationIndexSiteSequence, randomMutatedNucleotide);
+        this.nucleotideSequence = mutatedNucleotideSequence.toString();
+
+        ////////
 
         int mSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(originalAminoAcid);
         int nSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(mutatedAminoAcid);
@@ -183,58 +209,6 @@ public class GeometricSeqPhenotype implements Phenotype {
         String fullString = String.format("%s, %.4f,%.4f", this.nucleotideSequence, this.correspondingGeometricPhenotype.getTraitA(),
                                           this.correspondingGeometricPhenotype.getTraitB());
         return fullString;
-    }
-
-    private String getRandomMutatedNucleotide(String originalCodon, int mutationIndexSite) {
-        String nucleotides = "AGTC";
-        int mutationIndexSiteCodon = mutationIndexSite % 3;
-        char originalNucleotideToMutate = originalCodon.charAt(mutationIndexSiteCodon);
-
-        double[] transitionTransversion = Simulation.transitionTranversionProbability.get(originalNucleotideToMutate);
-
-        double randomNum = Math.random();
-        int indexAlphabet = 0;
-        for (int i = 0; i < 4;i++) {
-            if (randomNum < transitionTransversion[i]) {
-                indexAlphabet = i;
-                break;
-            }
-        }
-        char randomMutatedNucleotide = nucleotides.charAt(indexAlphabet);
-
-        StringBuilder mutatedCodon = new StringBuilder(originalCodon);
-
-        mutatedCodon.setCharAt(mutationIndexSiteCodon, randomMutatedNucleotide);
-        String translatedAminoAcidFromTriplet = Simulation.codonMap.get(mutatedCodon.toString());
-
-        int count = 0;
-
-        while (translatedAminoAcidFromTriplet.equals("STOP")) {
-            randomNum = Math.random();
-            indexAlphabet = 0;
-            for (int i = 0; i < 4;i++) {
-                if (randomNum < transitionTransversion[i]) {
-                    indexAlphabet = i;
-                    break;
-                }
-            }
-             randomMutatedNucleotide = nucleotides.charAt(indexAlphabet);
-
-            mutatedCodon.setCharAt(mutationIndexSiteCodon, randomMutatedNucleotide);
-            translatedAminoAcidFromTriplet = Simulation.codonMap.get(mutatedCodon.toString());
-            count++;
-            if (count > 10) {
-                //System.out.println(mutationIndexSiteCodon +  " -> " + originalCodon +  " -> " + randomNum + " -> " + randomMutatedNucleotide + " -> " + translatedAminoAcidFromTriplet);
-            }
-        }
-
-        StringBuilder mutatedNucleotideSequence = new StringBuilder(this.nucleotideSequence);
-        mutatedNucleotideSequence.setCharAt(mutationIndexSite, randomMutatedNucleotide);
-        this.nucleotideSequence = mutatedNucleotideSequence.toString();
-
-        Simulation.mutations.println("" + originalNucleotideToMutate + randomMutatedNucleotide);
-
-        return translatedAminoAcidFromTriplet;
     }
 
     // Returns a random index within the bounds of String.length.()=maxRange
