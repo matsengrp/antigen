@@ -277,6 +277,10 @@ public class Parameters {
 			}
 			if (map.get("startingSequence") != null) {
 				startingSequence = (String) map.get("startingSequence");
+
+				if (phenotypeSpace.equals("geometricSeq")) {
+					assert(startingSequence.length() % 3 == 0) : "startingSequence length should be a multiple of 3";
+				}
 			}
 			if (map.get("crossImmunityFunction") != null) {
 				crossImmunityFunction = (String) map.get("crossImmunityFunction");
