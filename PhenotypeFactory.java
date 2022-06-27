@@ -44,7 +44,7 @@ public class PhenotypeFactory {
 			if (startingSequence == null) {
 				p = new GeometricSeqPhenotype(Parameters.initialTraitA, 0);
 			} else {
-				p = new GeometricSeqPhenotype(Parameters.initialTraitA, 0, Parameters.startingSequence);
+				p = new GeometricSeqPhenotype(Parameters.initialTraitA, 0, Parameters.startingSequence.toCharArray());
 			}
 		}
 		return p;
