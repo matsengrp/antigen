@@ -25,7 +25,7 @@ public class SequencePhenotype implements Phenotype {
     /**
      * Run expensive tests iff DEBUG == true.
      */
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     // Abstraction Function:
     // A SequencePhenotype, s, is null if s.sequence = null, otherwise s.sequence = sequence
