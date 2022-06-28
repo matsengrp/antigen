@@ -4,7 +4,7 @@
 
 # simulation parameters
 burnin: 0                                   # days to wait before logging output 
-endDay: 500                                # number of days to simulate
+endDay: 5000                                # number of days to simulate
 deltaT: 0.1                                 # number of days to move forward in a single timestep
 printStep: 50                               # print to out.timeseries every X days
 tipSamplingRate: 0.0002                     # store X samples per deme per day
@@ -67,5 +67,5 @@ meanStepEpitope:
 sdStepEpitope:
 mut2D: false                                # whether to mutate in a full 360 degree arc
 fixedStep: false                            # whether to fix step size, i.e. ignore sdStep
-startingSequence: "TCAGAA"
+startingSequence: "GTAATCATCATCCCTATCAGGGTTTGGAGTGAGTGGTGACGGTTATTCCCCAGGAATGGACTTCTTATTCACAGTCGGTCACATTGGGCTACTCCTTGGGTCTTCCGCTTGGCCCGGTCTGTTGGGCCGCCATTGCGTGAGTTTCGGCCCTGTGCTGCGCTGTGTCGGCGATTCTCATTGGGGCCTCACATCTGGAAACCCCGACCTATTTTGACGGCACCATTGGCGGAAGTTGCTGGGCTTGTGCACCGTGAAGTCCTCCGCGGGCCTCCCCCCTACAAAAGACGATAAGCTCCGGCAAGCAGCATTGATCAACGCAAGGATCGGCGATATTAACAGAGATACGGCTGATTACTCTTGTTGGTGTGGTATCGCTAAACTGCGCCGCGGAGCCTTATGGCAAAGTCGTCCGCGAACCATTCCGGTAGCGCTTAAGGTCCATAGCACATTCATCGCATCCCGGCGTGCGTTCAATTTGACGACCCCTTGGCGCAAAGGTGCTGGCCACGTGCTAAATTAAAGCGGCTGCACTGCTGTAAGGTCCGTTACGGAGAGGGCGGCCTGGGGAGAGCACTAGCCCATCGACCTGTACAGGAACAC"
 alphabetType: "nucleotides"                  # options include: nucleotides, aminoAcids
