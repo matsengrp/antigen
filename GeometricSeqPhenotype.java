@@ -7,7 +7,7 @@ import java.util.Arrays;
  *
  * @author Thien Tran
  */
-public class GeometricSeqPhenotype implements Phenotype {
+public class GeometricSeqPhenotype extends GeometricPhenotype {
     /**
      * The valid letters that make up the nucleotide sequence of this GeometricSeqPhenotype.
      *
@@ -18,12 +18,14 @@ public class GeometricSeqPhenotype implements Phenotype {
     /**
      * The corresponding GeometricPhenotype of this GeometricSeqPhenotype
      */
-    private GeometricPhenotype correspondingGeometricPhenotype;
+    //private GeometricPhenotype correspondingGeometricPhenotype;
 
     /**
      * The nucleotide sequence of this GeometricSeqPhenotype
      */
     private char[] nucleotideSequence;
+    private double traitA;
+    private double traitB;
 
     /**
      * Run expensive tests iff DEBUG == true.
@@ -49,11 +51,8 @@ public class GeometricSeqPhenotype implements Phenotype {
      * and an empty GeometricPhenotype
      */
     public GeometricSeqPhenotype() {
-        this.correspondingGeometricPhenotype = new GeometricPhenotype();
-
         this.nucleotideSequence = new char[Parameters.startingSequence.length()];
         startingSequenceGenerator();
-        checkRep();
     }
 
     /**
@@ -65,11 +64,11 @@ public class GeometricSeqPhenotype implements Phenotype {
      * and GeometricPhenotype with the data content of the given parameters.
      */
     public GeometricSeqPhenotype(double tA, double tB) {
-        this.correspondingGeometricPhenotype = new GeometricPhenotype(tA, tB);
+        traitA = tA;
+        traitB = tB;
 
-        this.nucleotideSequence = new char[Parameters.startingSequence.length()];
         startingSequenceGenerator();
-        checkRep();
+        //checkRep();
     }
 
     // Generates a random sequence of nucleotides of length Parameters.startingSequence.length()
@@ -102,50 +101,32 @@ public class GeometricSeqPhenotype implements Phenotype {
      * and GeometricPhenotype with the data content of the given parameters.
      */
     public GeometricSeqPhenotype(double tA, double tB, char[] startingSequence) {
-        this.correspondingGeometricPhenotype = new GeometricPhenotype(tA, tB);
+        traitA = tA;
+        traitB = tB;
         this.nucleotideSequence = startingSequence;
-        checkRep();
+        //checkRep();
     }
 
     public double getTraitA() {
-        return correspondingGeometricPhenotype.getTraitA();
+        return traitA;
     }
 
     public double getTraitB() {
-        return correspondingGeometricPhenotype.getTraitB();
-    }
-
-    public void setTraitA(double tA) {
-        correspondingGeometricPhenotype.setTraitA(tA);
-        checkRep();
-    }
-
-    public void setTraitB(double tB) {
-        correspondingGeometricPhenotype.setTraitB(tB);
-        checkRep();
+        return traitB;
     }
 
     public String getSequence() {
         return Arrays.toString(this.nucleotideSequence);
     }
 
-    public GeometricPhenotype getCorrespondingGeometricPhenotype() {
-        return this.correspondingGeometricPhenotype;
-    }
 
     public double distance(Phenotype p) {
-        GeometricPhenotype geometricP = ((GeometricSeqPhenotype) p).getCorrespondingGeometricPhenotype();
-        checkRep();
-        return correspondingGeometricPhenotype.distance(geometricP);
-    }
-
-    public double riskOfInfection( Phenotype[] history) {
-        GeometricPhenotype[] geometricHistory = new GeometricPhenotype[history.length];
-        for (int i = 0; i < history.length; i++) {
-            geometricHistory[i] = ((GeometricSeqPhenotype) history[i]).getCorrespondingGeometricPhenotype();
-        }
-        checkRep();
-        return correspondingGeometricPhenotype.riskOfInfection(geometricHistory);
+        GeometricSeqPhenotype p2d = (GeometricSeqPhenotype) p;
+        double distA = (getTraitA() - p2d.getTraitA());
+        double distB = (getTraitB() - p2d.getTraitB());
+        double dist = (distA * distA) + (distB * distB);
+        dist = Math.sqrt(dist);
+        return dist;
     }
 
     /**
@@ -203,11 +184,11 @@ public class GeometricSeqPhenotype implements Phenotype {
 
         double[] mutations = Simulation.siteMutationVectors.get(mutationIndexSiteSequence)[mSiteMutationVectors][nSiteMutationVectors];
 
-        this.correspondingGeometricPhenotype = new GeometricPhenotype(this.correspondingGeometricPhenotype.getTraitA() + mutations[0], this.correspondingGeometricPhenotype.getTraitB() + mutations[1]);
+        double mutA = getTraitA() + mutations[0];
+        double mutB = getTraitB() + mutations[1];
 
-        checkRep();
-
-        return new GeometricSeqPhenotype(this.correspondingGeometricPhenotype.getTraitA(), this.correspondingGeometricPhenotype.getTraitB(), this.nucleotideSequence);
+        Phenotype mutP = new GeometricSeqPhenotype(mutA,mutB, Arrays.copyOf(this.nucleotideSequence, Parameters.startingSequence.length()));
+        return mutP;
     }
 
     /**
@@ -217,8 +198,8 @@ public class GeometricSeqPhenotype implements Phenotype {
      * @return the String representation of the GeometricSeqPhenotype represented by this.
      */
     public String toString() {
-        String fullString = String.format("%s, %.4f,%.4f", String.valueOf(this.nucleotideSequence), this.correspondingGeometricPhenotype.getTraitA(),
-                                          this.correspondingGeometricPhenotype.getTraitB());
+        String fullString = String.format("%s, %.4f,%.4f", String.valueOf(this.nucleotideSequence), this.getTraitA(),
+                                          this.getTraitB());
         return fullString;
     }
 
@@ -231,16 +212,16 @@ public class GeometricSeqPhenotype implements Phenotype {
     /**
      * Throws an exception if the representation invariant is violated.
      */
-    private void checkRep() {
-        if (DEBUG)  {
-            assert(this.nucleotideSequence.length == Parameters.startingSequence.length()) : "Nucleotide sequences must remain the same length throughout a Simulation";
-            assert(this.correspondingGeometricPhenotype != null) : "All GeometricSeqPhenotypes must have a GeometricPhenotype";
-            for (int i = 0; i < this.nucleotideSequence.length; i += 3) {
-                String triplet = "" + this.nucleotideSequence[i] + this.nucleotideSequence[i + 1] + this.nucleotideSequence[i + 2];
-                String translatedAminoAcid = Simulation.codonMap.get(triplet);
-
-                assert(!translatedAminoAcid.equals("STOP")) : "There should not be a stop codon at site " + (i/3);
-            }
-        }
-    }
+//    private void checkRep() {
+//        if (DEBUG)  {
+//            assert(this.nucleotideSequence.length == Parameters.startingSequence.length()) : "Nucleotide sequences must remain the same length throughout a Simulation";
+//            assert(this.correspondingGeometricPhenotype != null) : "All GeometricSeqPhenotypes must have a GeometricPhenotype";
+//            for (int i = 0; i < this.nucleotideSequence.length; i += 3) {
+//                String triplet = "" + this.nucleotideSequence[i] + this.nucleotideSequence[i + 1] + this.nucleotideSequence[i + 2];
+//                String translatedAminoAcid = Simulation.codonMap.get(triplet);
+//
+//                assert(!translatedAminoAcid.equals("STOP")) : "There should not be a stop codon at site " + (i/3);
+//            }
+//        }
+//    }
 }
