@@ -6,111 +6,6 @@ import java.io.*;
 import com.javamex.classmexer.*;
 
 public class Simulation {
-	public static PrintStream mutations;
-
-	static {
-		try {
-			mutations = new PrintStream("mutation.csv");
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static Map<Character, double[]> transitionTranversionProbability = new HashMap<>()  {{
-		// key: nucleotide
-		// value: int array of probability that key will mutate to the letter in the corresponding index
-		// {A, G, T, C}
-		put('A', new double[]{0, 0.5, 0.75, 1.0});
-		put('G', new double[]{0.5, 0.5, 0.75, 1.0});
-		put('T', new double[]{0.25, 0.5, 0.5, 1.0});
-		put('C', new double[]{0.25, 0.5, 1.0, 1.0});
-	}};
-
-	public static Map<String, String> codonMap = new HashMap<>() {{
-		put("TTT", "F");
-		put("TTC", "F");
-		put("TTA", "L");
-		put("TTG", "L");
-
-		put("CTT", "L");
-		put("CTC", "L");
-		put("CTA", "L");
-		put("CTG", "L");
-
-		put("ATT", "I");
-		put("ATC", "I");
-		put("ATA", "I");
-		put("ATG", "M");
-
-		put("GTT", "V");
-		put("GTC", "V");
-		put("GTA", "V");
-		put("GTG", "V");
-
-
-		put("TCT", "S");
-		put("TCC", "S");
-		put("TCA", "S");
-		put("TCG", "S");
-
-		put("CCT", "P");
-		put("CCC", "P");
-		put("CCA", "P");
-		put("CCG", "P");
-
-		put("ACT", "T");
-		put("ACC", "T");
-		put("ACA", "T");
-		put("ACG", "T");
-
-		put("GCT", "A");
-		put("GCC", "A");
-		put("GCA", "A");
-		put("GCG", "A");
-
-
-		put("TAT", "Y");
-		put("TAC", "Y");
-		put("TAA", "STOP");
-		put("TAG", "STOP");
-
-		put("CAT", "H");
-		put("CAC", "H");
-		put("CAA", "Q");
-		put("CAG", "Q");
-
-		put("AAT", "N");
-		put("AAC", "N");
-		put("AAA", "K");
-		put("AAG", "K");
-
-		put("GAT", "D");
-		put("GAC", "D");
-		put("GAA", "E");
-		put("GAG", "E");
-
-
-		put("TGT", "C");
-		put("TGC", "C");
-		put("TGA", "STOP");
-		put("TGG", "W");
-
-		put("CGT", "R");
-		put("CGC", "R");
-		put("CGA", "R");
-		put("CGG", "R");
-
-		put("AGT", "S");
-		put("AGC", "S");
-		put("AGA", "T");
-		put("AGG", "T");
-
-		put("GGT", "G");
-		put("GGC", "G");
-		put("GGA", "G");
-		put("GGG", "G");
-	}};
-
 	// fields
 	private List<HostPopulation> demes = new ArrayList<>();
 	private double diversity;
@@ -130,8 +25,7 @@ public class Simulation {
 	private List<Double> rList = new ArrayList<>();
 	private List<Double> casesList = new ArrayList<>();
 
-	public static int matrixSize = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
-	public static Map<Integer, double[][][]> siteMutationVectors = new HashMap<>();
+
 
 	// constructor
 	public Simulation() {
@@ -143,56 +37,6 @@ public class Simulation {
 				hp = new HostPopulation(i);
 			}
 			demes.add(hp);
-		}
-
-		initializeSiteMutationVectors();
-
-	}
-
-	private void initializeSiteMutationVectors() {
-		for (int siteNumber = 0; siteNumber < Parameters.startingSequence.length(); siteNumber++) {
-			double[][][] currentSiteMutationMatrix = new double[matrixSize][matrixSize][];
-			for (int wildTypeIndex = 0; wildTypeIndex < matrixSize; wildTypeIndex++) {
-				for (int mutationIndex = 0; mutationIndex < matrixSize; mutationIndex++) {
-					if (mutationIndex < wildTypeIndex) { // update lower and upper triangle in this branch.
-						// direction of mutation
-						double theta;
-						if (Parameters.mut2D) {
-							theta = Random.nextDouble(0, 2 * Math.PI);
-						} else {
-							if (Random.nextBoolean(0.5)) {
-								theta = 0;
-							} else {
-								theta = Math.PI;
-							}
-						}
-
-						// size of mutation
-						double r = Parameters.meanStep;
-						if (!Parameters.fixedStep) {
-							double alpha = (Parameters.meanStep * Parameters.meanStep) / (Parameters.sdStep * Parameters.sdStep);
-							double beta = (Parameters.sdStep * Parameters.sdStep) / Parameters.meanStep;
-							r = Random.nextGamma(alpha, beta);
-						}
-
-						// create phenotype
-						double mutA = r * Math.cos(theta);
-						double mutB = r * Math.sin(theta);
-
-						double[] mutations = new double[]{mutA, mutB};
-
-						currentSiteMutationMatrix[wildTypeIndex][mutationIndex] = mutations;
-
-						mutations = new double[]{-1 * mutA, -1 * mutB};
-
-						currentSiteMutationMatrix[mutationIndex][wildTypeIndex] = mutations;
-					} else if (mutationIndex == wildTypeIndex) {
-						currentSiteMutationMatrix[wildTypeIndex][mutationIndex] = new double[]{0.0, 0.0};
-					}
-				}
-			}
-
-			siteMutationVectors.put(siteNumber, currentSiteMutationMatrix);
 		}
 	}
 

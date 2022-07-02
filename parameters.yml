@@ -4,7 +4,7 @@
 
 # simulation parameters
 burnin: 0                                   # days to wait before logging output 
-endDay: 5000                                # number of days to simulate
+endDay: 4000                               # number of days to simulate
 deltaT: 0.1                                 # number of days to move forward in a single timestep
 printStep: 50                               # print to out.timeseries every X days
 tipSamplingRate: 0.0002                     # store X samples per deme per day
@@ -53,7 +53,7 @@ demeAmplitudes: [0.1, 0., 0.1]              # amplitude of seasonality
 demeOffsets: [0., 0., 0.5]                  # seasonal offset relative to the year
 
 # immune parameters  
-phenotypeSpace: "geometricSeq"                  # options include: geometric, geometric3d, geometric10d, sequence, geometricSeq
+phenotypeSpace: "geometricSeq"              # options include: geometric, geometric3d, geometric10d, sequence, geometricSeq
 muPhenotype: 0.005                          # in mutations per individual per day
 waning: false                               # whether to allow waning of host immunity
 waningRate: 0.01                            # rate per day of a host removing a random phenotype from their immune history
@@ -61,11 +61,12 @@ waningRate: 0.01                            # rate per day of a host removing a 
 smithConversion: 0.1                        # multiplier to distance to give cross-immunity
 homologousImmunity: 0.95                    # immunity raised to antigenically identical virus
 initialTraitA: -6.                          # value in dimension 1 for initial host immunity
-meanStep: 0.3                               # mean mutation size
-sdStep: 0.3                                 # standard deviation of mutation size
-meanStepEpitope:
-sdStepEpitope:
+meanStep: 0.3                               # mean mutation size for non-epitopes
+sdStep: 0.3                                 # standard deviation of mutation size for non-epitopes
+meanStepEpitope: 0.5                        # mean mutation size for epitopes
+sdStepEpitope: 0.2                          # standard deviation of mutation size for epitopes
+epitopeCount: 2                             # the total number of epitopes in the sequence
 mut2D: false                                # whether to mutate in a full 360 degree arc
 fixedStep: false                            # whether to fix step size, i.e. ignore sdStep
-startingSequence: "GTAATCATCATCCCTATCAGGGTTTGGAGTGAGTGGTGACGGTTATTCCCCAGGAATGGACTTCTTATTCACAGTCGGTCACATTGGGCTACTCCTTGGGTCTTCCGCTTGGCCCGGTCTGTTGGGCCGCCATTGCGTGAGTTTCGGCCCTGTGCTGCGCTGTGTCGGCGATTCTCATTGGGGCCTCACATCTGGAAACCCCGACCTATTTTGACGGCACCATTGGCGGAAGTTGCTGGGCTTGTGCACCGTGAAGTCCTCCGCGGGCCTCCCCCCTACAAAAGACGATAAGCTCCGGCAAGCAGCATTGATCAACGCAAGGATCGGCGATATTAACAGAGATACGGCTGATTACTCTTGTTGGTGTGGTATCGCTAAACTGCGCCGCGGAGCCTTATGGCAAAGTCGTCCGCGAACCATTCCGGTAGCGCTTAAGGTCCATAGCACATTCATCGCATCCCGGCGTGCGTTCAATTTGACGACCCCTTGGCGCAAAGGTGCTGGCCACGTGCTAAATTAAAGCGGCTGCACTGCTGTAAGGTCCGTTACGGAGAGGGCGGCCTGGGGAGAGCACTAGCCCATCGACCTGTACAGGAACAC"
-alphabetType: "nucleotides"                  # options include: nucleotides, aminoAcids
+startingSequence: "GTAATCGAGTGAGTGATCATCCCTATCAGGGTTTGGAGTGAGTGGTGACGGTTATTCCCCAGGAATGGACTTCTTATTCACAGTCGGTCACATTGGGCTACTCCTTGGGTCTTCCGCTTGGCCCGGTCTGTTGGGCCGCCATTGCGTGAGTTTCGGCCCTGTGCTGCGCTGTGTCGGCGATTCTCATTGGGGCCTCACATCTGGAAACCCCGACCTATTTTGACGGCACCATTGGCGGAAGTTGCTGGGCTTGTGCACCGTGAAGTCCTCCGCGGGCCTCCCCCCTACAAAAGACGATAAGCTCCGGCAAGCAGCATTGATCAACGCAAGGATCGGCGATATTAACAGAGATACGGCTGATTACTCTTGTTGGTGTGGTATCGCTAAACTGCGCCGCGGAGCCTTATGGCAAAGTCGTCCGCGAACCATTCCGGTAGCGCTTAAGGTCCATAGCACATTCATCGCATCCCGGCGTGCGTTCAATTTGACGACCCCTTGGCGCAAAGGTGCTGGCCACGTGCTAAATTAAAGCGGCTGCACTGCTGTAAGGTCCGTTACGGAGAGGGCGGCCTGGGGAGAGCACTAGCCCATCGACCTGTACAGGAACAC" # The original sequence of a Virus
+alphabetType: "nucleotides"                 # options include: nucleotides, aminoAcids

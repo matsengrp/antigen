@@ -8,13 +8,13 @@ import java.io.*;
 public class Parameters {
 
 	public enum AlphabetType {
-		NUCLEOTIDES("AGTC"),
+		NUCLEOTIDES("ACGT"),
 		AMINO_ACIDS("ACDEFGHIKLMNPQRSTWYV");
 
 		private final String validCharacters;
 
 		AlphabetType(String validCharacters) {
-			this. validCharacters = validCharacters;
+			this.validCharacters = validCharacters;
 		}
 
 		public String getValidCharacters() {
@@ -30,89 +30,92 @@ public class Parameters {
 	// simulation parameters
 	public static int burnin = 0;
 	public static int endDay = 5000;
-	public static double deltaT = 0.1;                                 	// number of days to move forward in a single timestep
-	public static int printStep = 10;									// print to out.timeseries every week
-	public static double tipSamplingRate = 0.0002;						// in samples per deme per day
+	public static double deltaT = 0.1; // number of days to move forward in a single timestep
+	public static int printStep = 10; // print to out.timeseries every week
+	public static double tipSamplingRate = 0.0002; // in samples per deme per day
 	public static int tipSamplesPerDeme = 1000;
-	public static boolean tipSamplingProportional = true;				// whether to sample proportional to prevalance
-	public static double treeProportion = 0.1;							// proportion of tips to use in tree reconstruction
-	public static int diversitySamplingCount = 1000;					// how many samples to draw to calculate diversity, Ne*tau, serial interval
-	public static int netauWindow = 100;								// window in days to calculate Ne*tau
-	public static boolean repeatSim = true;								// repeat simulation until endDay is reached?
-	public static boolean immunityReconstruction = false;				// whether to print immunity reconstruction to out.immunity
-	public static boolean memoryProfiling = false;						// requires -javaagent:classmexer.jar to run
+	public static boolean tipSamplingProportional = true; // whether to sample proportional to prevalance
+	public static double treeProportion = 0.1; // proportion of tips to use in tree reconstruction
+	public static int diversitySamplingCount = 1000; // how many samples to draw to calculate diversity, Ne*tau, serial
+														// interval
+	public static int netauWindow = 100; // window in days to calculate Ne*tau
+	public static boolean repeatSim = true; // repeat simulation until endDay is reached?
+	public static boolean immunityReconstruction = false; // whether to print immunity reconstruction to out.immunity
+	public static boolean memoryProfiling = false; // requires -javaagent:classmexer.jar to run
 	public static double yearsFromMK = 1.0;
-	public static boolean pcaSamples = false;							// whether to rotate and flip virus tree
-	public static boolean reducedOutput = false;						// whether to output only out.summary and out.timeseries
-	public static boolean detailedOutput = false;						// whether to output out.hosts and out.viruses files enabling checkpointing
-	public static boolean restartFromCheckpoint = false;				// whether to load population from out.hosts
-	public static String outPath = "output/";							// path to dump output files.
-	public static String outPrefix = "run-";							// suffix for output files.
+	public static boolean pcaSamples = false; // whether to rotate and flip virus tree
+	public static boolean reducedOutput = false; // whether to output only out.summary and out.timeseries
+	public static boolean detailedOutput = false; // whether to output out.hosts and out.viruses files enabling
+													// checkpointing
+	public static boolean restartFromCheckpoint = false; // whether to load population from out.hosts
+	public static String outPath = "output/"; // path to dump output files.
+	public static String outPrefix = "run-"; // suffix for output files.
 
 	// metapopulation parameters
 	public static int demeCount = 3;
-	public static String[] demeNames = {"north", "tropics", "south"};
-	public static int[] initialNs = {1000000,1000000,1000000};
+	public static String[] demeNames = { "north", "tropics", "south" };
+	public static int[] initialNs = { 1000000, 1000000, 1000000 };
 
 	// host parameters
-	public static double birthRate = 0.000091;					// in births per individual per day, 1/30 years = 0.000091
-	public static double deathRate = 0.000091;					// in deaths per individual per day, 1/30 years = 0.000091
-	public static boolean swapDemography = true;				// whether to keep overall population size constant
+	public static double birthRate = 0.000091; // in births per individual per day, 1/30 years = 0.000091
+	public static double deathRate = 0.000091; // in deaths per individual per day, 1/30 years = 0.000091
+	public static boolean swapDemography = true; // whether to keep overall population size constant
 
 	// epidemiological parameters
-	public static int initialI = 10;							// in individuals
-	public static int initialDeme = 2;							// index of deme where infection starts, 1..n
-	public static double initialPrR = 0.5; 						// as proportion of population
-	public static double beta = 0.36; // 0.3					// in contacts per individual per day
-	public static double nu = 0.2; //0.2						// in recoveries per individual per day
-	public static double betweenDemePro = 0.0005;				// relative to within-deme beta	
+	public static int initialI = 10; // in individuals
+	public static int initialDeme = 2; // index of deme where infection starts, 1..n
+	public static double initialPrR = 0.5; // as proportion of population
+	public static double beta = 0.36; // 0.3 // in contacts per individual per day
+	public static double nu = 0.2; // 0.2 // in recoveries per individual per day
+	public static double betweenDemePro = 0.0005; // relative to within-deme beta
 
 	// transcendental immunity
 	public static boolean transcendental = false;
-	public static double immunityLoss = 0.01;					// in R->S per individual per day
+	public static double immunityLoss = 0.01; // in R->S per individual per day
 	public static double initialPrT = 0.1;
 
 	// seasonal betas
-	public static double[] demeBaselines = {1,1,1};
-	public static double[] demeAmplitudes = {0.1,0,0.1};
-	public static double[] demeOffsets = {0,0,0.5};				// relative to the year
+	public static double[] demeBaselines = { 1, 1, 1 };
+	public static double[] demeAmplitudes = { 0.1, 0, 0.1 };
+	public static double[] demeOffsets = { 0, 0, 0.5 }; // relative to the year
 
 	// phenotype parameters
-	public static String phenotypeSpace = "geometric";			// options include: "geometric", "geometric3d", "geometric10d"
-	public static double muPhenotype = 0.005; 					// in mutations per individual per day
-	public static boolean waning = false;						// whether to allow waning of host immunity
-	public static double waningRate = 0.01;						// rate per day of a host removing a random phenotype from their immune history
+	public static String phenotypeSpace = "geometric"; // options include: "geometric", "geometric3d", "geometric10d"
+	public static double muPhenotype = 0.005; // in mutations per individual per day
+	public static boolean waning = false; // whether to allow waning of host immunity
+	public static double waningRate = 0.01; // rate per day of a host removing a random phenotype from their immune
+											// history
 
 	// parameters specific to GeometricPhenotype
-	public static double smithConversion = 0.1;					// multiplier to distance to give cross-immunity
-	public static double homologousImmunity = 0.05;				// immunity raised to antigenically identical virus
+	public static double smithConversion = 0.1; // multiplier to distance to give cross-immunity
+	public static double homologousImmunity = 0.05; // immunity raised to antigenically identical virus
 	public static double initialTraitA = -6;
 	public static double meanStep = 0.3;
 	public static double sdStep = 0.3;
-	public static boolean mut2D = false;						// whether to mutate in a full 360 degree arc
-	public static boolean fixedStep = false;					// whether to fix mutation step size
-
-	// parameters specific to SequencePhenotype
-	public static String startingSequence = "AGTC";
-	public static String crossImmunityFunction = "exponential";
-	public static double crossImmunityStrength = 1.0;		    // default starting sequence
-	public static String alphabetType = "nucleotides";          // default sequence to consist of nucleotides
-	public static String alphabet = AlphabetType.NUCLEOTIDES.getValidCharacters();                     // default valid letters to be nucleotides
+	public static boolean mut2D = false; // whether to mutate in a full 360 degree arc
+	public static boolean fixedStep = false; // whether to fix mutation step size
+	public static String startingSequence = "AGAGTCTAGTCC"; // default starting sequence
+	public static String alphabetType = "nucleotides"; // default sequence to consist of nucleotides
+	public static String alphabet = AlphabetType.NUCLEOTIDES.getValidCharacters(); // default valid letters to be
+																					// nucleotides
+	public static int epitopeCount = 1;
+	public static double meanStepEpitope = 0.3;
+	public static double sdStepEpitope = 0.3;
 
 	// measured in years, starting at burnin
 	public static double getDate() {
-		return (day - (double) burnin ) / 365.0;
+		return (day - (double) burnin) / 365.0;
 	}
 
 	public static boolean dayIsInteger() {
-   		return Math.ceil(day) - Math.floor(day) == 0;
+		return Math.ceil(day) - Math.floor(day) == 0;
 	}
 
 	public static double getSeasonality(int index) {
 		double baseline = demeBaselines[index];
 		double amplitude = demeAmplitudes[index];
 		double offset = demeOffsets[index];
-		return baseline + amplitude * Math.cos(2*Math.PI*getDate() + 2*Math.PI*offset);
+		return baseline + amplitude * Math.cos(2 * Math.PI * getDate() + 2 * Math.PI * offset);
 	}
 
 	// initialize
@@ -121,7 +124,7 @@ public class Parameters {
 		urImmunity = PhenotypeFactory.makeHostPhenotype();
 	}
 
-	// load parameters.yml	
+	// load parameters.yml
 	public static void load() {
 
 		try {
@@ -279,7 +282,7 @@ public class Parameters {
 				startingSequence = (String) map.get("startingSequence");
 
 				if (phenotypeSpace.equals("geometricSeq")) {
-					assert(startingSequence.length() % 3 == 0) : "startingSequence length should be a multiple of 3";
+					assert (startingSequence.length() % 3 == 0) : "startingSequence length should be a multiple of 3";
 				}
 			}
 			if (map.get("crossImmunityFunction") != null) {
@@ -295,11 +298,21 @@ public class Parameters {
 					alphabet = AlphabetType.AMINO_ACIDS.getValidCharacters();
 				}
 			}
-			if (map.get("outPath") != null){
-				outPath = (String) map.get("outPath");
+
+			if (map.get("epitopeCount") != null) {
+				epitopeCount = (int) map.get("epitopeCount");
+				int totalSites = startingSequence.length() / 3;
+				if (epitopeCount > totalSites) {
+					epitopeCount = totalSites;
+				}
 			}
-			if (map.get("outPrefix") != null){
-				outPrefix= (String) map.get("outPrefix");
+
+			if (map.get("meanStepEpitope") != null) {
+				meanStepEpitope = (double) map.get("meanStepEpitope");
+			}
+
+			if (map.get("sdStepEpitope") != null) {
+				sdStepEpitope = (double) map.get("sdStepEpitope");
 			}
 
 		} catch (IOException e) {
@@ -309,27 +322,27 @@ public class Parameters {
 	}
 
 	private static int[] toIntArray(List<Integer> list) {
-  		int[] ret = new int[list.size()];
-  		for (int i = 0; i < ret.length; i++) {
-    		ret[i] = list.get(i);
-    	}
-  		return ret;
+		int[] ret = new int[list.size()];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = list.get(i);
+		}
+		return ret;
 	}
 
 	private static double[] toDoubleArray(List<Double> list) {
-  		double[] ret = new double[list.size()];
-  		for (int i = 0; i < ret.length; i++) {
-    		ret[i] = list.get(i);
-    	}
-  		return ret;
+		double[] ret = new double[list.size()];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = list.get(i);
+		}
+		return ret;
 	}
 
 	private static String[] toStringArray(List<String> list) {
-  		String[] ret = new String[list.size()];
-  		for (int i = 0; i < ret.length; i++) {
-    		ret[i] = list.get(i);
-    	}
-  		return ret;
+		String[] ret = new String[list.size()];
+		for (int i = 0; i < ret.length; i++) {
+			ret[i] = list.get(i);
+		}
+		return ret;
 	}
 
 }
