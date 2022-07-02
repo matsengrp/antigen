@@ -11,21 +11,34 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
     /**
      * The valid letters that make up the nucleotide sequence of this GeometricSeqPhenotype.
      *
-     * Valid letters are {A, G, T , C}
+     * Valid letters are {A, C, G, T}
      */
     private final char[] ALPHABET = Parameters.AlphabetType.NUCLEOTIDES.getValidCharacters().toCharArray();
-
-    /**
-     * The corresponding GeometricPhenotype of this GeometricSeqPhenotype
-     */
-    //private GeometricPhenotype correspondingGeometricPhenotype;
 
     /**
      * The nucleotide sequence of this GeometricSeqPhenotype
      */
     private char[] nucleotideSequence;
+
+    /**
+     * The first parameter that determines the position of this GeometricPhenotype in Euclidean space
+     */
     private double traitA;
+
+    /**
+     * The second parameter that determines the position of this GeometricPhenotype in Euclidean space
+     */
     private double traitB;
+
+    /**
+     * The number of epitope mutations this GeometricPhenotype went through, beginning with Parameters.startingSequence
+     */
+    private int eMutation = 0;
+
+    /**
+     * The number of non-epitope mutations this GeometricPhenotype went through, beginning with Parameters.startingSequence
+     */
+    private int neMutation = 0;
 
     /**
      * Run expensive tests iff DEBUG == true.
@@ -34,7 +47,9 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
 
     // Abstraction Function:
     // A GeometricSeqPhenotype, gsp, is null if gsp.sequence = null,
-    // otherwise gsp.sequence = sequence for sequence.length() > 0 and sequence.length() % 3 == 0
+    // otherwise gsp.sequence = sequence for sequence.length() > 0 and sequence.length() % 3 == 0.
+    //
+    // The location of gsp in Euclidean space is defined by (traitA, traitB) each gsp is associated with a sequence of nucleotides.
     // gsp1.sequence and gsp2.sequence are allowed to be equal for two given GeometricSeqPhenotype
 
     // Representation invariant for every GeometricSeqPhenotype:
@@ -53,6 +68,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
     public GeometricSeqPhenotype() {
         this.nucleotideSequence = new char[Parameters.startingSequence.length()];
         startingSequenceGenerator();
+        checkRep();
     }
 
     /**
@@ -68,7 +84,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         traitB = tB;
 
         startingSequenceGenerator();
-        //checkRep();
+        checkRep();
     }
 
     // Generates a random sequence of nucleotides of length Parameters.startingSequence.length()
@@ -76,6 +92,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         for (int siteIndex = 0; siteIndex < Parameters.startingSequence.length(); siteIndex += 3) {
             String aminoAcid = "";
 
+            // Generate codon at siteIndex
             while (aminoAcid.equals("") || aminoAcid.equals("STOP")) {
                 String codon = "";
                 for (int codonIndex = 0; codonIndex < 3; codonIndex++) {
@@ -84,10 +101,9 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
                     codon += nucleotide;
                     this.nucleotideSequence[siteIndex + codonIndex] = nucleotide;
                 }
-                aminoAcid = Simulation.codonMap.get(codon);
+                aminoAcid = Biology.CodonMap.CODONS.getAminoAcid(codon);
             }
         }
-        System.out.println(String.valueOf(this.nucleotideSequence));
     }
 
     /**
@@ -104,28 +120,53 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         traitA = tA;
         traitB = tB;
         this.nucleotideSequence = startingSequence;
-        //checkRep();
+        checkRep();
     }
 
+    public GeometricSeqPhenotype(double tA, double tB, char[] startingSequence, int e, int ne) {
+        traitA = tA;
+        traitB = tB;
+        this.nucleotideSequence = startingSequence;
+        this.eMutation = e;
+        this.neMutation = ne;
+        checkRep();
+    }
+
+    /**
+     * Return x-coordinate of where this GeometricSeqPhenotype is in Euclidean space
+     *
+     * @return position of this GeometricSeqPhenotype along the x-axis
+    */
     public double getTraitA() {
         return traitA;
     }
 
+    /**
+     * Return y-coordinate of where this GeometricSeqPhenotype is in Euclidean space
+     *
+     * @return position of this GeometricSeqPhenotype along the y-axis
+     */
     public double getTraitB() {
         return traitB;
     }
 
     public String getSequence() {
-        return Arrays.toString(this.nucleotideSequence);
+        return String.valueOf(this.nucleotideSequence);
     }
 
-
+    /**
+     * Return the (Euclidean) distance between this GeometricSeqPhenotype and p in Euclidean space
+     *
+     * @param p  GeometricSeqPhenotype to calculate the distance between
+     * @return distance between this GeometricSeqPhenotype and p
+     */
     public double distance(Phenotype p) {
         GeometricSeqPhenotype p2d = (GeometricSeqPhenotype) p;
         double distA = (getTraitA() - p2d.getTraitA());
         double distB = (getTraitB() - p2d.getTraitB());
         double dist = (distA * distA) + (distB * distB);
         dist = Math.sqrt(dist);
+        checkRep();
         return dist;
     }
 
@@ -140,66 +181,82 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         // If mutation creates a stop codon, then mutate at another index
 
         // this.nucleotideSequence is a char[] instead of
-        //  - String since Strings are immutable. New Strings have to be created to mutate a sequence, which is messy and uses up heap space. Plus, Strings include an extra byte '\n'.
+        //  - String since Strings are immutable. New Strings have to be created to mutate a sequence,
+        //    which is messy and uses up extra heap space. Plus, Strings include an extra byte '\n'.
         //  - StringBuffer because it's just a Wrapper around a char[], and has functionality that we don't need such as resizing.
 
         String wildTypeAminoAcid = "", mutantAminoAcid = "";
         int mutationIndexSiteSequence = -1;
-        char randomMutatedNucleotide = '@';
+        int mutationIndexSite = -1;
+        char mutatedNucleotide = '@', originalNucleotide = '@';
 
+        // mutate at least once
+        // keep mutating if mutation generates a stop codon
         while (mutantAminoAcid.equals("") || mutantAminoAcid.equals("STOP")) {
+            // choose random index to mutate in this.nucleotideSequence
             mutationIndexSiteSequence = random(this.nucleotideSequence.length);
 
-            int codonStartIndex = 3 * (mutationIndexSiteSequence / 3);
-            String originalCodon = "" + this.nucleotideSequence[codonStartIndex] + this.nucleotideSequence[codonStartIndex + 1] + this.nucleotideSequence[codonStartIndex + 2];
+            originalNucleotide = this.nucleotideSequence[mutationIndexSiteSequence];
 
-            wildTypeAminoAcid = Simulation.codonMap.get(originalCodon);
+            int mutationIndexSiteCodon = mutationIndexSiteSequence % 3; // index of nucleotide being mutated in codon {0, 1, 2}
+            mutationIndexSite = mutationIndexSiteSequence / 3; // site # where mutation is occurring {0, . . ., total number of sites - 1}
+            int codonStartIndex = 3 * mutationIndexSite; // start index of nucleotide being mutated in codon {0, 3, 6, . . .}
 
-            int mutationIndexSiteCodon = mutationIndexSiteSequence % 3;
             char originalNucleotideToMutate = this.nucleotideSequence[mutationIndexSiteSequence];
-            double[] transitionTransversion = Simulation.transitionTranversionProbability.get(originalNucleotideToMutate);
+            String originalCodon = "" + this.nucleotideSequence[codonStartIndex] +
+                                        this.nucleotideSequence[codonStartIndex + 1] +
+                                        this.nucleotideSequence[codonStartIndex + 2];
+            wildTypeAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(originalCodon);
 
+            // get mutant nucleotide (transition versus transversion)
+            mutatedNucleotide = Biology.MutationType.MUTATION.getNucleotide(originalNucleotideToMutate);
 
-            double randomNum = Math.random();
-            int indexAlphabet = 0;
-            for (int i = 0; i < 4; i++) {
-                if (randomNum < transitionTransversion[i]) {
-                    indexAlphabet = i;
-                    break;
-                }
-            }
-
-            randomMutatedNucleotide = Parameters.AlphabetType.NUCLEOTIDES.getValidCharacters().charAt(indexAlphabet);
+            // get new codon after mutation occurs
             StringBuffer mutatedCodon = new StringBuffer(originalCodon);
-            mutatedCodon.setCharAt(mutationIndexSiteCodon, randomMutatedNucleotide);
-            mutantAminoAcid = Simulation.codonMap.get(mutatedCodon.toString());
+            mutatedCodon.setCharAt(mutationIndexSiteCodon, mutatedNucleotide);
+            mutantAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(mutatedCodon.toString());
         }
 
-        this.nucleotideSequence[mutationIndexSiteSequence] = randomMutatedNucleotide;
+        // get new nucleotide sequence after mutating at the random index
+        char[] copyNucleotideSequence = Arrays.copyOf(this.nucleotideSequence, Parameters.startingSequence.length());
+        copyNucleotideSequence[mutationIndexSiteSequence] = mutatedNucleotide;
 
-        //
-
+        // get indices for the matrix based on the wild type and mutant amino acids
+        // matrix i,j correspond with the String "ACDEFGHIKLMNPQRSTWYV"
         int mSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(wildTypeAminoAcid);
         int nSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(mutantAminoAcid);
 
-        double[] mutations = Simulation.siteMutationVectors.get(mutationIndexSiteSequence)[mSiteMutationVectors][nSiteMutationVectors];
+        double[] mutations = Biology.SiteMutationVectors.VECTORS.getVector(mutationIndexSite, mSiteMutationVectors, nSiteMutationVectors); // use matrix at site # where mutation is occurring
+        double mutA = getTraitA() + mutations[0]; // r * cos(theta)
+        double mutB = getTraitB() + mutations[1]; // r * sin(theta)
 
-        double mutA = getTraitA() + mutations[0];
-        double mutB = getTraitB() + mutations[1];
+        // count number of epitope and non-epitope mutations
+        int eMutationNew = this.eMutation;
+        int neMutationNew = this.neMutation;
+        if (Biology.SiteMutationVectors.VECTORS.getEpitopeSites().contains(mutationIndexSite)) {
+            eMutationNew += 1;
+        } else {
+            neMutationNew += 1;
+        }
 
-        Phenotype mutP = new GeometricSeqPhenotype(mutA,mutB, Arrays.copyOf(this.nucleotideSequence, Parameters.startingSequence.length()));
+        // For testing transition versus transversion ratio
+        // TestGeometricSeqPhenotype.mutations.println("" + originalNucleotide + mutatedNucleotide);
+
+        checkRep();
+        Phenotype mutP = new GeometricSeqPhenotype(mutA,mutB, copyNucleotideSequence, eMutationNew, neMutationNew);
         return mutP;
     }
 
     /**
-     * Returns the sequence and the position of this GeometricSeqPhenotype (i.e. the String representation of the GeometricSeqPhenotype represented by this).
-     * Valid example outputs include "ACG, 0.0, 0.0" and "ACGTGTACGTGT, 2.3, 8.9".
+     * Returns the sequence, the position of this GeometricSeqPhenotype, and number of epitope and non-epitope mutations
+     * (i.e. the String representation of the GeometricSeqPhenotype represented by this).
+     * Valid example outputs include "ACG, 0.0, 0.0, 0, 0" and "ACGTGTACGTGT, 2.3, 8.9, 40, 10".
      *
      * @return the String representation of the GeometricSeqPhenotype represented by this.
      */
     public String toString() {
-        String fullString = String.format("%s, %.4f,%.4f", String.valueOf(this.nucleotideSequence), this.getTraitA(),
-                                          this.getTraitB());
+        String fullString = String.format("%s, %.4f, %.4f, %d, %d", String.valueOf(this.nucleotideSequence), this.getTraitA(),
+                                          this.getTraitB(), this.eMutation, this.neMutation);
         return fullString;
     }
 
@@ -209,19 +266,16 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         return random.nextInt(0, maxRange - 1);
     }
 
-    /**
-     * Throws an exception if the representation invariant is violated.
-     */
-//    private void checkRep() {
-//        if (DEBUG)  {
-//            assert(this.nucleotideSequence.length == Parameters.startingSequence.length()) : "Nucleotide sequences must remain the same length throughout a Simulation";
-//            assert(this.correspondingGeometricPhenotype != null) : "All GeometricSeqPhenotypes must have a GeometricPhenotype";
-//            for (int i = 0; i < this.nucleotideSequence.length; i += 3) {
-//                String triplet = "" + this.nucleotideSequence[i] + this.nucleotideSequence[i + 1] + this.nucleotideSequence[i + 2];
-//                String translatedAminoAcid = Simulation.codonMap.get(triplet);
-//
-//                assert(!translatedAminoAcid.equals("STOP")) : "There should not be a stop codon at site " + (i/3);
-//            }
-//        }
-//    }
+    // Throws an exception if the representation invariant is violated.
+    private void checkRep() {
+        if (DEBUG)  {
+            assert(this.nucleotideSequence.length == Parameters.startingSequence.length()) : "Nucleotide sequences must remain the same length throughout a Simulation";
+            for (int i = 0; i < this.nucleotideSequence.length; i += 3) {
+                String triplet = "" + this.nucleotideSequence[i] + this.nucleotideSequence[i + 1] + this.nucleotideSequence[i + 2];
+                String translatedAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(triplet);
+
+                assert(!translatedAminoAcid.equals("STOP")) : "There should not be a stop codon at site " + (i/3);
+            }
+        }
+    }
 }

@@ -8,7 +8,7 @@ import java.io.*;
 public class Parameters {
 
 	public enum AlphabetType {
-		NUCLEOTIDES("AGTC"),
+		NUCLEOTIDES("ACGT"),
 		AMINO_ACIDS("ACDEFGHIKLMNPQRSTWYV");
 
 		private final String validCharacters;
@@ -89,9 +89,12 @@ public class Parameters {
 	public static double sdStep = 0.3;
 	public static boolean mut2D = false;						// whether to mutate in a full 360 degree arc
 	public static boolean fixedStep = false;					// whether to fix mutation step size
-	public static String startingSequence = "AGTC";				// default starting sequence
+	public static String startingSequence = "AGAGTCTAGTCC";				// default starting sequence
 	public static String alphabetType = "nucleotides";          // default sequence to consist of nucleotides
 	public static String alphabet = AlphabetType.NUCLEOTIDES.getValidCharacters();                     // default valid letters to be nucleotides
+	public static int epitopeCount = 1;
+	public static double meanStepEpitope = 0.3;
+	public static double sdStepEpitope = 0.3;
 
 	// measured in years, starting at burnin
 	public static double getDate() {
@@ -283,6 +286,23 @@ public class Parameters {
 					alphabet = AlphabetType.AMINO_ACIDS.getValidCharacters();
 				}
 			}
+
+			if (map.get("epitopeCount") != null) {
+				epitopeCount = (int) map.get("epitopeCount");
+				int totalSites = startingSequence.length() / 3;
+				if (epitopeCount > totalSites) {
+					epitopeCount = totalSites;
+				}
+			}
+
+			if (map.get("meanStepEpitope") != null) {
+				meanStepEpitope = (double) map.get("meanStepEpitope");
+			}
+
+			if (map.get("sdStepEpitope") != null) {
+				sdStepEpitope = (double) map.get("sdStepEpitope");
+			}
+
 
 		} catch (IOException e) {
 			System.out.println("Cannot load parameters.yml, using defaults");
