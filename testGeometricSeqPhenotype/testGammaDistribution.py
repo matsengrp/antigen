@@ -6,7 +6,7 @@ import numpy as np
 import scipy.stats as stats
 
 def make_map():
-    for i in range(10): # update range() to change the number of graphs to produce
+    for i in range(567): # update range() to change the number of graphs to produce
         data = pd.read_csv("valuesGammaDistribution/0_site" + str(i) + ".csv")
 
         data = data[["r", "theta"]]
@@ -16,7 +16,7 @@ def make_map():
         sns.distplot(data['r'])
 
         # ~Gamma
-        x = np.arange(0, 5, 0.1)
+        x = np.arange(0, 3, 0.1)
         y = stats.gamma.pdf(x, a=1, scale=0.3)
 
         plt.plot(x, y)

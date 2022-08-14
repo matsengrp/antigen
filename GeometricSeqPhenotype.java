@@ -9,13 +9,6 @@ import java.util.Arrays;
  */
 public class GeometricSeqPhenotype extends GeometricPhenotype {
     /**
-     * The valid letters that make up the nucleotide sequence of this GeometricSeqPhenotype.
-     *
-     * Valid letters are {A, C, G, T}
-     */
-    private final char[] ALPHABET = Parameters.AlphabetType.NUCLEOTIDES.getValidCharacters().toCharArray();
-
-    /**
      * The nucleotide sequence of this GeometricSeqPhenotype
      */
     private char[] nucleotideSequence;
@@ -31,12 +24,12 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
     private double traitB;
 
     /**
-     * The number of epitope mutations this GeometricPhenotype went through, beginning with Parameters.startingSequence
+     * The number of epitope mutations this GeometricPhenotype went through (counting from the startingSequence)
      */
     private int eMutation = 0;
 
     /**
-     * The number of non-epitope mutations this GeometricPhenotype went through, beginning with Parameters.startingSequence
+     * The number of non-epitope mutations this GeometricPhenotype went through (counting from the startingSequence)
      */
     private int neMutation = 0;
 
@@ -89,6 +82,8 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
 
     // Generates a random sequence of nucleotides of length Parameters.startingSequence.length()
     private void startingSequenceGenerator() {
+        char[] nucleotideAlphabet = Parameters.AlphabetType.NUCLEOTIDES.getValidCharacters().toCharArray();
+
         for (int siteIndex = 0; siteIndex < Parameters.startingSequence.length(); siteIndex += 3) {
             String aminoAcid = "";
 
@@ -96,8 +91,8 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
             while (aminoAcid.equals("") || aminoAcid.equals("STOP")) {
                 String codon = "";
                 for (int codonIndex = 0; codonIndex < 3; codonIndex++) {
-                    int indexAlphabet = random(this.ALPHABET.length);
-                    char nucleotide = this.ALPHABET[indexAlphabet];
+                    int indexAlphabet = random(nucleotideAlphabet.length);
+                    char nucleotide = nucleotideAlphabet[indexAlphabet];
                     codon += nucleotide;
                     this.nucleotideSequence[siteIndex + codonIndex] = nucleotide;
                 }
@@ -180,15 +175,14 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         // Mutates a nucleotide in the sequence at a random index
         // If mutation creates a stop codon, then mutate at another index
 
-        // this.nucleotideSequence is a char[] instead of
+        // this.nucleotideSequence is represented using a char[] instead of
         //  - String since Strings are immutable. New Strings have to be created to mutate a sequence,
         //    which is messy and uses up extra heap space. Plus, Strings include an extra byte '\n'.
         //  - StringBuffer because it's just a Wrapper around a char[], and has functionality that we don't need such as resizing.
 
         String wildTypeAminoAcid = "", mutantAminoAcid = "";
         int mutationIndexSiteSequence = -1;
-        int mutationIndexSite = -1;
-        char mutatedNucleotide = '@', originalNucleotide = '@';
+        char mutatedNucleotide = ' ', originalNucleotide = ' ';
 
         // mutate at least once
         // keep mutating if mutation generates a stop codon
@@ -198,38 +192,30 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
 
             originalNucleotide = this.nucleotideSequence[mutationIndexSiteSequence];
 
-            int mutationIndexSiteCodon = mutationIndexSiteSequence % 3; // index of nucleotide being mutated in codon {0, 1, 2}
-            mutationIndexSite = mutationIndexSiteSequence / 3; // site # where mutation is occurring {0, . . ., total number of sites - 1}
-            int codonStartIndex = 3 * mutationIndexSite; // start index of nucleotide being mutated in codon {0, 3, 6, . . .}
-
             char originalNucleotideToMutate = this.nucleotideSequence[mutationIndexSiteSequence];
-            String originalCodon = "" + this.nucleotideSequence[codonStartIndex] +
-                                        this.nucleotideSequence[codonStartIndex + 1] +
-                                        this.nucleotideSequence[codonStartIndex + 2];
-            wildTypeAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(originalCodon);
 
-            // get mutant nucleotide (transition versus transversion)
+            // get mutant nucleotide (transition transversion ratio)
             mutatedNucleotide = Biology.MutationType.MUTATION.getNucleotide(originalNucleotideToMutate);
 
-            // get new codon after mutation occurs
-            StringBuffer mutatedCodon = new StringBuffer(originalCodon);
-            mutatedCodon.setCharAt(mutationIndexSiteCodon, mutatedNucleotide);
-            mutantAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(mutatedCodon.toString());
+            String[] wildTypeMutantAminoAcids = mutateHelper(mutationIndexSiteSequence, mutatedNucleotide);
+
+            wildTypeAminoAcid = wildTypeMutantAminoAcids[0];
+            mutantAminoAcid = wildTypeMutantAminoAcids[1];
         }
 
+        int mutationIndexSite = mutationIndexSiteSequence / 3; // site # where mutation is occurring {0, . . ., total number of sites - 1}
+
+        // update parameter 1 and 2
+        double[] vectors = getVectors(mutationIndexSite, wildTypeAminoAcid, mutantAminoAcid);
+        double mutA = vectors[0];
+        double mutB = vectors[1];
+
+        // update parameter 3
         // get new nucleotide sequence after mutating at the random index
         char[] copyNucleotideSequence = Arrays.copyOf(this.nucleotideSequence, Parameters.startingSequence.length());
         copyNucleotideSequence[mutationIndexSiteSequence] = mutatedNucleotide;
 
-        // get indices for the matrix based on the wild type and mutant amino acids
-        // matrix i,j correspond with the String "ACDEFGHIKLMNPQRSTWYV"
-        int mSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(wildTypeAminoAcid);
-        int nSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(mutantAminoAcid);
-
-        double[] mutations = Biology.SiteMutationVectors.VECTORS.getVector(mutationIndexSite, mSiteMutationVectors, nSiteMutationVectors); // use matrix at site # where mutation is occurring
-        double mutA = getTraitA() + mutations[0]; // r * cos(theta)
-        double mutB = getTraitB() + mutations[1]; // r * sin(theta)
-
+        // update parameter 4 and 5
         // count number of epitope and non-epitope mutations
         int eMutationNew = this.eMutation;
         int neMutationNew = this.neMutation;
@@ -239,12 +225,53 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
             neMutationNew += 1;
         }
 
-        // For testing transition versus transversion ratio
+        // uncomment line below to test transition transversion ratio:
         // TestGeometricSeqPhenotype.mutations.println("" + originalNucleotide + mutatedNucleotide);
 
         checkRep();
-        Phenotype mutP = new GeometricSeqPhenotype(mutA,mutB, copyNucleotideSequence, eMutationNew, neMutationNew);
+        Phenotype mutP = new GeometricSeqPhenotype(mutA, mutB, copyNucleotideSequence, eMutationNew, neMutationNew);
         return mutP;
+    }
+
+    // Returns a vector from the precomputed matrices given wild type and mutant amino acids
+    // and the amino acid site where the nucleotide mutation occurs.
+    private double[] getVectors(int mutationIndexSite, String wildTypeAminoAcid, String mutantAminoAcid) {
+        double mutA = 0.0;
+        double mutB = 0.0;
+        if (!wildTypeAminoAcid.equals(mutantAminoAcid)) {
+            // get indices for the matrix based on the wild type and mutant amino acids
+            // matrix i,j correspond with the String "ACDEFGHIKLMNPQRSTWYV"
+            int mSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(wildTypeAminoAcid);
+            int nSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(mutantAminoAcid);
+
+            double[] mutations = Biology.SiteMutationVectors.VECTORS.getVector(mutationIndexSite, mSiteMutationVectors, nSiteMutationVectors); // use matrix at site # where mutation is occurring
+            mutA = getTraitA() + mutations[0]; // r * cos(theta)
+            mutB = getTraitB() + mutations[1]; // r * sin(theta)
+        }
+
+        return new double[]{mutA, mutB};
+    }
+
+    // Mutates nucleotide sequence at given mutationIndexSiteSequence with given char mutatedNucleotide.
+    // Returns the wild type and mutant amino acid as a String[]
+    //
+    // package private helper method so that the updating of the nucleotide sequence can be tested in TestGeometricSeqPhenotype.java
+    String[] mutateHelper(int mutationIndexSiteSequence, char mutatedNucleotide) {
+        int mutationIndexSiteCodon = mutationIndexSiteSequence % 3; // index of nucleotide being mutated in codon {0, 1, 2}
+        int mutationIndexSite = mutationIndexSiteSequence / 3; // site # where mutation is occurring {0, . . ., total number of sites - 1}
+        int codonStartIndex = 3 * mutationIndexSite; // start index of nucleotide being mutated in codon {0, 3, 6, . . .}
+
+        String originalCodon = "" + this.nucleotideSequence[codonStartIndex] +
+                this.nucleotideSequence[codonStartIndex + 1] +
+                this.nucleotideSequence[codonStartIndex + 2];
+        String wildTypeAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(originalCodon);
+
+        // get new codon after mutation occurs
+        StringBuilder mutatedCodon = new StringBuilder(originalCodon);
+        mutatedCodon.setCharAt(mutationIndexSiteCodon, mutatedNucleotide);
+        String mutantAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(mutatedCodon.toString());
+
+        return new String[]{wildTypeAminoAcid, mutantAminoAcid};
     }
 
     /**

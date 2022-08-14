@@ -16,7 +16,6 @@ public class PhenotypeFactory {
 		if (GEOMETRIC.equals(Parameters.phenotypeSpace)) { p = new GeometricPhenotype(); }	
 		if (GEOMETRIC3D.equals(Parameters.phenotypeSpace)) { p = new GeometricPhenotype3D(); }
 		if (GEOMETRIC10D.equals(Parameters.phenotypeSpace)) { p = new GeometricPhenotype10D(); }
-		if (SEQUENCE.equals(Parameters.phenotypeSpace)) { p = new SequencePhenotype(); }
 		if (GEOMETRIC_SEQ.equals(Parameters.phenotypeSpace)) { p = new GeometricSeqPhenotype(); }
 		return p;
 	
@@ -35,9 +34,6 @@ public class PhenotypeFactory {
 		if (GEOMETRIC10D.equals(Parameters.phenotypeSpace)) {
 			double[] traits = {Parameters.initialTraitA, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 			p = new GeometricPhenotype10D(traits); 
-		}
-		if (SEQUENCE.equals(Parameters.phenotypeSpace)) {
-			p = new SequencePhenotype(Parameters.startingSequence);
 		}
 		if (GEOMETRIC_SEQ.equals(Parameters.phenotypeSpace)) {
 			String startingSequence = Parameters.startingSequence;

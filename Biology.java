@@ -1,6 +1,10 @@
+import cern.colt.Arrays;
+
+import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Scanner;
 
 /**
  * A class that allows antigen to model mutations more realistically, thus, respecting biology
@@ -8,6 +12,40 @@ import java.util.Map;
  * @author Thien Tran
  */
 public class Biology {
+    public enum DMSData {
+        DMS_DATA();
+        public final double[][] aminoAcidPreference;
+
+        DMSData() {
+            int numberOfAminoAcidSites = Parameters.startingSequence.length() / 3;
+            int numberOfAminoAcids = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
+            aminoAcidPreference = new double[numberOfAminoAcidSites][numberOfAminoAcids];
+
+            try {
+                Scanner dms = new Scanner(new File(Parameters.DMSData));
+                dms.nextLine(); // read header
+
+                for (int i = 0; i < numberOfAminoAcidSites; i++) {
+                    Scanner currentSite = new Scanner(dms.nextLine());
+                    currentSite.useDelimiter(",");
+
+                    currentSite.next(); // ignore site number
+
+                    for (int j = 0; j < numberOfAminoAcids; j++) {
+                        double probability = currentSite.nextDouble();
+                        aminoAcidPreference[i][j] = probability;
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        public double[][] getAminoAcidPreference() {
+            return aminoAcidPreference;
+        }
+    }
+
     /**
      * Possible mutations that can occur at a single nucleotide site
      */
@@ -17,13 +55,22 @@ public class Biology {
 
         MutationType() {
             this.transitionTranversionProbability = new HashMap<>()  {{
+                double transition = 0.5 / (Parameters.transitionTransversionRatio + 1.0);
+                double transversion = Parameters.transitionTransversionRatio / (Parameters.transitionTransversionRatio + 1.0);
                 // key: nucleotide
                 // value: int[] that gives the probability of being < to the index which corresponds to [A, C, G, T]
-                put('A', new double[]{0, 0.25, 0.75, 1.0});
-                put('C', new double[]{0.25, 0.25, 0.5, 1.0});
-                put('G', new double[]{0.5, 0.75, 0.75, 1.0});
-                put('T', new double[]{0.25, 0.75, 1.0, 1.0});
-                // TODO: allow ratio to be updated using parameters.yml
+
+                // Example:
+                // Parameters.transitionTransversionRatio: 5.0
+                // A: {0, 0.5/6, 5.5/6.0, 1.0}
+                // C: {0.5/6.0, 0.5/6.0, 1.0/6.0, 1.0}
+                // G: {5.0/6.0, 5.5/6.0, 5.5/6.0, 1.0}
+                // T: {0.5/6.0, 5.5/6.0, 1.0, 1.0}
+
+                put('A', new double[]{0, transition, transition + transversion, 1.0});
+                put('C', new double[]{transition, transition, transition + transition, 1.0});
+                put('G', new double[]{transversion, transversion + transition, transversion + transition, 1.0});
+                put('T', new double[]{transition, transition + transversion, 1.0, 1.0});
             }};
         }
 
@@ -47,7 +94,6 @@ public class Biology {
                 }
             }
 
-            // return "ACGT".charAt(indexAlphabet)
             return Parameters.AlphabetType.NUCLEOTIDES.getValidCharacters().charAt(indexAlphabet);
         }
     }
@@ -168,17 +214,13 @@ public class Biology {
         private final int totalSites = Parameters.startingSequence.length() / 3;
 
         public final Map<Integer, double[][][]> siteMutationVectors;
-        public final HashSet epitopeSites;
+        public final HashSet<Integer> epitopeSites;
         public final String[] stringOutputCSV = new String[totalSites]; // String[] to create CSV from
 
         SiteMutationVectors() {
-            // choose n sites to be epitopes without replacement
-            // n = Parameters.epitopeCount
-            int[] epitopes = new java.util.Random().ints(0, totalSites).distinct().limit(Parameters.epitopeCount).toArray();
-
             HashSet<Integer> epitopeSitesSet = new HashSet<>();
-            for (int i = 0; i < epitopes.length; i++) {
-                epitopeSitesSet.add(i);
+            for (int i = 0; i < Parameters.epitopeSites.length; i++) {
+                epitopeSitesSet.add(Parameters.epitopeSites[i] - 1); // Allow users to index starting at 1, but store values starting at 0
             }
             this.epitopeSites = epitopeSitesSet;
 
@@ -218,7 +260,6 @@ public class Biology {
 
                             double meanStep;
                             double sdStep;
-
                             if (this.epitopeSites.contains(nucleotideSiteNumber)) {
                                 // epitope sites
                                 meanStep = Parameters.meanStepEpitope;
@@ -251,9 +292,6 @@ public class Biology {
                             currentStringOutputCSV += "" + Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().charAt(wildTypeIndex) +
                                       nucleotideSiteNumber + Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().charAt(mutationIndex) +
                                       "," + r + "," + theta + '\n';
-                        } else if (mutationIndex == wildTypeIndex) {
-                            // vectors in diagonals are [0.0, 0.0]
-                            currentSiteMutationMatrix[wildTypeIndex][mutationIndex] = new double[]{0.0, 0.0};
                         }
                     }
                 }
