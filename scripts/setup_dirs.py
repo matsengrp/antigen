@@ -53,7 +53,7 @@ def make_dirs(new_params_list, runs=1):
     path_list = []
     # Loop through list of dictinoaries
     for params in new_params_list:
-        config_path = "results/" # Stem for new hyperparam configuration path.
+        config_path = "" # Stem for new hyperparam configuration path.
         # Iterater over keys and values:
         for key, val in params.items():
             config_path += str(key) + '_' + str(val) + '_'
@@ -77,7 +77,6 @@ def main():
     parser = argparse.ArgumentParser(description='Update parameter file.')
     parser.add_argument('in_file', help='Path to source parameter.yml file.', type=str)
     parser.add_argument('edits_file', help='Path to YAML file holding desired parameter updates.', type=str)
-    parser.add_argument('out_file', help='Path to write updated .yml file to.', type=str)
 
     args = parser.parse_args()
 
