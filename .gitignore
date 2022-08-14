@@ -52,6 +52,7 @@ Thumbs.db
 out*/
 out*
 results/
+simulations/
 
 # IPython files #
 ##################
