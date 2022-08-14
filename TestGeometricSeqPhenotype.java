@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Random;
+import java.util.Scanner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -38,16 +38,16 @@ public class TestGeometricSeqPhenotype {
         long seed = 5;
         r.setSeed(seed);
         emptyPheno = new GeometricSeqPhenotype();
-        simplePheno = new GeometricSeqPhenotype(0.0, 0.0, new char[]{'T', 'G', 'C', 'T', 'A', 'G'});
+        simplePheno = new GeometricSeqPhenotype(0.0, 0.0, new char[]{'T', 'G', 'C', 'A', 'T', 'C'});
 
-        simplePheno2 = new GeometricSeqPhenotype(20.0, 10.0, new char[]{'T', 'G', 'C', 'T', 'A', 'G'});
+        simplePheno2 = new GeometricSeqPhenotype(20.0, 10.0, new char[]{'T', 'G', 'C', 'A', 'T', 'C'});
 
         // Create a small history of GeometricSeq phenotypes
         history = new GeometricSeqPhenotype[3];
 
-        history[0] = new GeometricSeqPhenotype(1.0, 2.0, new char[]{'T', 'G', 'C', 'T', 'A', 'G'});
-        history[1] = new GeometricSeqPhenotype(3.0, 2.0, new char[]{'T', 'G', 'C', 'T', 'A', 'G'});
-        history[2] = new GeometricSeqPhenotype(5.0, 8.0, new char[]{'T', 'G', 'C', 'T', 'A', 'G'});
+        history[0] = new GeometricSeqPhenotype(1.0, 2.0, new char[]{'T', 'G', 'C', 'A', 'T', 'C'});
+        history[1] = new GeometricSeqPhenotype(3.0, 2.0, new char[]{'T', 'G', 'C', 'A', 'T', 'C'});
+        history[2] = new GeometricSeqPhenotype(5.0, 8.0, new char[]{'T', 'G', 'C', 'A', 'T', 'C'});
     }
 
     /**
@@ -58,7 +58,7 @@ public class TestGeometricSeqPhenotype {
         assertEquals(0, emptyPheno.getSequence().length() % 3);
         assertEquals(Parameters.startingSequence.length(), emptyPheno.getSequence().length());
 
-        assertEquals("TGCTAG", simplePheno.getSequence());
+        assertEquals("TGCATC", simplePheno.getSequence());
     }
 
     /**
@@ -75,7 +75,7 @@ public class TestGeometricSeqPhenotype {
      */
     @Test
     public void testGetSequence() {
-        assertEquals("TGCTAG", simplePheno.getSequence());
+        assertEquals("TGCATC", simplePheno.getSequence());
     }
 
     @Test
@@ -93,9 +93,13 @@ public class TestGeometricSeqPhenotype {
      */
     @Test
     public void testMutate() {
-        assertEquals("TGCTAG", simplePheno.getSequence());
         GeometricSeqPhenotype mutantPheno = (GeometricSeqPhenotype) simplePheno.mutate();
-        assertNotEquals("TGCTAG", mutantPheno.getSequence());
+
+        assertEquals("TGCATC", simplePheno.getSequence());
+        assertNotEquals("TGCATC", mutantPheno.getSequence());
+
+        String[] wildTypeMutantAminoAcids = simplePheno.mutateHelper(0, 'A');
+        assertEquals(new String[]{"C", "S"}, wildTypeMutantAminoAcids);
     }
 
     /**
@@ -118,54 +122,73 @@ public class TestGeometricSeqPhenotype {
 
     /**
      * A redundant test for returning the sequence, but with toString().
-     * This may change a bit as the class develops (i.e., specific epitope sequences)
      */
     @Test
     public void testToString() {
-        assertEquals("TGCTAG, 0.0000, 0.0000, 0, 0", simplePheno.toString());
-        assertNotEquals("TGCTAG, 0.0000, 0.0000, 0, 0", simplePheno.mutate().toString());
+        // This may change as the class develops (i.e., new enhancements).
+        assertEquals("TGCATC, 0.0000, 0.0000, 0, 0", simplePheno.toString());
+        assertNotEquals("TGCATC, 0.0000, 0.0000, 0, 0", simplePheno.mutate().toString());
     }
 
+    /**
+     * Test that DMS data stored in Antigen reflects the data passed in.
+     */
+    @Test
+    public void testDMSData() throws FileNotFoundException {
+        int numberOfAminoAcidSites = Parameters.startingSequence.length() / 3;
+        int numberOfAminoAcids = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
+
+        int numberOfSites = 0;
+
+        for (int i = 0; i < numberOfAminoAcidSites; i++) {
+            numberOfSites++;
+            double currentSiteSum = 0.0;
+            for (int j = 0; j < numberOfAminoAcids; j++) {
+                currentSiteSum += Biology.DMSData.DMS_DATA.getAminoAcidPreference()[i][j];
+            }
+            assertEquals(1.0, currentSiteSum, 0.0001);
+        }
+
+        Scanner DMSData = new Scanner(new File(Parameters.DMSData));
+
+        int dmsDataLineCount = 0;
+        DMSData.nextLine(); // ignore the header
+        while (DMSData.hasNextLine()) {
+            dmsDataLineCount++;
+            DMSData.nextLine();
+        }
+
+        assertEquals(dmsDataLineCount, numberOfSites);
+    }
+
+    /**
+     * Creates a csv file for each amino acid site's matrix of vectors in a directory, test/valuesGammaDistribution.
+     */
     @Test
     public void testGammaDistribution() throws IOException {
-        new File("valuesGammaDistribution").mkdirs();
-        Parameters.load();
-        Parameters.initialize();
-
-        System.out.println(Biology.SiteMutationVectors.VECTORS.getEpitopeSites());
+        new File("testGeometricSeqPhenotype/valuesGammaDistribution").mkdirs();
 
         String[] values = Biology.SiteMutationVectors.VECTORS.getStringOutputCSV();
-        int matrixSize = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
 
         for (int i = 0; i < values.length; i++) {
             String value = values[i];
-            PrintStream output = new PrintStream("valuesGammaDistribution/0_site" + i + ".csv");
+            PrintStream output = new PrintStream("testGeometricSeqPhenotype/valuesGammaDistribution/0_site" + i + ".csv");
             output.println(value);
 
             Map<Integer, double[][][]> matrices = Biology.SiteMutationVectors.VECTORS.getMatrices();
-
-            System.out.println(Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters());
-
-            for (int j = 0; j < matrixSize; j++) {
-                System.out.print("" + Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().charAt(j));
-                for (int k = 0; k < matrixSize; k++) {
-                    System.out.print(Arrays.toString(matrices.get(i)[j][k]));
-                }
-                System.out.println();
-            }
         }
 
         // run python testGammaDistribution.py for each i such that "0_site" + i + ".csv"
     }
 
     /**
-     * PrintStream to print original and mutant nucleotide pairs to
+     * PrintStream (mutations.csv) to print wild type and mutant nucleotide pairs to.
      */
     public static PrintStream mutations;
 
     static {
         try {
-            mutations = new PrintStream("mutations.csv");
+            mutations = new PrintStream("testGeometricSeqPhenotype/mutations.csv");
             mutations.println(Parameters.startingSequence);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

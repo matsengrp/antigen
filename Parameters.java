@@ -28,8 +28,8 @@ public class Parameters {
 	public static Phenotype urImmunity = null;
 
 	// simulation parameters
-	public static int burnin = 0;
-	public static int endDay = 5000;
+	public static int burnin = 0; // days to wait before logging output
+	public static int endDay = 5000; // number of days to simulate
 	public static double deltaT = 0.1; // number of days to move forward in a single timestep
 	public static int printStep = 10; // print to out.timeseries every week
 	public static double tipSamplingRate = 0.0002; // in samples per deme per day
@@ -53,8 +53,8 @@ public class Parameters {
 
 	// metapopulation parameters
 	public static int demeCount = 3;
-	public static String[] demeNames = { "north", "tropics", "south" };
-	public static int[] initialNs = { 1000000, 1000000, 1000000 };
+	public static String[] demeNames = { "north", "tropics", "south" }; // deme names
+	public static int[] initialNs = { 1000000, 1000000, 1000000 }; // inital deme population sizes
 
 	// host parameters
 	public static double birthRate = 0.000091; // in births per individual per day, 1/30 years = 0.000091
@@ -70,13 +70,13 @@ public class Parameters {
 	public static double betweenDemePro = 0.0005; // relative to within-deme beta
 
 	// transcendental immunity
-	public static boolean transcendental = false;
+	public static boolean transcendental = false; // whether to include a general recovered class
 	public static double immunityLoss = 0.01; // in R->S per individual per day
-	public static double initialPrT = 0.1;
+	public static double initialPrT = 0.1; // initial faction in general recovered class
 
 	// seasonal betas
-	public static double[] demeBaselines = { 1, 1, 1 };
-	public static double[] demeAmplitudes = { 0.1, 0, 0.1 };
+	public static double[] demeBaselines = { 1, 1, 1 }; // baseline of seasonality
+	public static double[] demeAmplitudes = { 0.1, 0, 0.1 }; // amplitude of seasonality
 	public static double[] demeOffsets = { 0, 0, 0.5 }; // relative to the year
 
 	// phenotype parameters
@@ -89,18 +89,18 @@ public class Parameters {
 	// parameters specific to GeometricPhenotype
 	public static double smithConversion = 0.1; // multiplier to distance to give cross-immunity
 	public static double homologousImmunity = 0.05; // immunity raised to antigenically identical virus
-	public static double initialTraitA = -6;
-	public static double meanStep = 0.3;
-	public static double sdStep = 0.3;
+	public static double initialTraitA = -6; // value in dimension 1 for initial host immunity
+	public static double meanStep = 0.3; // mean mutation size for non-epitopes
+	public static double sdStep = 0.3; // standard deviation of mutation size for non-epitopes
+	public static double meanStepEpitope = 0.3; // mean mutation size for epitopes
+	public static double sdStepEpitope = 0.3; // standard deviation of mutation size for epitopes
+	public static int[] epitopeSites = {}; // epitope sites of Virus (valid inputs are between 1 and
+											// startingSequence.length() / 3)
+	public static double transitionTransversionRatio = 5.0; // transition transversion rate ratio, k
 	public static boolean mut2D = false; // whether to mutate in a full 360 degree arc
 	public static boolean fixedStep = false; // whether to fix mutation step size
 	public static String startingSequence = "AGAGTCTAGTCC"; // default starting sequence
-	public static String alphabetType = "nucleotides"; // default sequence to consist of nucleotides
-	public static String alphabet = AlphabetType.NUCLEOTIDES.getValidCharacters(); // default valid letters to be
-																					// nucleotides
-	public static int epitopeCount = 1;
-	public static double meanStepEpitope = 0.3;
-	public static double sdStepEpitope = 0.3;
+	public static String DMSData = "avg_pref.csv"; // default starting sequence
 
 	// measured in years, starting at burnin
 	public static double getDate() {
@@ -272,6 +272,18 @@ public class Parameters {
 			if (map.get("sdStep") != null) {
 				sdStep = (double) map.get("sdStep");
 			}
+			if (map.get("meanStepEpitope") != null) {
+				meanStepEpitope = (double) map.get("meanStepEpitope");
+			}
+			if (map.get("sdStepEpitope") != null) {
+				sdStepEpitope = (double) map.get("sdStepEpitope");
+			}
+			if (map.get("epitopeSites") != null) {
+				epitopeSites = toIntArray((List<Integer>) map.get("epitopeSites"));
+			}
+			if (map.get("transitionTransversionRatio") != null) {
+				transitionTransversionRatio = (double) map.get("transitionTransversionRatio");
+			}
 			if (map.get("mut2D") != null) {
 				mut2D = (boolean) map.get("mut2D");
 			}
@@ -279,46 +291,31 @@ public class Parameters {
 				fixedStep = (boolean) map.get("fixedStep");
 			}
 			if (map.get("startingSequence") != null) {
-				startingSequence = (String) map.get("startingSequence");
+				startingSequence = ((String) map.get("startingSequence")).toUpperCase();
 
 				if (phenotypeSpace.equals("geometricSeq")) {
-					assert (startingSequence.length() % 3 == 0) : "startingSequence length should be a multiple of 3";
+					if (startingSequence.length() % 3 != 0) {
+						System.out.println("startingSequence length should be a multiple of 3");
+						throw new IOException();
+					}
+
+					for (int i = 0; i < startingSequence.length(); i += 3) {
+						String triplet = startingSequence.substring(i, i + 3);
+						String translatedAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(triplet);
+
+						if (translatedAminoAcid.equals("STOP")) {
+							System.out.println("There should not be a stop codon at site " + (i / 3));
+							throw new IOException();
+						}
+					}
 				}
 			}
-			if (map.get("crossImmunityFunction") != null) {
-				crossImmunityFunction = (String) map.get("crossImmunityFunction");
+			if (map.get("DMSData") != null) {
+				DMSData = (String) map.get("DMSData");
 			}
-			if (map.get("crossImmunityStrength") != null) {
-				crossImmunityStrength = (double) map.get("crossImmunityStrength");
-			}
-			if (map.get("alphabetType") != null) {
-				alphabetType = (String) map.get("alphabetType");
-
-				if (alphabetType.equals("aminoAcids")) {
-					alphabet = AlphabetType.AMINO_ACIDS.getValidCharacters();
-				}
-			}
-
-			if (map.get("epitopeCount") != null) {
-				epitopeCount = (int) map.get("epitopeCount");
-				int totalSites = startingSequence.length() / 3;
-				if (epitopeCount > totalSites) {
-					epitopeCount = totalSites;
-				}
-			}
-
-			if (map.get("meanStepEpitope") != null) {
-				meanStepEpitope = (double) map.get("meanStepEpitope");
-			}
-
-			if (map.get("sdStepEpitope") != null) {
-				sdStepEpitope = (double) map.get("sdStepEpitope");
-			}
-
 		} catch (IOException e) {
 			System.out.println("Cannot load parameters.yml, using defaults");
 		}
-
 	}
 
 	private static int[] toIntArray(List<Integer> list) {
