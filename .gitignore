@@ -23,6 +23,7 @@ antigen.jar
 *.7z
 *.dmg
 *.gz
+*.jar
 *.rar
 *.tar
 *.zip
