@@ -30,16 +30,16 @@ public class Parameters {
 	public static Phenotype urImmunity = null;
 
 	// simulation parameters
-	public static int burnin = 0;										// days to wait before logging output
+	public static int burnin = 0;
 	public static int endDay = 5000;									// number of days to simulate
-	public static double deltaT = 0.1;                                 	// number of days to move forward in a single timestep	
+	public static double deltaT = 0.1;                                 	// number of days to move forward in a single timestep
 	public static int printStep = 10;									// print to out.timeseries every week
 	public static double tipSamplingRate = 0.0002;						// in samples per deme per day
 	public static int tipSamplesPerDeme = 1000;
 	public static boolean tipSamplingProportional = true;				// whether to sample proportional to prevalance
 	public static double treeProportion = 0.1;							// proportion of tips to use in tree reconstruction
 	public static int diversitySamplingCount = 1000;					// how many samples to draw to calculate diversity, Ne*tau, serial interval
-	public static int netauWindow = 100;								// window in days to calculate Ne*tau		
+	public static int netauWindow = 100;								// window in days to calculate Ne*tau
 	public static boolean repeatSim = true;								// repeat simulation until endDay is reached?
 	public static boolean immunityReconstruction = false;				// whether to print immunity reconstruction to out.immunity
 	public static boolean memoryProfiling = false;						// requires -javaagent:classmexer.jar to run
@@ -48,6 +48,8 @@ public class Parameters {
 	public static boolean reducedOutput = false;						// whether to output only out.summary and out.timeseries
 	public static boolean detailedOutput = false;						// whether to output out.hosts and out.viruses files enabling checkpointing
 	public static boolean restartFromCheckpoint = false;				// whether to load population from out.hosts
+	public static String outPath = "output/";							// path to dump output files.
+	public static String outPrefix = "run-";							// suffix for output files.
 
 	// metapopulation parameters
 	public static int demeCount = 3;
@@ -307,6 +309,12 @@ public class Parameters {
 						}
 					}
 				}
+			}
+			if (map.get("outPath") != null){
+				outPath = (String) map.get("outPath");
+			}
+			if (map.get("outPrefix") != null){
+				outPrefix= (String) map.get("outPrefix");
 			}
 			if (map.get("DMSFile") != null) {
 				DMSFile = (String) map.get("DMSFile");

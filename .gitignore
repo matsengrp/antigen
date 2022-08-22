@@ -23,7 +23,6 @@ antigen.jar
 *.7z
 *.dmg
 *.gz
-*.iso
 *.jar
 *.rar
 *.tar
@@ -42,3 +41,13 @@ Thumbs.db
 /bin/
 /.classpath
 /.project
+.ipynb_checkpoints/
+
+# IntelliJ generated files #
+*.iml
+/.idea
+
+# Output files #
+#################
+out*/
+out*

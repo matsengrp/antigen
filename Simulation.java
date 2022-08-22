@@ -385,6 +385,8 @@ public class Simulation {
 
 		try {
 
+			File outDirs = new File(Parameters.outPath);
+			outDirs.mkdirs();
 			File seriesFile = new File("out.timeseries");
 			seriesFile.delete();
 			seriesFile.createNewFile();
