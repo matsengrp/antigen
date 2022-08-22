@@ -6,7 +6,7 @@ import java.io.*;
 public class VirusTree {
 
 	// fields
-	private static Virus root = Parameters.urVirus;	
+	private static Virus root = Parameters.urVirus;
 	private static List<Virus> tips = new ArrayList<>();
 	
 	public static double xMin;
@@ -412,28 +412,28 @@ public class VirusTree {
 	
 	// flips the 2d euclidean space so that first sample is always to the left of the last sample
 	public static void flip() {
-	
-		if (Parameters.phenotypeSpace.equals("geometric")) {
+		List<Virus> virusList = postOrderNodes();
 
-			List<Virus> virusList = postOrderNodes();
-			int n = virusList.size();	
-			
-			// find first and last virus			
-			Virus firstVirus = virusList.get(0);
-			Virus lastVirus = virusList.get(0);
-			double firstDate = firstVirus.getBirth();
-			double lastDate = lastVirus.getBirth();
-					
-			for (Virus v : virusList) {
-				if (v.getBirth() < firstDate) {
-					firstDate = v.getBirth();
-					firstVirus = v;
-				}
-				if (v.getBirth() > lastDate) {
-					lastDate = v.getBirth();
-					lastVirus = v;
-				}				
+		int n = virusList.size();
+
+		// find first and last virus
+		Virus firstVirus = virusList.get(0);
+		Virus lastVirus = virusList.get(0);
+		double firstDate = firstVirus.getBirth();
+		double lastDate = lastVirus.getBirth();
+
+		for (Virus v : virusList) {
+			if (v.getBirth() < firstDate) {
+				firstDate = v.getBirth();
+				firstVirus = v;
 			}
+			if (v.getBirth() > lastDate) {
+				lastDate = v.getBirth();
+				lastVirus = v;
+			}
+		}
+
+		if (Parameters.phenotypeSpace.equals("geometric")) {
 			
 			// is the x-value of first virus greater than the x-value of last virus?
 			// if so, flip
@@ -467,26 +467,6 @@ public class VirusTree {
 
 		if (Parameters.phenotypeSpace.equals("geometricSeq")) {
 
-			List<Virus> virusList = postOrderNodes();
-			int n = virusList.size();
-
-			// find first and last virus
-			Virus firstVirus = virusList.get(0);
-			Virus lastVirus = virusList.get(0);
-			double firstDate = firstVirus.getBirth();
-			double lastDate = lastVirus.getBirth();
-
-			for (Virus v : virusList) {
-				if (v.getBirth() < firstDate) {
-					firstDate = v.getBirth();
-					firstVirus = v;
-				}
-				if (v.getBirth() > lastDate) {
-					lastDate = v.getBirth();
-					lastVirus = v;
-				}
-			}
-
 			// is the x-value of first virus greater than the x-value of last virus?
 			// if so, flip
 
@@ -518,26 +498,6 @@ public class VirusTree {
 		}
 		
 		if (Parameters.phenotypeSpace.equals("geometric3d")) {
-
-			List<Virus> virusList = postOrderNodes();
-			int n = virusList.size();	
-			
-			// find first and last virus			
-			Virus firstVirus = virusList.get(0);
-			Virus lastVirus = virusList.get(0);
-			double firstDate = firstVirus.getBirth();
-			double lastDate = lastVirus.getBirth();
-					
-			for (Virus v : virusList) {
-				if (v.getBirth() < firstDate) {
-					firstDate = v.getBirth();
-					firstVirus = v;
-				}
-				if (v.getBirth() > lastDate) {
-					lastDate = v.getBirth();
-					lastVirus = v;
-				}				
-			}
 			
 			// is the x-value of first virus greater than the x-value of last virus?
 			// if so, flip
@@ -581,50 +541,33 @@ public class VirusTree {
 		zMin = 0.0;
 		zMax = 0.0;		
 	
-		if (Parameters.phenotypeSpace.equals("geometric")) {
-			for (Virus v : postOrderNodes()) {
-			
-				GeometricPhenotype p = (GeometricPhenotype) v.getPhenotype();
-				double x = p.getTraitA();
-				double y = p.getTraitB();
-				if (xMin > x) { xMin = x; }
-				if (xMax < x) { xMax = x; }
-				if (yMin > y) { yMin = y; }
-				if (yMax < y) { yMax = y; }	
-			
+
+		for (Virus v : postOrderNodes()) {
+			Phenotype p = v.getPhenotype();
+			double x = 0.0;
+			double y = 0.0;
+			switch (Parameters.phenotypeSpace) {
+				case "geometric":
+					x = ((GeometricPhenotype) p).getTraitA();
+					y = ((GeometricPhenotype) p).getTraitB();
+					break;
+				case "geometricSeq":
+					x = ((GeometricSeqPhenotype) p).getTraitA();
+					y = ((GeometricSeqPhenotype) p).getTraitB();
+					break;
+				case "geometric3d":
+					double z = ((GeometricPhenotype3D) p).getTraitC();
+					if (zMin > z) {
+						zMin = z;
+					}
+					if (zMax < z) {
+						zMax = z;
+					}
+					break;
 			}
+
+			updateRangeHelper(x, y);
 		}
-
-		if (Parameters.phenotypeSpace.equals("geometricSeq")) {
-			for (Virus v : postOrderNodes()) {
-
-				GeometricSeqPhenotype p = (GeometricSeqPhenotype) v.getPhenotype();
-				double x = p.getTraitA();
-				double y = p.getTraitB();
-				if (xMin > x) { xMin = x; }
-				if (xMax < x) { xMax = x; }
-				if (yMin > y) { yMin = y; }
-				if (yMax < y) { yMax = y; }
-
-			}
-		}
-		
-		if (Parameters.phenotypeSpace.equals("geometric3d")) {
-			for (Virus v : postOrderNodes()) {
-			
-				GeometricPhenotype3D p = (GeometricPhenotype3D) v.getPhenotype();
-				double x = p.getTraitA();
-				double y = p.getTraitB();
-				double z = p.getTraitC();				
-				if (xMin > x) { xMin = x; }
-				if (xMax < x) { xMax = x; }
-				if (yMin > y) { yMin = y; }
-				if (yMax < y) { yMax = y; }	
-				if (zMin > z) { zMin = z; }
-				if (zMax < z) { zMax = z; }					
-			
-			}
-		}		
 		
 		xMin = Math.floor(xMin) - 10;
 		xMax = Math.ceil(xMax) + 10;
@@ -633,6 +576,13 @@ public class VirusTree {
 		zMin = Math.floor(zMin) - 10;
 		zMax = Math.ceil(zMax) + 10;		
 	
+	}
+
+	private static void updateRangeHelper(double x, double y) {
+		if (xMin > x) { xMin = x; }
+		if (xMax < x) { xMax = x; }
+		if (yMin > y) { yMin = y; }
+		if (yMax < y) { yMax = y; }
 	}
 
 	public static void printRange() {

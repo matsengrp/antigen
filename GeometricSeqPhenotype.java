@@ -1,8 +1,10 @@
 import java.util.Arrays;
 
 /**
- * <b>GeometricSeqPhenotype</b> represents a phenotype.
- * Distance and cross-immunity can be calculated between two GeometricSeqPhenotypes.
+ * <b>GeometricSeqPhenotype</b> stores a Virus's genetic sequence and antigenic phenotype,
+ * and tracks the cumulative number of mutations in epitope and non-epitope sites.
+ * Antigenic phenotype is defined as a position in 2D space, where the antigenic distance
+ * between two viruses can be computed as the Euclidean distance between them.
  * Multiple Viruses can reference a single GeometricSeqPhenotype which is identified by its data contents.
  *
  * @author Thien Tran
@@ -26,12 +28,17 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
     /**
      * The number of epitope mutations this GeometricPhenotype went through (counting from the startingSequence)
      */
-    private int eMutation = 0;
+    private int eMutation;
 
     /**
      * The number of non-epitope mutations this GeometricPhenotype went through (counting from the startingSequence)
      */
-    private int neMutation = 0;
+    private int neMutation;
+
+    /**
+     *
+     */
+    public static final boolean SANITY_TEST = true;
 
     /**
      * Run expensive tests iff DEBUG == true.
@@ -59,24 +66,27 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
      * and an empty GeometricPhenotype
      */
     public GeometricSeqPhenotype() {
+        this.traitA = 0.0;
+        this.traitB = 0.0;
         this.nucleotideSequence = new char[Parameters.startingSequence.length()];
         startingSequenceGenerator();
+        this.eMutation = 0;
+        this.neMutation = 0;
         checkRep();
     }
 
     /**
      * Constructor that creates a new GeometricSeqPhenotype.
      *
-     * @param tA
-     * @param tB
+     * @param tA the x-coordinate of the new GeometricSeqPhenotype.
+     * @param tB the y-coordinate of the new GeometricSeqPhenotype.
      * @effects Constructs a new GeometricSeqPhenotype that has a random starting sequence of length Parameters.sequence.length()
      * and GeometricPhenotype with the data content of the given parameters.
      */
     public GeometricSeqPhenotype(double tA, double tB) {
-        traitA = tA;
-        traitB = tB;
-
-        startingSequenceGenerator();
+        this();
+        this.traitA = tA;
+        this.traitB = tB;
         checkRep();
     }
 
@@ -91,7 +101,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
             while (aminoAcid.equals("") || aminoAcid.equals("STOP")) {
                 String codon = "";
                 for (int codonIndex = 0; codonIndex < 3; codonIndex++) {
-                    int indexAlphabet = random(nucleotideAlphabet.length);
+                    int indexAlphabet = Random.nextInt(0, nucleotideAlphabet.length - 1);
                     char nucleotide = nucleotideAlphabet[indexAlphabet];
                     codon += nucleotide;
                     this.nucleotideSequence[siteIndex + codonIndex] = nucleotide;
@@ -104,26 +114,39 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
     /**
      * Constructor that creates a new GeometricSeqPhenotype.
      *
-     * @param tA
-     * @param tB
-     * @param startingSequence
+     * @param tA the x-coordinate of the new GeometricSeqPhenotype.
+     * @param tB the y-coordinate of the new GeometricSeqPhenotype.
+     * @param startingSequence the starting nucleotide sequence of the GeometricSeqPhenotype to be constructed.
      * @requires nucleotideSequence != null && nucleotideSequence.length() > 0 && nucleotideSequence.length() % 3 == 0
      * @effects Constructs a new GeometricSeqPhenotype that has a starting sequence
      * and GeometricPhenotype with the data content of the given parameters.
      */
     public GeometricSeqPhenotype(double tA, double tB, char[] startingSequence) {
-        traitA = tA;
-        traitB = tB;
+        this();
+        this.traitA = tA;
+        this.traitB = tB;
         this.nucleotideSequence = startingSequence;
         checkRep();
     }
 
-    public GeometricSeqPhenotype(double tA, double tB, char[] startingSequence, int e, int ne) {
-        traitA = tA;
-        traitB = tB;
+    /**
+     * Constructor that creates a new GeometricSeqPhenotype.
+     *
+     * @param tA the x-coordinate of the new GeometricSeqPhenotype.
+     * @param tB the y-coordinate of the new GeometricSeqPhenotype.
+     * @param startingSequence the starting nucleotide sequence of the GeometricSeqPhenotype to be constructed.
+     * @param e the number of epitope mutations this GeometricSeqPhenotype is from startingSequence
+     * @param nE the number of non-epitope mutations from startingSequence is from startingSequence
+     * @requires nucleotideSequence != null && nucleotideSequence.length() > 0 && nucleotideSequence.length() % 3 == 0
+     * @effects Constructs a new GeometricSeqPhenotype that has a starting sequence
+     * and GeometricPhenotype with the data content of the given parameters.
+     */
+    public GeometricSeqPhenotype(double tA, double tB, char[] startingSequence, int e, int nE) {
+        this.traitA = tA;
+        this.traitB = tB;
         this.nucleotideSequence = startingSequence;
         this.eMutation = e;
-        this.neMutation = ne;
+        this.neMutation = nE;
         checkRep();
     }
 
@@ -145,6 +168,12 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         return traitB;
     }
 
+    /**
+     * Returns the nucleotide sequence of this GeometricSeqPhenotype.
+     * Valid example outputs include "ACG" and "ACGTGTACGTGT"
+     *
+     * @return the nucleotide sequence of the GeometricSeqPhenotype represented by this.
+     */
     public String getSequence() {
         return String.valueOf(this.nucleotideSequence);
     }
@@ -181,63 +210,63 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         //  - StringBuffer because it's just a Wrapper around a char[], and has functionality that we don't need such as resizing.
 
         String wildTypeAminoAcid = "", mutantAminoAcid = "";
-        int mutationIndexSiteSequence = -1;
-        char mutatedNucleotide = ' ', originalNucleotide = ' ';
+        int nucleotideMutationIndex = -1;
+        char wildTypeNucleotide = ' ', mutantNucleotide = ' ';
 
-        // mutate at least once
-        // keep mutating if mutation generates a stop codon
+        // Make a single nucleotide mutation to the sequence
+        // If the mutation results in a stop codon, then throw that mutation away and try another one
         while (mutantAminoAcid.equals("") || mutantAminoAcid.equals("STOP")) {
             // choose random index to mutate in this.nucleotideSequence
-            mutationIndexSiteSequence = random(this.nucleotideSequence.length);
+            nucleotideMutationIndex = Random.nextInt(0, this.nucleotideSequence.length - 1);
 
-            originalNucleotide = this.nucleotideSequence[mutationIndexSiteSequence];
+            wildTypeNucleotide = this.nucleotideSequence[nucleotideMutationIndex];
 
-            char originalNucleotideToMutate = this.nucleotideSequence[mutationIndexSiteSequence];
+            // get mutant nucleotide (transition/transversion ratio)
+            mutantNucleotide = Biology.MutationType.MUTATION.getNucleotide(wildTypeNucleotide);
 
-            // get mutant nucleotide (transition transversion ratio)
-            mutatedNucleotide = Biology.MutationType.MUTATION.getNucleotide(originalNucleotideToMutate);
-
-            String[] wildTypeMutantAminoAcids = mutateHelper(mutationIndexSiteSequence, mutatedNucleotide);
+            String[] wildTypeMutantAminoAcids = mutateHelper(nucleotideMutationIndex, mutantNucleotide);
 
             wildTypeAminoAcid = wildTypeMutantAminoAcids[0];
             mutantAminoAcid = wildTypeMutantAminoAcids[1];
         }
 
-        int mutationIndexSite = mutationIndexSiteSequence / 3; // site # where mutation is occurring {0, . . ., total number of sites - 1}
+        int proteinMutationIndex = nucleotideMutationIndex / 3; // site # where mutation is occurring {0, . . ., total number of sites - 1}
 
-        // update parameter 1 and 2
-        double[] vectors = getVectors(mutationIndexSite, wildTypeAminoAcid, mutantAminoAcid);
+        // Update the x and y coordinates of the virus in antigenic space
+        double[] vectors = updateAntigenicPhenotype(proteinMutationIndex, wildTypeAminoAcid, mutantAminoAcid);
         double mutA = vectors[0];
         double mutB = vectors[1];
 
-        // update parameter 3
-        // get new nucleotide sequence after mutating at the random index
+        // Update the virus's nucleotide sequence by introducing the mutation from above
         char[] copyNucleotideSequence = Arrays.copyOf(this.nucleotideSequence, Parameters.startingSequence.length());
-        copyNucleotideSequence[mutationIndexSiteSequence] = mutatedNucleotide;
+        copyNucleotideSequence[nucleotideMutationIndex] = mutantNucleotide;
 
-        // update parameter 4 and 5
-        // count number of epitope and non-epitope mutations
+        // Determine whether the mutation occurred in an epitope or non-epitope site, and update
+        // the counts of epitope and non-epitope mutations accordingly
         int eMutationNew = this.eMutation;
         int neMutationNew = this.neMutation;
-        if (Biology.SiteMutationVectors.VECTORS.getEpitopeSites().contains(mutationIndexSite)) {
+        if (Biology.SiteMutationVectors.VECTORS.getEpitopeSites().contains(proteinMutationIndex)) {
             eMutationNew += 1;
         } else {
             neMutationNew += 1;
         }
 
-        // uncomment line below to test transition transversion ratio:
-        // TestGeometricSeqPhenotype.mutations.println("" + originalNucleotide + mutatedNucleotide);
+        if (SANITY_TEST) {
+            // (proteinMutationIndex + 1) to show one-based numbering
+            TestGeometricSeqPhenotype.mutations.println((nucleotideMutationIndex + 1) + "," + wildTypeNucleotide + mutantNucleotide);
+        }
 
         checkRep();
         Phenotype mutP = new GeometricSeqPhenotype(mutA, mutB, copyNucleotideSequence, eMutationNew, neMutationNew);
         return mutP;
     }
 
-    // Returns a vector from the precomputed matrices given wild type and mutant amino acids
-    // and the amino acid site where the nucleotide mutation occurs.
-    private double[] getVectors(int mutationIndexSite, String wildTypeAminoAcid, String mutantAminoAcid) {
-        double mutA = 0.0;
-        double mutB = 0.0;
+    // Updates a virus's location in antigenic space upon a mutation by taking the
+    // vector giving the virus's current location and then summing it with a
+    // precomputed vector that gives the antigenic effect of the mutation
+    private double[] updateAntigenicPhenotype(int mutationIndexSite, String wildTypeAminoAcid, String mutantAminoAcid) {
+        double mutA = 0.0; // virus's location in the x dimension
+        double mutB = 0.0; // virus's location in the y dimension
         if (!wildTypeAminoAcid.equals(mutantAminoAcid)) {
             // get indices for the matrix based on the wild type and mutant amino acids
             // matrix i,j correspond with the String "ACDEFGHIKLMNPQRSTWYV"
@@ -252,31 +281,31 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         return new double[]{mutA, mutB};
     }
 
-    // Mutates nucleotide sequence at given mutationIndexSiteSequence with given char mutatedNucleotide.
+    // Mutates nucleotide sequence at given nucleotideMutationIndex with given char mutantNucleotide.
     // Returns the wild type and mutant amino acid as a String[]
     //
     // package private helper method so that the updating of the nucleotide sequence can be tested in TestGeometricSeqPhenotype.java
-    String[] mutateHelper(int mutationIndexSiteSequence, char mutatedNucleotide) {
-        int mutationIndexSiteCodon = mutationIndexSiteSequence % 3; // index of nucleotide being mutated in codon {0, 1, 2}
-        int mutationIndexSite = mutationIndexSiteSequence / 3; // site # where mutation is occurring {0, . . ., total number of sites - 1}
-        int codonStartIndex = 3 * mutationIndexSite; // start index of nucleotide being mutated in codon {0, 3, 6, . . .}
+    String[] mutateHelper(int nucleotideMutationIndex, char mutantNucleotide) {
+        int nucleotideMutationCodonIndex = nucleotideMutationIndex % 3; // index of nucleotide being mutated in codon {0, 1, 2}
+        int proteinMutationIndex = nucleotideMutationIndex / 3; // protein site # where mutation is occurring {0, . . ., total number of sites - 1}
+        int nucleotideMutationFirstCodonIndex = 3 * proteinMutationIndex; // start index of nucleotide being mutated in codon {0, 3, 6, . . .}
 
-        String originalCodon = "" + this.nucleotideSequence[codonStartIndex] +
-                this.nucleotideSequence[codonStartIndex + 1] +
-                this.nucleotideSequence[codonStartIndex + 2];
-        String wildTypeAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(originalCodon);
+        String wildTypeCodon = "" + this.nucleotideSequence[nucleotideMutationFirstCodonIndex] +
+                this.nucleotideSequence[nucleotideMutationFirstCodonIndex + 1] +
+                this.nucleotideSequence[nucleotideMutationFirstCodonIndex + 2];
+        String wildTypeAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(wildTypeCodon);
 
         // get new codon after mutation occurs
-        StringBuilder mutatedCodon = new StringBuilder(originalCodon);
-        mutatedCodon.setCharAt(mutationIndexSiteCodon, mutatedNucleotide);
+        StringBuilder mutatedCodon = new StringBuilder(wildTypeCodon);
+        mutatedCodon.setCharAt(nucleotideMutationCodonIndex, mutantNucleotide);
         String mutantAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(mutatedCodon.toString());
 
         return new String[]{wildTypeAminoAcid, mutantAminoAcid};
     }
 
     /**
-     * Returns the sequence, the position of this GeometricSeqPhenotype, and number of epitope and non-epitope mutations
-     * (i.e. the String representation of the GeometricSeqPhenotype represented by this).
+     * Returns the virus's sequence, position in antigenic space,
+     * and cumulative number of epitope and non-epitope mutations in its evolutionary history
      * Valid example outputs include "ACG, 0.0, 0.0, 0, 0" and "ACGTGTACGTGT, 2.3, 8.9, 40, 10".
      *
      * @return the String representation of the GeometricSeqPhenotype represented by this.
@@ -285,12 +314,6 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         String fullString = String.format("%s, %.4f, %.4f, %d, %d", String.valueOf(this.nucleotideSequence), this.getTraitA(),
                                           this.getTraitB(), this.eMutation, this.neMutation);
         return fullString;
-    }
-
-    // Returns a random index within the bounds of String.length.()=maxRange
-    private int random(int maxRange) {
-        Random random = new Random();
-        return random.nextInt(0, maxRange - 1);
     }
 
     // Throws an exception if the representation invariant is violated.

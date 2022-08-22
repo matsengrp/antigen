@@ -7,7 +7,10 @@ import java.util.Map;
 import java.util.Scanner;
 
 /**
- * A class that allows antigen to model mutations more realistically, thus, respecting biology
+ * A class that allows antigen to model a virus's genetic sequence,
+ * and how changes in sequence give rise to changes in both:
+ * i) antigenic phenotype
+ * ii) viral fitness in the absence of immune selection (e.g., quantified by DMS data)
  *
  * @author Thien Tran
  */
@@ -22,7 +25,7 @@ public class Biology {
             aminoAcidPreference = new double[numberOfAminoAcidSites][numberOfAminoAcids];
 
             try {
-                Scanner dms = new Scanner(new File(Parameters.DMSData));
+                Scanner dms = new Scanner(new File(Parameters.DMSFile));
                 dms.nextLine(); // read header
 
                 for (int i = 0; i < numberOfAminoAcidSites; i++) {
@@ -47,12 +50,16 @@ public class Biology {
     }
 
     /**
-     * Possible mutations that can occur at a single nucleotide site
+     * Transition/transversion ratio used to determine what a given wild type nucleotide should be mutated to.
      */
     public enum MutationType {
         MUTATION();
         public final Map<Character, double[]> transitionTranversionProbability;
 
+        /**
+         * Constructor that creates a probability distribution for each nucleotide,
+         * where each possible mutation is weighted by a pre-defined transition/transversion ratio.
+         */
         MutationType() {
             this.transitionTranversionProbability = new HashMap<>()  {{
                 double transition = 0.5 / (Parameters.transitionTransversionRatio + 1.0);
@@ -99,7 +106,7 @@ public class Biology {
     }
 
     /**
-     * DNA and RNA codon table
+     * DNA codon table
      */
     public enum CodonMap {
         CODONS();
@@ -182,8 +189,8 @@ public class Biology {
 
                 put("AGT", "S");
                 put("AGC", "S");
-                put("AGA", "T");
-                put("AGG", "T");
+                put("AGA", "R");
+                put("AGG", "R");
 
                 put("GGT", "G");
                 put("GGC", "G");
@@ -204,7 +211,10 @@ public class Biology {
     }
 
     /**
-     * Matrices of vectors to determine where to move virus in Euclidean space
+     * Data type used to determine how changes in sequence lead to changes in to a virus's location in antigenic space.
+     * Specifically, for each site, a vector for each possible amino-acid mutations is pre-computed.
+     * Vectors angles are drawn from a uniform distribution, while vector magnitudes are drawn from a gamma distribution.
+     * Gamma distributions differ for epitope and non-epitope sites.
      *
      * Each site is drawn from the gamma distribution
      */
@@ -218,27 +228,42 @@ public class Biology {
         public final String[] stringOutputCSV = new String[totalSites]; // String[] to create CSV from
 
         SiteMutationVectors() {
+            // SiteMutationVectors is represented using a Map that maps each protein site to a 2D array of double[].
+            // Rows in the 2D array represent wild type amino acids, while columns represent mutant amino acids.
+            // Each entry is a double[] of size 2 where the first index represents the x-coordinate
+            // and the second index represents the y-coordinate of the corresponding vector of the wild type and mutant amino acids.
+            // Example:
+            //          A               C               D           . . .
+            // A    [0.0, 0.0]     [-1.0, -2.0]    [-1.0, -1.0]
+            // C    [1.0, 2.0]      [0.0, 0.0]      [3.0, 0.5]
+            // D    [1.0, 1.0]     [-3.0, -0.5]     [0.0, 0.0]
+            // .
+            // .
+            // .
+
             HashSet<Integer> epitopeSitesSet = new HashSet<>();
             for (int i = 0; i < Parameters.epitopeSites.length; i++) {
                 epitopeSitesSet.add(Parameters.epitopeSites[i] - 1); // Allow users to index starting at 1, but store values starting at 0
             }
             this.epitopeSites = epitopeSitesSet;
 
-            // create a mapping of site # to matrix of vectors
-            // m = wild type amino acid
-            // n = mutant type amino acid
+            // create a mapping of site # to 2D array of vectors
+            // mutations: 2D Array
+            // i: index of wild type amino acid
+            // j: index of mutant amino acid
+            // ACDEFGHIKLMNPQRSTWYV 0 -> A, 1 -> C, 2 -> D, etc.
             int matrixSize = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
             Map<Integer, double[][][]> currentSiteMutationVectors  = new HashMap<>();
 
-            // sites
+            // Cycle over each site in the protein sequence and create a 2D array
             for (int nucleotideSiteNumber = 0; nucleotideSiteNumber < Parameters.startingSequence.length() / 3; nucleotideSiteNumber += 1) {
                 String currentStringOutputCSV = "mutation,r,theta\n";
 
                 double[][][] currentSiteMutationMatrix = new double[matrixSize][matrixSize][];
 
-                // rows of a single matrix
+                // Create 2D where rows are wild type mino acids and columns are mutant amino acids
                 for (int wildTypeIndex = 0; wildTypeIndex < matrixSize; wildTypeIndex++) {
-                    // columns of a single matrix
+
                     for (int mutationIndex = 0; mutationIndex < matrixSize; mutationIndex++) {
                         if (mutationIndex < wildTypeIndex) { // update lower and upper triangle in this branch.
                             // direction of mutation
@@ -277,14 +302,17 @@ public class Biology {
                                 r = Random.nextGamma(alpha, beta);
                             }
 
-                            // create phenotype
+                            // create antigenic phenotype by computing the x and y coordinates (mutA and mutB) of the virus in antigenic space
                             double mutA = r * Math.cos(theta);
                             double mutB = r * Math.sin(theta);
 
-                            // mutations_i,j
+                            // add vector=(mutA, mutB) to mutations_i,j, where
+                            // mutA is the x-coordinate
+                            // mutB is the y-coordinate
+                            // mutations is the 2D array that corresponds to the current amino acid site
                             currentSiteMutationMatrix[wildTypeIndex][mutationIndex] = new double[]{mutA, mutB};
 
-                            // mutations_j,i (value is inverse of value at mutations_j,i)
+                            // add vector=(-mutA, -mutB) to mutations_j,i
                             currentSiteMutationMatrix[mutationIndex][wildTypeIndex] = new double[]{-1 * mutA, -1 * mutB};
 
                             // amino acid mutation notation
@@ -335,7 +363,7 @@ public class Biology {
         }
 
         /**
-         * Returns a set of indices that represent epitope sites, which are final within a simulation run.
+         * Returns a set of indices that represent epitope sites, which are fixed within a simulation run.
          *
          * @return epitope site indices
          */

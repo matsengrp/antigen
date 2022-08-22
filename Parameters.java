@@ -5,6 +5,8 @@
 import java.util.*;
 import java.io.*;
 
+import static org.junit.Assert.assertEquals;
+
 public class Parameters {
 
 	public enum AlphabetType {
@@ -89,12 +91,12 @@ public class Parameters {
 	public static double sdStep = 0.3;							// standard deviation of mutation size for non-epitopes
 	public static double meanStepEpitope = 0.3;					// mean mutation size for epitopes
 	public static double sdStepEpitope = 0.3;					// standard deviation of mutation size for epitopes
-	public static int[] epitopeSites = {};						// epitope sites of Virus (valid inputs are between 1 and startingSequence.length() / 3)
-	public static double transitionTransversionRatio = 5.0;		// transition transversion rate ratio, k
+	public static int[] epitopeSites = {};						// epitope sites of virus (valid inputs are between 1 and startingSequence.length() / 3)
+	public static double transitionTransversionRatio = 5.0;		// transition/transversion rate ratio, k
 	public static boolean mut2D = false;						// whether to mutate in a full 360 degree arc
 	public static boolean fixedStep = false;					// whether to fix mutation step size
 	public static String startingSequence = "AGAGTCTAGTCC";		// default starting sequence
-	public static String DMSData = "avg_pref.csv";				// default starting sequence
+	public static String DMSFile = "avg_pref.csv";				// name of DMS csv file: must have 21 columns (site number and amino acid preferences ordered alphabetically) and rows must equal the number of amino acid sites in the virus sequence)
 
 	// measured in years, starting at burnin
 	public static double getDate() {
@@ -287,12 +289,14 @@ public class Parameters {
 			if (map.get("startingSequence") != null) {
 				startingSequence = ((String) map.get("startingSequence")).toUpperCase();
 
+				// Check that startingSequence is not an empty String and is a multiple of 3.
 				if (phenotypeSpace.equals("geometricSeq")) {
-					if (startingSequence.length() % 3 != 0) {
-						System.out.println("startingSequence length should be a multiple of 3");
+					if (startingSequence.length() == 0 || startingSequence.length() % 3 != 0) {
+						System.out.println("startingSequence length should be any multiple of 3, except for 0.");
 						throw new IOException();
 					}
 
+					// Check startingSequence for stop signals.
 					for (int i = 0; i < startingSequence.length(); i += 3) {
 						String triplet = startingSequence.substring(i, i + 3);
 						String translatedAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(triplet);
@@ -304,8 +308,25 @@ public class Parameters {
 					}
 				}
 			}
-			if (map.get("DMSData") != null) {
-				DMSData = (String) map.get("DMSData");
+			if (map.get("DMSFile") != null) {
+				DMSFile = (String) map.get("DMSFile");
+
+				// Check if the number of rows in DMSFile is equal to the length of the protein sequence.
+				int numberOfSites = startingSequence.length() / 3;
+				int dmsDataLineCount = 0;
+
+				Scanner DMSData = new Scanner(new File(Parameters.DMSFile));
+				DMSData.nextLine(); // ignore the header
+				while (DMSData.hasNextLine()) {
+					dmsDataLineCount++;
+					DMSData.nextLine();
+				}
+
+				if (dmsDataLineCount != numberOfSites) {
+					System.out.println("The DMS data provided does not have the same number of rows as the length of the protein sequence\n" +
+							           "Expected # of Sites: " + numberOfSites + "\nActual # of Sites in " + DMSFile + ": " + dmsDataLineCount);
+					throw new IOException();
+				}
 			}
 		} catch (IOException e) {
 			System.out.println("Cannot load parameters.yml, using defaults");
