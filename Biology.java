@@ -17,26 +17,30 @@ import java.util.Scanner;
 public class Biology {
     public enum DMSData {
         DMS_DATA();
-        public final double[][] aminoAcidPreference;
+        public double[][] aminoAcidPreference = null;
+        private final double[] equalPreferences = new double[]{0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05};;
 
         DMSData() {
-            int numberOfAminoAcidSites = Parameters.startingSequence.length() / 3;
-            int numberOfAminoAcids = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
-            aminoAcidPreference = new double[numberOfAminoAcidSites][numberOfAminoAcids];
-
             try {
-                Scanner dms = new Scanner(new File(Parameters.DMSFile));
-                dms.nextLine(); // read header
+                // Only initialize aminoAcidPreference if DMS data is provided.
+                if (Parameters.DMSFile != null) {
+                    int numberOfAminoAcidSites = Parameters.startingSequence.length() / 3;
+                    int numberOfAminoAcids = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
+                    aminoAcidPreference = new double[numberOfAminoAcidSites][numberOfAminoAcids];
 
-                for (int i = 0; i < numberOfAminoAcidSites; i++) {
-                    Scanner currentSite = new Scanner(dms.nextLine());
-                    currentSite.useDelimiter(",");
+                    Scanner dms = new Scanner(new File(Parameters.DMSFile));
+                    dms.nextLine(); // read header
 
-                    currentSite.next(); // ignore site number
+                    for (int i = 0; i < numberOfAminoAcidSites; i++) {
+                        Scanner currentSite = new Scanner(dms.nextLine());
+                        currentSite.useDelimiter(",");
 
-                    for (int j = 0; j < numberOfAminoAcids; j++) {
-                        double probability = currentSite.nextDouble();
-                        aminoAcidPreference[i][j] = probability;
+                        currentSite.next(); // ignore site number
+
+                        for (int j = 0; j < numberOfAminoAcids; j++) {
+                            double probability = currentSite.nextDouble();
+                            aminoAcidPreference[i][j] = probability;
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -44,8 +48,12 @@ public class Biology {
             }
         }
 
-        public double[][] getAminoAcidPreference() {
-            return aminoAcidPreference;
+        public double[] getAminoAcidPreference(int site) {
+            // If DMS data is not provided, then return double[] of equal amino acid preferences.
+            if (aminoAcidPreference == null) {
+                return equalPreferences;
+            }
+            return aminoAcidPreference[site];
         }
     }
 
