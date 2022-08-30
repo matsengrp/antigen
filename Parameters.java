@@ -102,24 +102,26 @@ public class Parameters {
 	public static boolean mut2D = false; // whether to mutate in a full 360 degree arc
 	public static boolean fixedStep = false; // whether to fix mutation step size
 	public static String startingSequence = "AGAGTCTAGTCC"; // default starting sequence
-	public static String DMSFile = "avg_pref.csv"; // name of DMS csv file: must have 21 columns (site number and amino
-													// acid preferences ordered alphabetically) and rows must equal the
-													// number of amino acid sites in the virus sequence)
+	public static String DMSFile = null; // name of DMS csv file: must have 21 columns (site number and amino acid
+											// preferences ordered alphabetically) and rows must equal the number of
+											// amino acid sites in the virus sequence)
 
 	// measured in years, starting at burnin
 	public static double getDate() {
 		return (day - (double) burnin) / 365.0;
 	}
 
-	public static boolean dayIsInteger() {
-		return Math.ceil(day) - Math.floor(day) == 0;
+	public static boolean dayIsInteger return Math.ceil(day)-Math.floor(day)==0;
 	}
 
-	public static double getSeasonality(int index) {
-		double baseline = demeBaselines[index];
-		double amplitude = demeAmplitudes[index];
-		double offset = demeOffsets[index];
-		return baseline + amplitude * Math.cos(2 * Math.PI * getDate() + 2 * Math.PI * offset);
+	//
+	public static double getSeasonality(int index) { 
+		double baseline = demeBaselines[ind 
+		double amplitude = demeAmplitudes[index 
+		double offset = demeOffsets[index]; 
+	return baseline+amplitude*Math.cos(2*Math.PI*
+
+	getDate() + 2 * Math.PI * offset);
 	}
 
 	// initialize
@@ -368,5 +370,3 @@ public class Parameters {
 		}
 		return ret;
 	}
-
-}

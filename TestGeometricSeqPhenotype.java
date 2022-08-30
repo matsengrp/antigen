@@ -199,7 +199,7 @@ public class TestGeometricSeqPhenotype {
         for (int i = 0; i < numberOfAminoAcidSites; i++) {
             double currentSiteSum = 0.0;
             for (int j = 0; j < numberOfAminoAcids; j++) {
-                currentSiteSum += Biology.DMSData.DMS_DATA.getAminoAcidPreference()[i][j];
+                currentSiteSum += Biology.DMSData.DMS_DATA.getAminoAcidPreference(i)[j];
             }
             assertEquals(1.0, currentSiteSum, 0.0001);
         }
@@ -234,7 +234,7 @@ public class TestGeometricSeqPhenotype {
         try {
             if (GeometricSeqPhenotype.SANITY_TEST) {
                 mutations = new PrintStream("testGeometricSeqPhenotype/mutations.csv");
-                mutations.println("site,pair");
+                mutations.println("siteN,pairWildMutantN,wildAA,mutantAA,wildCodon,mutantCodon,cycle,id");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
