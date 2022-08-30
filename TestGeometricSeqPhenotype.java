@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -193,7 +194,7 @@ public class TestGeometricSeqPhenotype {
 
         // Check if each row (array) in the DMS data sums up to 1.0.
         int numberOfAminoAcidSites = Parameters.startingSequence.length() / 3;
-        int numberOfAminoAcids = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
+        int numberOfAminoAcids = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
 
         // Cycle through each array, and sum up each element in the nexted array.
         for (int i = 0; i < numberOfAminoAcidSites; i++) {
@@ -210,16 +211,28 @@ public class TestGeometricSeqPhenotype {
      */
     @Test
     public void testGammaDistribution() throws IOException {
+        // Initialize static parameters to test different distributions
+        Parameters.load();
+        Parameters.initialize();
         new File("testGeometricSeqPhenotype/valuesGammaDistribution").mkdirs();
 
         String[] values = Biology.SiteMutationVectors.VECTORS.getStringOutputCSV();
+        Map<Integer, double[][][]> matrices = Biology.SiteMutationVectors.VECTORS.getMatrices();
 
         for (int i = 0; i < values.length; i++) {
             String value = values[i];
             PrintStream output = new PrintStream("testGeometricSeqPhenotype/valuesGammaDistribution/0_site" + i + ".csv");
             output.println(value);
 
-            Map<Integer, double[][][]> matrices = Biology.SiteMutationVectors.VECTORS.getMatrices();
+            double[][][] matrix = matrices.get(i);
+            System.out.println("Matrix " + i);
+            for(int j = 0; j < Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().length(); j++) {
+                for(int k = 0; k < Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().length(); k++) {
+                    // Nulls are along the diagonal
+                    System.out.print(Arrays.toString(matrix[j][k]));
+                }
+                System.out.println();
+            }
         }
 
         // Run: python testGammaDistribution.py for each i such that "0_site" + i + ".csv"
@@ -234,7 +247,7 @@ public class TestGeometricSeqPhenotype {
         try {
             if (GeometricSeqPhenotype.SANITY_TEST) {
                 mutations = new PrintStream("testGeometricSeqPhenotype/mutations.csv");
-                mutations.println("siteN,pairWildMutantN,wildAA,mutantAA,wildCodon,mutantCodon,cycle,id");
+                mutations.println("siteN,wildCodon,mutantCodon,pairWildMutantN,wildAA,mutantAA,cycle,id");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();

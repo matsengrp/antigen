@@ -5,25 +5,7 @@
 import java.util.*;
 import java.io.*;
 
-import static org.junit.Assert.assertEquals;
-
 public class Parameters {
-
-	public enum AlphabetType {
-		NUCLEOTIDES("ACGT"),
-		AMINO_ACIDS("ACDEFGHIKLMNPQRSTWYV");
-
-		private final String validCharacters;
-
-		AlphabetType(String validCharacters) {
-			this.validCharacters = validCharacters;
-		}
-
-		public String getValidCharacters() {
-			return validCharacters;
-		}
-	}
-
 	// global parameters
 	public static double day = 0;
 	public static Virus urVirus = null;

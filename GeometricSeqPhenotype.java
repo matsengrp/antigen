@@ -210,19 +210,9 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
             mutantAminoAcid = wildTypeMutantAminoAcids[1];
 
             if (SANITY_TEST) {
-                int nucleotideMutationCodonIndex = nucleotideMutationIndex % 3;
-                int proteinMutationIndex = nucleotideMutationIndex / 3;
-                int nucleotideMutationFirstCodonIndex = 3 * proteinMutationIndex;
-                String wildTypeCodon = "" + this.nucleotideSequence[nucleotideMutationFirstCodonIndex] +
-                        this.nucleotideSequence[nucleotideMutationFirstCodonIndex + 1] +
-                        this.nucleotideSequence[nucleotideMutationFirstCodonIndex + 2];
-
-                StringBuilder mutantCodon = new StringBuilder(wildTypeCodon);
-                mutantCodon.setCharAt(nucleotideMutationCodonIndex, mutantNucleotide);
-
                 // (proteinMutationIndex + 1) to show one-based numbering
-                TestGeometricSeqPhenotype.mutations.println((nucleotideMutationIndex + 1) + "," + wildTypeNucleotide + mutantNucleotide + "," +
-                        wildTypeAminoAcid + "," + mutantAminoAcid + "," + wildTypeCodon + "," + mutantCodon + "," +  cycle + "," + this.hashCode());
+                TestGeometricSeqPhenotype.mutations.print("" + wildTypeNucleotide + mutantNucleotide + "," + wildTypeAminoAcid + "," +
+                                                          mutantAminoAcid + "," +  cycle + "," + this.hashCode() + "\n");
             }
         }
 
@@ -260,8 +250,8 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         if (!wildTypeAminoAcid.equals(mutantAminoAcid)) {
             // get indices for the matrix based on the wild type and mutant amino acids
             // matrix i,j correspond with the String "ACDEFGHIKLMNPQRSTWYV"
-            int mSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(wildTypeAminoAcid);
-            int nSiteMutationVectors = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(mutantAminoAcid);
+            int mSiteMutationVectors = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(wildTypeAminoAcid);
+            int nSiteMutationVectors = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(mutantAminoAcid);
 
             double[] mutations = Biology.SiteMutationVectors.VECTORS.getVector(mutationIndexSite, mSiteMutationVectors, nSiteMutationVectors); // use matrix at site # where mutation is occurring
             mutA = getTraitA() + mutations[0]; // r * cos(theta)
@@ -289,6 +279,11 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         StringBuilder mutantCodon = new StringBuilder(wildTypeCodon);
         mutantCodon.setCharAt(nucleotideMutationCodonIndex, mutantNucleotide);
         String mutantAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(mutantCodon.toString());
+
+        if (SANITY_TEST) {
+            // (proteinMutationIndex + 1) to show one-based numbering
+            TestGeometricSeqPhenotype.mutations.print((nucleotideMutationIndex + 1) + "," + wildTypeCodon + "," + mutantCodon + ",");
+        }
 
         return new String[]{wildTypeAminoAcid, mutantAminoAcid};
     }
