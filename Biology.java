@@ -15,6 +15,21 @@ import java.util.Scanner;
  * @author Thien Tran
  */
 public class Biology {
+    public enum AlphabetType {
+        NUCLEOTIDES("ACGT"),
+        AMINO_ACIDS("ACDEFGHIKLMNPQRSTWYV");
+
+        private final String validCharacters;
+
+        AlphabetType(String validCharacters) {
+            this. validCharacters = validCharacters;
+        }
+
+        public String getValidCharacters() {
+            return validCharacters;
+        }
+    }
+
     public enum DMSData {
         DMS_DATA();
         public double[][] aminoAcidPreference = null;
@@ -25,7 +40,7 @@ public class Biology {
                 // Only initialize aminoAcidPreference if DMS data is provided.
                 if (Parameters.DMSFile != null) {
                     int numberOfAminoAcidSites = Parameters.startingSequence.length() / 3;
-                    int numberOfAminoAcids = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
+                    int numberOfAminoAcids = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
                     aminoAcidPreference = new double[numberOfAminoAcidSites][numberOfAminoAcids];
 
                     Scanner dms = new Scanner(new File(Parameters.DMSFile));
@@ -109,7 +124,7 @@ public class Biology {
                 }
             }
 
-            return Parameters.AlphabetType.NUCLEOTIDES.getValidCharacters().charAt(indexAlphabet);
+            return Biology.AlphabetType.NUCLEOTIDES.getValidCharacters().charAt(indexAlphabet);
         }
     }
 
@@ -260,7 +275,7 @@ public class Biology {
             // i: index of wild type amino acid
             // j: index of mutant amino acid
             // ACDEFGHIKLMNPQRSTWYV 0 -> A, 1 -> C, 2 -> D, etc.
-            int matrixSize = Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
+            int matrixSize = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
             Map<Integer, double[][][]> currentSiteMutationVectors  = new HashMap<>();
 
             // Cycle over each site in the protein sequence and create a 2D array
@@ -325,8 +340,8 @@ public class Biology {
 
                             // amino acid mutation notation
                             // wild type amino acid + site # + mutant amino acid
-                            currentStringOutputCSV += "" + Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().charAt(wildTypeIndex) +
-                                      nucleotideSiteNumber + Parameters.AlphabetType.AMINO_ACIDS.getValidCharacters().charAt(mutationIndex) +
+                            currentStringOutputCSV += "" + Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().charAt(wildTypeIndex) +
+                                      nucleotideSiteNumber + Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().charAt(mutationIndex) +
                                       "," + r + "," + theta + '\n';
                         }
                     }
