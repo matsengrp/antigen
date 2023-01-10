@@ -1,5 +1,3 @@
-import cern.colt.Arrays;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -75,15 +73,15 @@ public class Biology {
     /**
      * Transition/transversion ratio used to determine what a given wild type nucleotide should be mutated to.
      */
-    public enum MutationType {
+    public enum K80DNAEvolutionModel {
         MUTATION();
         public final Map<Character, double[]> transitionTranversionProbability;
 
         /**
-         * Constructor that creates a probability distribution for each nucleotide,
+         * Constructor that creates an array of "boundaries" for each nucleotide,
          * where each possible mutation is weighted by a pre-defined transition/transversion ratio.
          */
-        MutationType() {
+        K80DNAEvolutionModel() {
             this.transitionTranversionProbability = new HashMap<>()  {{
                 double transition = 0.5 / (Parameters.transitionTransversionRatio + 1.0);
                 double transversion = Parameters.transitionTransversionRatio / (Parameters.transitionTransversionRatio + 1.0);
@@ -110,10 +108,10 @@ public class Biology {
          * @param originalNucleotideToMutate the original nucleotide to mutate
          * @return the new nucleotide to change the original nucleotide to
          */
-        public char getNucleotide(char originalNucleotideToMutate) {
+        public char sampleNucleotide(char originalNucleotideToMutate) {
             double[] transitionTransversion = this.transitionTranversionProbability.get(originalNucleotideToMutate);
 
-            // choose a random number between 0-1
+            // Choose a random number between 0-1
             double randomNum = Math.random();
             int indexAlphabet = 0;
 
@@ -236,7 +234,7 @@ public class Biology {
     /**
      * Data type used to determine how changes in sequence lead to changes in to a virus's location in antigenic space.
      * Specifically, for each site, a vector for each possible amino-acid mutations is pre-computed.
-     * Vectors angles are drawn from a uniform distribution, while vector magnitudes are drawn from a gamma distribution.
+     * Vector angles are drawn from a uniform distribution, while vector magnitudes are drawn from a gamma distribution.
      * Gamma distributions differ for epitope and non-epitope sites.
      *
      * Each site is drawn from the gamma distribution
@@ -270,7 +268,7 @@ public class Biology {
             }
             this.epitopeSites = epitopeSitesSet;
 
-            // create a mapping of site # to 2D array of vectors
+            // Create a mapping of site # to 2D array of vectors
             // mutations: 2D Array
             // i: index of wild type amino acid
             // j: index of mutant amino acid
@@ -284,7 +282,7 @@ public class Biology {
 
                 double[][][] currentSiteMutationMatrix = new double[matrixSize][matrixSize][];
 
-                // Create 2D where rows are wild type mino acids and columns are mutant amino acids
+                // Create 2D where rows are wild type amino acids and columns are mutant amino acids
                 for (int wildTypeIndex = 0; wildTypeIndex < matrixSize; wildTypeIndex++) {
 
                     for (int mutationIndex = 0; mutationIndex < matrixSize; mutationIndex++) {

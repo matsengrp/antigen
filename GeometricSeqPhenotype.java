@@ -28,12 +28,12 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
     /**
      * The number of epitope mutations this GeometricPhenotype went through (counting from the startingSequence)
      */
-    private int eMutation;
+    private int epitopeMutationCount;
 
     /**
      * The number of non-epitope mutations this GeometricPhenotype went through (counting from the startingSequence)
      */
-    private int neMutation;
+    private int nonepitopeMutationCount;
 
     /**
      *
@@ -69,8 +69,8 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         this.traitA = 0.0;
         this.traitB = 0.0;
         this.nucleotideSequence = Parameters.startingSequence.toCharArray();
-        this.eMutation = 0;
-        this.neMutation = 0;
+        this.epitopeMutationCount = 0;
+        this.nonepitopeMutationCount = 0;
         checkRep();
     }
 
@@ -123,8 +123,8 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         this.traitA = tA;
         this.traitB = tB;
         this.nucleotideSequence = startingSequence;
-        this.eMutation = e;
-        this.neMutation = nE;
+        this.epitopeMutationCount = e;
+        this.nonepitopeMutationCount = nE;
         checkRep();
     }
 
@@ -168,7 +168,6 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         double distB = (getTraitB() - p2d.getTraitB());
         double dist = (distA * distA) + (distB * distB);
         dist = Math.sqrt(dist);
-        checkRep();
         return dist;
     }
 
@@ -202,7 +201,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
             wildTypeNucleotide = this.nucleotideSequence[nucleotideMutationIndex];
 
             // get mutant nucleotide (transition/transversion ratio)
-            mutantNucleotide = Biology.MutationType.MUTATION.getNucleotide(wildTypeNucleotide);
+            mutantNucleotide = Biology.K80DNAEvolutionModel.MUTATION.sampleNucleotide(wildTypeNucleotide);
 
             String[] wildTypeMutantAminoAcids = mutateHelper(nucleotideMutationIndex, mutantNucleotide);
 
@@ -228,8 +227,8 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
 
         // Determine whether the mutation occurred in an epitope or non-epitope site, and update
         // the counts of epitope and non-epitope mutations accordingly
-        int eMutationNew = this.eMutation;
-        int neMutationNew = this.neMutation;
+        int eMutationNew = this.epitopeMutationCount;
+        int neMutationNew = this.nonepitopeMutationCount;
         if (Biology.SiteMutationVectors.VECTORS.getEpitopeSites().contains(proteinMutationIndex)) {
             eMutationNew += 1;
         } else {
@@ -247,15 +246,17 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
     private double[] updateAntigenicPhenotype(int mutationIndexSite, String wildTypeAminoAcid, String mutantAminoAcid) {
         double mutA = 0.0; // virus's location in the x dimension
         double mutB = 0.0; // virus's location in the y dimension
+
         if (!wildTypeAminoAcid.equals(mutantAminoAcid)) {
             // get indices for the matrix based on the wild type and mutant amino acids
             // matrix i,j correspond with the String "ACDEFGHIKLMNPQRSTWYV"
             int mSiteMutationVectors = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(wildTypeAminoAcid);
             int nSiteMutationVectors = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(mutantAminoAcid);
 
+            // Move virus using precomputed x and y coordinates
             double[] mutations = Biology.SiteMutationVectors.VECTORS.getVector(mutationIndexSite, mSiteMutationVectors, nSiteMutationVectors); // use matrix at site # where mutation is occurring
-            mutA = getTraitA() + mutations[0]; // r * cos(theta)
-            mutB = getTraitB() + mutations[1]; // r * sin(theta)
+            mutA = getTraitA() + mutations[0]; // mutations[0] = r * cos(theta) represents where to move virus in the x dimension
+            mutB = getTraitB() + mutations[1]; // mutations[1] = r * sin(theta) represents where to move virus in the y dimension
         }
 
         return new double[]{mutA, mutB};
@@ -297,7 +298,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
      */
     public String toString() {
         String fullString = String.format("%s, %.4f, %.4f, %d, %d", String.valueOf(this.nucleotideSequence), this.getTraitA(),
-                                          this.getTraitB(), this.eMutation, this.neMutation);
+                                          this.getTraitB(), this.epitopeMutationCount, this.nonepitopeMutationCount);
         return fullString;
     }
 
