@@ -93,17 +93,19 @@ public class Parameters {
 		return (day - (double) burnin) / 365.0;
 	}
 
-	public static boolean dayIsInteger return Math.ceil(day)-Math.floor(day)==0;
+	/**
+	 * @return True if current day is an integer, false otherwise.
+	 */
+	public static boolean dayIsInteger() {
+		return Math.ceil(day) - Math.floor(day) == 0;
 	}
 
 	//
-	public static double getSeasonality(int index) { 
-		double baseline = demeBaselines[ind 
-		double amplitude = demeAmplitudes[index 
-		double offset = demeOffsets[index]; 
-	return baseline+amplitude*Math.cos(2*Math.PI*
-
-	getDate() + 2 * Math.PI * offset);
+	public static double getSeasonality(int index) {
+		double baseline = demeBaselines[index];
+		double amplitude = demeAmplitudes[index];
+		double offset = demeOffsets[index];
+		return baseline + amplitude * Math.cos(2 * Math.PI * getDate() + 2 * Math.PI * offset);
 	}
 
 	// initialize
@@ -364,3 +366,4 @@ public class Parameters {
 		}
 		return ret;
 	}
+}
