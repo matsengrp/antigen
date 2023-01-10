@@ -267,7 +267,7 @@ public class TestGeometricSeqPhenotype {
     static {
         try {
             if (GeometricSeqPhenotype.SANITY_TEST) {
-                mutations = new PrintStream("testGeometricSeqPhenotype/mutations.csv");
+                mutations = new PrintStream("mutations.csv");
                 mutations.println("siteN,wildCodon,mutantCodon,pairWildMutantN,wildAA,mutantAA,cycle,id");
             }
         } catch (FileNotFoundException e) {
