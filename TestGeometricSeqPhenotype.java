@@ -6,7 +6,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -183,6 +185,40 @@ public class TestGeometricSeqPhenotype {
         // traitA and traitB are not deterministic.
         // E should be 0 and nE should be 1
         assertTrue(simplePheno.mutate().toString().contains(", 0, 1"));
+    }
+
+    /**
+     * Test that all 64 codons are accounted for and corresponds to the correct amino acid.
+     */
+    @Test
+    public void testCodonMap() throws FileNotFoundException {
+        // Initialize static parameters to create CodonMap in Biology
+        Parameters.load();
+        Parameters.initialize();
+
+        // Create a new CodonMap from a codon table txt file,
+        // which will be used to validate CodonMap in Biology
+        Map<String, String> codonMapTest = new HashMap<>();
+
+        Scanner codonTable = new Scanner(new File("codon_table.txt"));
+        codonTable.nextLine();
+
+        while (codonTable.hasNextLine()) {
+            Scanner codonLine = new Scanner(codonTable.nextLine());
+
+            String codon = codonLine.next(); // codon
+            codonLine.next(); // throw out second column (amino acid abbreviation)
+            String aminoAcid = codonLine.next(); // amino acid codon codes for
+
+            // txt file saved from GitHub uses "O" instead of "STOP" to represent stop codons
+            if (aminoAcid.equals("O")) {
+                aminoAcid = "STOP";
+            }
+
+            codonMapTest.put(codon, aminoAcid);
+        }
+
+        assertEquals(codonMapTest, Biology.CodonMap.CODONS.codonMap);
     }
 
     /**
