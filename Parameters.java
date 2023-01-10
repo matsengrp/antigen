@@ -272,6 +272,18 @@ public class Parameters {
 			if (map.get("transitionTransversionRatio") != null) {
 				transitionTransversionRatio = (double) map.get("transitionTransversionRatio");
 			}
+			if (map.get("meanStepEpitope") != null) {
+				meanStepEpitope = (double) map.get("meanStepEpitope");
+			}
+			if (map.get("sdStepEpitope") != null) {
+				sdStepEpitope = (double) map.get("sdStepEpitope");
+			}
+			if (map.get("epitopeSites") != null) {
+				epitopeSites = toIntArray((List<Integer>) map.get("epitopeSites"));
+			}
+			if (map.get("transitionTransversionRatio") != null) {
+				transitionTransversionRatio = (double) map.get("transitionTransversionRatio");
+			}
 			if (map.get("mut2D") != null) {
 				mut2D = (boolean) map.get("mut2D");
 			}
