@@ -22,6 +22,11 @@ The program can be compiled with:
 
 	javac *.java
 
+
+I (@zorian15) have found that I sometimes need to specify all of the `.jar` files in the compilation command to get things to compile completely, this can be done with::
+
+	javac -classpath ".:lib/classmexer.jar:lib/colt-1.2.0.jar:lib/hamcrest-core-1.3.jar:lib/junit-4.13.1.jar:" *.java
+
 Then to run:
 
 	java -XX:+UseSerialGC -Xmx1G Antigen
