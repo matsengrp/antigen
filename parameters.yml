@@ -51,9 +51,9 @@ initialPrT: 0.1                             # initial faction in general recover
 demeBaselines: [1., 1., 1.]                 # baseline of seasonality
 demeAmplitudes: [0.1, 0., 0.1]              # amplitude of seasonality
 demeOffsets: [0., 0., 0.5]                  # seasonal offset relative to the year
-    
-# immune parameters
-phenotypeSpace: "geometricSeq"              # options include: geometric, geometric3d, geometric10d, sequence
+
+# immune parameters  
+phenotypeSpace: "geometricSeq"              # options include: geometric, geometric3d, geometric10d, sequence, geometricSeq
 muPhenotype: 0.005                          # in mutations per individual per day
 waning: false                               # whether to allow waning of host immunity
 waningRate: 0.01                            # rate per day of a host removing a random phenotype from their immune history

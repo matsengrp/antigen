@@ -25,7 +25,7 @@ public class TestGeometricSeqPhenotype {
     private GeometricSeqPhenotype simplePheno; // Give a specific sequence
     private GeometricSeqPhenotype simplePheno2; // Give a specific sequence
 
-    GeometricSeqPhenotype [] history;
+    GeometricSeqPhenotype[] history;
 
     /**
      * Define variables needed for multiple tests.
@@ -38,16 +38,21 @@ public class TestGeometricSeqPhenotype {
         Parameters.homologousImmunity = 0.95;
 
         emptyPheno = new GeometricSeqPhenotype();
-        simplePheno = new GeometricSeqPhenotype(0.0, 0.0, new char[]{'T', 'G', 'C', 'A', 'T', 'C'});
+        simplePheno = new GeometricSeqPhenotype(0.0, 0.0, new char[] { 'T', 'G', 'C',
+                'A', 'T', 'C' });
 
-        simplePheno2 = new GeometricSeqPhenotype(20.0, 10.0, new char[]{'G', 'C', 'T', 'G', 'G', 'A'});
+        simplePheno2 = new GeometricSeqPhenotype(20.0, 10.0, new char[] { 'G', 'C',
+                'T', 'G', 'G', 'A' });
 
         // Create a small history of GeometricSeq phenotypes.
         history = new GeometricSeqPhenotype[3];
 
-        history[0] = new GeometricSeqPhenotype(1.0, 2.0, new char[]{'T', 'G', 'C', 'G', 'C', 'C'});
-        history[1] = new GeometricSeqPhenotype(3.0, 2.0, new char[]{'T', 'G', 'C', 'G', 'C', 'T'});
-        history[2] = new GeometricSeqPhenotype(5.0, 8.0, new char[]{'C', 'T', 'C', 'G', 'C', 'T'});
+        history[0] = new GeometricSeqPhenotype(1.0, 2.0, new char[] { 'T', 'G', 'C',
+                'G', 'C', 'C' });
+        history[1] = new GeometricSeqPhenotype(3.0, 2.0, new char[] { 'T', 'G', 'C',
+                'G', 'C', 'T' });
+        history[2] = new GeometricSeqPhenotype(5.0, 8.0, new char[] { 'C', 'T', 'C',
+                'G', 'C', 'T' });
     }
 
     /**
@@ -59,9 +64,11 @@ public class TestGeometricSeqPhenotype {
         // Nucleotide sequence must be a multiple of 3.
         assertEquals(0, emptyPheno.getSequence().length() % 3);
         // Nucleotide sequence must be the same length as the startingSequence.
-        assertEquals(Parameters.startingSequence.length(), emptyPheno.getSequence().length());
+        assertEquals(Parameters.startingSequence.length(),
+                emptyPheno.getSequence().length());
 
-        // Check that non-empty constructor works and data contents are equal to the given parameters.
+        // Check that non-empty constructor works and data contents are equal to the
+        // given parameters.
         assertEquals("GCTGGA", simplePheno2.getSequence());
         assertEquals(20.0, simplePheno2.getTraitA(), 0.0);
         assertEquals(10.0, simplePheno2.getTraitB(), 0.0);
@@ -92,7 +99,8 @@ public class TestGeometricSeqPhenotype {
      */
     @Test
     public void testDistance() {
-        // Calculates the distance between this GeometricSeqPhenotype and p in Euclidean space.
+        // Calculates the distance between this GeometricSeqPhenotype and p in Euclidean
+        // space.
 
         // simplePheno: traitA=0.0, traitB=0.0
         // history[0]: traitA=1.0, traitB=2.0
@@ -124,7 +132,8 @@ public class TestGeometricSeqPhenotype {
         String simplePhenoSeq = simplePheno.getSequence();
         String mutantPhenoSeq = mutantPheno.getSequence();
 
-        // Make sure that the Hamming distance between the mutated and un-mutated nucleotide sequences equals one.
+        // Make sure that the Hamming distance between the mutated and un-mutated
+        // nucleotide sequences equals one.
         assertEquals(simplePhenoSeq.length(), mutantPhenoSeq.length());
         int counter = 0;
         for (int i = 0; i < simplePhenoSeq.length(); i++) {
@@ -139,19 +148,25 @@ public class TestGeometricSeqPhenotype {
 
         // Mutation in first codon and changes protein sequence
         String[] simpleWildTypeMutantAminoAcids1 = simplePheno.mutateHelper(0, 'A');
-        assertArrayEquals(new String[]{"C", "S"}, simpleWildTypeMutantAminoAcids1);
+        assertArrayEquals(new String[] { "C", "S" },
+                simpleWildTypeMutantAminoAcids1);
 
         // Mutation in first codon and doesn't change protein sequence
-        String[] simple2WildTypeMutantAminoAcids1 = simplePheno2.mutateHelper(1, 'C');
-        assertArrayEquals(new String[]{"A", "A"}, simple2WildTypeMutantAminoAcids1);
+        String[] simple2WildTypeMutantAminoAcids1 = simplePheno2.mutateHelper(1,
+                'C');
+        assertArrayEquals(new String[] { "A", "A" },
+                simple2WildTypeMutantAminoAcids1);
 
         // Mutation in second codon and changes protein sequence
-        String[] simple2WildTypeMutantAminoAcids2 = simplePheno2.mutateHelper(3, 'A');
-        assertArrayEquals(new String[]{"G", "R"}, simple2WildTypeMutantAminoAcids2);
+        String[] simple2WildTypeMutantAminoAcids2 = simplePheno2.mutateHelper(3,
+                'A');
+        assertArrayEquals(new String[] { "G", "R" },
+                simple2WildTypeMutantAminoAcids2);
 
         // Mutation in second codon and doesn't change protein sequence
         String[] simpleWildTypeMutantAminoAcids2 = simplePheno.mutateHelper(5, 'T');
-        assertArrayEquals(new String[]{"I", "I"}, simpleWildTypeMutantAminoAcids2);
+        assertArrayEquals(new String[] { "I", "I" },
+                simpleWildTypeMutantAminoAcids2);
     }
 
     /**
@@ -181,7 +196,8 @@ public class TestGeometricSeqPhenotype {
         assertEquals("TGCATC, 0.0000, 0.0000, 0, 0", simplePheno.toString());
 
         // Check that String representation changes after mutation.
-        assertNotEquals("TGCATC, 0.0000, 0.0000, 0, 0", simplePheno.mutate().toString());
+        assertNotEquals("TGCATC, 0.0000, 0.0000, 0, 0",
+                simplePheno.mutate().toString());
         // traitA and traitB are not deterministic.
         // E should be 0 and nE should be 1
         assertTrue(simplePheno.mutate().toString().contains(", 0, 1"));
@@ -222,11 +238,12 @@ public class TestGeometricSeqPhenotype {
     }
 
     /**
-     * Test that DMS data stored in Antigen reflects the csv file read from parameters.yml.
+     * Test that DMS data stored in Antigen reflects the csv file read from
+     * parameters.yml.
      */
     @Test
     public void testDMSData() {
-        //  The number of rows in the DMS file is checked in Parameters.
+        // The number of rows in the DMS file is checked in Parameters.
 
         // Check if each row (array) in the DMS data sums up to 1.0.
         int numberOfAminoAcidSites = Parameters.startingSequence.length() / 3;
@@ -243,7 +260,8 @@ public class TestGeometricSeqPhenotype {
     }
 
     /**
-     * Creates a csv file for each amino acid site's matrix of vectors in a directory, test/valuesGammaDistribution.
+     * Creates a csv file for each amino acid site's matrix of vectors in a
+     * directory, test/valuesGammaDistribution.
      */
     @Test
     public void testGammaDistribution() throws IOException {
@@ -257,13 +275,14 @@ public class TestGeometricSeqPhenotype {
 
         for (int i = 0; i < values.length; i++) {
             String value = values[i];
-            PrintStream output = new PrintStream("testGeometricSeqPhenotype/valuesGammaDistribution/0_site" + i + ".csv");
+            PrintStream output = new PrintStream(
+                    "testGeometricSeqPhenotype/valuesGammaDistribution/0_site" + i + ".csv");
             output.println(value);
 
             double[][][] matrix = matrices.get(i);
             System.out.println("Matrix " + i);
-            for(int j = 0; j < Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().length(); j++) {
-                for(int k = 0; k < Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().length(); k++) {
+            for (int j = 0; j < Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().length(); j++) {
+                for (int k = 0; k < Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().length(); k++) {
                     // Nulls are along the diagonal
                     System.out.print(Arrays.toString(matrix[j][k]));
                 }
@@ -271,18 +290,20 @@ public class TestGeometricSeqPhenotype {
             }
         }
 
-        // Run: python testGammaDistribution.py for each i such that "0_site" + i + ".csv"
+        // Run: python testGammaDistribution.py for each i such that "0_site" + i +
+        // ".csv"
     }
 
     /**
-     * PrintStream (mutations.csv) to print wild type and mutant nucleotide pairs to.
+     * PrintStream (mutations.csv) to print wild type and mutant nucleotide pairs
+     * to.
      */
     public static PrintStream mutations;
 
     static {
         try {
             if (GeometricSeqPhenotype.SANITY_TEST) {
-                mutations = new PrintStream("testGeometricSeqPhenotype/mutations.csv");
+                mutations = new PrintStream("mutations.csv");
                 mutations.println("siteN,wildCodon,mutantCodon,pairWildMutantN,wildAA,mutantAA,cycle,id");
             }
         } catch (FileNotFoundException e) {
