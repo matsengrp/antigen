@@ -611,7 +611,11 @@ public class VirusTree {
 			tipFile.delete();
 			tipFile.createNewFile();
 			PrintStream tipStream = new PrintStream(tipFile);
-			tipStream.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", "name", "year", "trunk", "tip", "mark", "location", "layout", "ag1", "ag2");
+			if (Parameters.phenotypeSpace.equals("geometricSeq")) {
+				tipStream.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", "name", "year", "trunk", "tip", "mark", "location", "layout", "nucleotideSequence", "traitA", "traitB", "epitopeMutationCount", "nonepitopeMutationCount");
+			} else {
+				tipStream.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", "name", "year", "trunk", "tip", "mark", "location", "layout", "ag1", "ag2");
+			}
 			for (Virus v : tips) {
 				tipStream.printf("\"%s\",%.4f,%d,%d,%d,%d,%.4f,%s\n", v, v.getBirth(), v.isTrunk() ? 1 : 0, v.isTip() ? 1 : 0, v.isMarked() ? 1 : 0, v.getDeme(), v.getLayout(), v.getPhenotype());
 			}
