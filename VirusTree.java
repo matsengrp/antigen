@@ -612,7 +612,7 @@ public class VirusTree {
 			tipFile.createNewFile();
 			PrintStream tipStream = new PrintStream(tipFile);
 			if (Parameters.phenotypeSpace.equals("geometricSeq")) {
-				tipStream.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", "name", "year", "trunk", "tip", "mark", "location", "layout", "nucleotideSequence", "traitA", "traitB", "epitopeMutationCount", "nonepitopeMutationCount");
+				tipStream.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", "name", "year", "trunk", "tip", "mark", "location", "layout", "nucleotideSequence", "ag1", "ag2", "epitopeMutationCount", "nonepitopeMutationCount");
 			} else {
 				tipStream.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", "name", "year", "trunk", "tip", "mark", "location", "layout", "ag1", "ag2");
 			}
