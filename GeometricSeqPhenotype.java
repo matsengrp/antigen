@@ -219,13 +219,11 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         String wildTypeAminoAcid = "", mutantAminoAcid = "";
         int nucleotideMutationIndex = -1;
         char wildTypeNucleotide = ' ', mutantNucleotide = ' ';
-        int cycle = 0;
 
         // Make a single nucleotide mutation to the sequence
         // If the mutation results in a stop codon, then throw that mutation away and
         // try another one
         while (mutantAminoAcid.equals("") || mutantAminoAcid.equals("STOP")) {
-            cycle++;
             // choose random index to mutate in this.nucleotideSequence
             nucleotideMutationIndex = Random.nextInt(0, this.nucleotideSequence.length - 1);
 
@@ -238,13 +236,6 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
 
             wildTypeAminoAcid = wildTypeMutantAminoAcids[0];
             mutantAminoAcid = wildTypeMutantAminoAcids[1];
-
-            // if (SANITY_TEST) {
-            // // (proteinMutationIndex + 1) to show one-based numbering
-            // TestGeometricSeqPhenotype.mutations.print("" + wildTypeNucleotide +
-            // mutantNucleotide + "," + wildTypeAminoAcid + "," +
-            // mutantAminoAcid + "," + cycle + "," + this.hashCode() + "\n");
-            // }
         }
 
         int proteinMutationIndex = nucleotideMutationIndex / 3; // site # where mutation is occurring {0, . . ., total
