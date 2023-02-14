@@ -649,6 +649,37 @@ public class VirusTree {
 		}
 		
 	}
+
+	public static void printFASTA() {
+		// tips instead of branches
+		try {
+			File fastaFile = new File(filenameStem + "out.fasta");
+			fastaFile.delete();
+			fastaFile.createNewFile();
+			PrintStream fastaStream = new PrintStream(fastaFile);
+			int fastaSequenceNum = 0;
+			for (Virus v : postOrderNodes()) {
+				if (v.getParent() != null) {
+					Virus vp = v.getParent();
+					printSequence(v.getPhenotype().toString(), fastaStream, fastaSequenceNum++);
+					printSequence(vp.getPhenotype().toString(), fastaStream, fastaSequenceNum++);
+				}
+			}
+			fastaStream.close();
+		} catch(IOException ex) {
+			System.out.println("Could not write to file");
+			System.exit(0);
+		}
+	}
+
+	private static void printSequence(String virusPhenotype, PrintStream fastaStream, int fastaSequenceNum) {
+		fastaStream.printf(">seq%d\n", fastaSequenceNum);
+		String sequence = virusPhenotype.split(",")[0];
+		String[] sequenceSplit = sequence.split("(?<=\\G.{60})");
+		for (int i = 0; i < sequenceSplit.length; i++) {
+			fastaStream.printf("%s\n", sequenceSplit[i]);
+		}
+	}
 	
 	// assess node in building Newick string
 	public static Virus assessNode(Virus v, List<Virus> visited, PrintStream treeStream) {
