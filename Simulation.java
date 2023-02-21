@@ -459,6 +459,7 @@ public class Simulation {
 			// tip and tree output
 			VirusTree.printTips();
 			VirusTree.printBranches();
+			VirusTree.printFASTA();
 			VirusTree.printNewick();
 
 			// immunity output

@@ -34,6 +34,7 @@ public class Parameters {
 	public static boolean restartFromCheckpoint = false; // whether to load population from out.hosts
 	public static String outPath = "output/"; // path to dump output files.
 	public static String outPrefix = "run-"; // suffix for output files.
+	public static String inPath = "input/"; // path to dump output files.
 
 	// metapopulation parameters
 	public static int demeCount = 3;
@@ -262,30 +263,6 @@ public class Parameters {
 			if (map.get("sdStep") != null) {
 				sdStep = (double) map.get("sdStep");
 			}
-			if (map.get("meanStepEpitope") != null) {
-				meanStepEpitope = (double) map.get("meanStepEpitope");
-			}
-			if (map.get("sdStepEpitope") != null) {
-				sdStepEpitope = (double) map.get("sdStepEpitope");
-			}
-			if (map.get("epitopeSites") != null) {
-				epitopeSites = toIntArray((List<Integer>) map.get("epitopeSites"));
-			}
-			if (map.get("transitionTransversionRatio") != null) {
-				transitionTransversionRatio = (double) map.get("transitionTransversionRatio");
-			}
-			if (map.get("meanStepEpitope") != null) {
-				meanStepEpitope = (double) map.get("meanStepEpitope");
-			}
-			if (map.get("sdStepEpitope") != null) {
-				sdStepEpitope = (double) map.get("sdStepEpitope");
-			}
-			if (map.get("epitopeSites") != null) {
-				epitopeSites = toIntArray((List<Integer>) map.get("epitopeSites"));
-			}
-			if (map.get("transitionTransversionRatio") != null) {
-				transitionTransversionRatio = (double) map.get("transitionTransversionRatio");
-			}
 			if (map.get("mut2D") != null) {
 				mut2D = (boolean) map.get("mut2D");
 			}
@@ -293,7 +270,8 @@ public class Parameters {
 				fixedStep = (boolean) map.get("fixedStep");
 			}
 			if (map.get("startingSequence") != null) {
-				startingSequence = ((String) map.get("startingSequence")).toUpperCase();
+				String startingSequenceFile = ((String) map.get("startingSequence"));
+				startingSequence = readStartingSequenceFile(inPath + startingSequenceFile);
 
 				// Check that startingSequence is not an empty String and is a multiple of 3.
 				if (phenotypeSpace.equals("geometricSeq")) {
@@ -313,6 +291,19 @@ public class Parameters {
 						}
 					}
 				}
+			}
+			if (map.get("epitopeSites") != null) {
+				String epitopeSitesFile = ((String) map.get("epitopeSites"));
+				epitopeSites = readEpitopeSitesFile(inPath + epitopeSitesFile);
+			}
+			if (map.get("meanStepEpitope") != null) {
+				meanStepEpitope = (double) map.get("meanStepEpitope");
+			}
+			if (map.get("sdStepEpitope") != null) {
+				sdStepEpitope = (double) map.get("sdStepEpitope");
+			}
+			if (map.get("transitionTransversionRatio") != null) {
+				transitionTransversionRatio = (double) map.get("transitionTransversionRatio");
 			}
 			if (map.get("DMSFile") != null) {
 				DMSFile = (String) map.get("DMSFile");
@@ -341,6 +332,42 @@ public class Parameters {
 		} catch (IOException e) {
 			System.out.println("Cannot load parameters.yml, using defaults");
 		}
+	}
+
+	// Returns String of the starting sequence given the fasta file
+	private static String readStartingSequenceFile(String startingSequenceFile) throws FileNotFoundException {
+		StringBuilder startingSequenceSB = new StringBuilder();
+		Scanner startingSequenceScanner = new Scanner(new File(startingSequenceFile));
+		startingSequenceScanner.nextLine(); // read header >
+
+		while (startingSequenceScanner.hasNextLine()) {
+			String startingSequenceLine = startingSequenceScanner.nextLine();
+			// Only read one sequence from the fasta file
+			if (startingSequenceLine.indexOf(0) == '>') {
+				System.out.println("Only one starting sequence can be simulated at a time.");
+				break;
+			}
+			startingSequenceSB.append(startingSequenceLine);
+		}
+
+		return startingSequenceSB.toString().toUpperCase();
+	}
+
+	// Returns int[] of the epitope sites given the txt file
+	private static int[] readEpitopeSitesFile(String epitopeSitesFile) throws FileNotFoundException {
+		Scanner epitopeSitesScanner = new Scanner(new File(epitopeSitesFile));
+		String epitopeSitesLine = epitopeSitesScanner.nextLine();
+
+		// Split epitope sites by ","
+		String[] epitopeSitesString = epitopeSitesLine.split(",");
+
+		// Convert String[] to int[]
+		int[] epitopeSitesInt = new int[epitopeSitesString.length];
+		for (int i = 0; i < epitopeSitesString.length; i++) {
+			epitopeSitesInt[i] = Integer.parseInt(epitopeSitesString[i].trim());
+		}
+
+		return epitopeSitesInt;
 	}
 
 	private static int[] toIntArray(List<Integer> list) {
