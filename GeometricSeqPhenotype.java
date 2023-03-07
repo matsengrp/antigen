@@ -240,10 +240,48 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
 
         int proteinMutationIndex = nucleotideMutationIndex / 3; // site # where mutation is occurring {0, . . ., total
                                                                 // number of sites - 1}
+
         // Update the x and y coordinates of the virus in antigenic space
-        double[] vectors = updateAntigenicPhenotype(proteinMutationIndex, wildTypeAminoAcid, mutantAminoAcid);
-        double mutA = vectors[0];
-        double mutB = vectors[1];
+        double mutA;
+        double mutB;
+        if (Parameters.predefinedVectors) {
+            double[] vectors = updateAntigenicPhenotype(proteinMutationIndex, wildTypeAminoAcid, mutantAminoAcid);
+            mutA = vectors[0];
+            mutB = vectors[1];
+        } else {
+            // direction of mutation
+            double theta;
+            if (Parameters.mut2D) {
+                theta = Random.nextDouble(0,2*Math.PI);
+            } else {
+                if (Random.nextBoolean(0.5)) { theta = 0; }
+                else { theta = Math.PI; }
+            }
+
+            double r;
+            double mean;
+            double sd;
+            // size of mutation
+            if (Biology.SiteMutationVectors.VECTORS.getEpitopeSites().contains(proteinMutationIndex)) {
+                r = Parameters.meanStepEpitope;
+                mean = Parameters.meanStepEpitope;
+                sd = Parameters.sdStepEpitope;
+            } else {
+                r = Parameters.meanStep;
+                mean = Parameters.meanStep;
+                sd = Parameters.sdStep;
+            }
+
+            if (!Parameters.fixedStep) {
+                double alpha = (mean *  mean) / (sd * sd);
+                double beta = (sd * sd) / mean;
+                r = Random.nextGamma(alpha, beta);
+            }
+
+            // create phenotype
+            mutA = getTraitA() + r * Math.cos(theta);
+            mutB = getTraitB() + r * Math.sin(theta);
+        }
 
         // Update the virus's nucleotide sequence by introducing the mutation from above
         char[] copyNucleotideSequence = Arrays.copyOf(this.nucleotideSequence, Parameters.startingSequence.length());

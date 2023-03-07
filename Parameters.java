@@ -88,6 +88,7 @@ public class Parameters {
 	public static String DMSFile = null; // name of DMS csv file: must have 21 columns (site number and amino acid
 											// preferences ordered alphabetically) and rows must equal the number of
 											// amino acid sites in the virus sequence)
+	public static boolean predefinedVectors = true;
 
 	// measured in years, starting at burnin
 	public static double getDate() {
@@ -328,6 +329,9 @@ public class Parameters {
 									+ dmsDataLineCount);
 					throw new IOException();
 				}
+			}
+			if (map.get("predefinedVectors") != null) {
+				predefinedVectors = (boolean) map.get("predefinedVectors");
 			}
 		} catch (IOException e) {
 			System.out.println("Cannot load parameters.yml, using defaults");
