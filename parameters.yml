@@ -4,7 +4,7 @@
 
 # simulation parameters
 burnin: 0                                   # days to wait before logging output 
-endDay: 1000                                # number of days to simulate
+endDay: 4000                                # number of days to simulate
 deltaT: 0.1                                 # number of days to move forward in a single timestep
 printStep: 50                               # print to out.timeseries every X days
 tipSamplingRate: 0.0002                     # store X samples per deme per day
@@ -55,15 +55,15 @@ demeOffsets: [0., 0., 0.5]                  # seasonal offset relative to the ye
 
 # immune parameters  
 phenotypeSpace: "geometricSeq"              # options include: geometric, geometric3d, geometric10d, sequence, geometricSeq
-muPhenotype: 0.05                          # in mutations per individual per day
+muPhenotype: 0.0001                          # in mutations per individual per day
 waning: false                               # whether to allow waning of host immunity
 waningRate: 0.01                            # rate per day of a host removing a random phenotype from their immune history
 
 smithConversion: 0.1                        # multiplier to distance to give cross-immunity
 homologousImmunity: 0.95                    # immunity raised to antigenically identical virus
 initialTraitA: -6.                          # value in dimension 1 for initial host immunity
-meanStep: 0.00001                            # mean mutation size for non-epitopes
-sdStep: 0.00001                              # standard deviation of mutation size for non-epitopes
+meanStep: 0.3                            # mean mutation size for non-epitopes
+sdStep: 0.3                              # standard deviation of mutation size for non-epitopes
 mut2D: false                                # whether to mutate in a full 360 degree arc
 fixedStep: false                            # whether to fix step size, i.e. ignore sdStep
 

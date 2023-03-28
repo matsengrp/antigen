@@ -242,45 +242,17 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
                                                                 // number of sites - 1}
 
         // Update the x and y coordinates of the virus in antigenic space
-        double mutA;
-        double mutB;
+        Biology.MutationVector vector;
         if (Parameters.predefinedVectors) {
-            double[] vectors = updateAntigenicPhenotype(proteinMutationIndex, wildTypeAminoAcid, mutantAminoAcid);
-            mutA = vectors[0];
-            mutB = vectors[1];
+            vector = updateAntigenicPhenotype(proteinMutationIndex, wildTypeAminoAcid, mutantAminoAcid);
         } else {
-            // direction of mutation
-            double theta;
-            if (Parameters.mut2D) {
-                theta = Random.nextDouble(0,2*Math.PI);
-            } else {
-                if (Random.nextBoolean(0.5)) { theta = 0; }
-                else { theta = Math.PI; }
-            }
-
-            double r;
-            double mean;
-            double sd;
-            // size of mutation
-            if (Biology.SiteMutationVectors.VECTORS.getEpitopeSites().contains(proteinMutationIndex)) {
-                r = Parameters.meanStepEpitope;
-                mean = Parameters.meanStepEpitope;
-                sd = Parameters.sdStepEpitope;
-            } else {
-                r = Parameters.meanStep;
-                mean = Parameters.meanStep;
-                sd = Parameters.sdStep;
-            }
-
-            if (!Parameters.fixedStep) {
-                double alpha = (mean *  mean) / (sd * sd);
-                double beta = (sd * sd) / mean;
-                r = Random.nextGamma(alpha, beta);
-            }
-
-            // create phenotype
-            mutA = getTraitA() + r * Math.cos(theta);
-            mutB = getTraitB() + r * Math.sin(theta);
+            boolean isEpitopeSite = Biology.SiteMutationVectors.VECTORS.getEpitopeSites().contains(proteinMutationIndex);
+            vector = Biology.MutationVector.calculateMutation(isEpitopeSite);
+            // TODO:
+//            if (SANITY_TEST && isEpitopeSite) {
+//                TestGeometricSeqPhenotype.randomMutationsDistribution
+//                        .print("" + wildTypeAminoAcid + proteinMutationIndex + mutantAminoAcid + "," + vector.r + "," + vector.theta + '\n');
+//            }
         }
 
         // Update the virus's nucleotide sequence by introducing the mutation from above
@@ -299,17 +271,14 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         }
 
         checkRep();
-        Phenotype mutP = new GeometricSeqPhenotype(mutA, mutB, copyNucleotideSequence, eMutationNew, neMutationNew);
+        Phenotype mutP = new GeometricSeqPhenotype(vector.mutA, vector.mutB, copyNucleotideSequence, eMutationNew, neMutationNew);
         return mutP;
     }
 
     // Updates a virus's location in antigenic space upon a mutation by taking the
     // vector giving the virus's current location and then summing it with a
     // precomputed vector that gives the antigenic effect of the mutation
-    private double[] updateAntigenicPhenotype(int mutationIndexSite, String wildTypeAminoAcid, String mutantAminoAcid) {
-        double mutA = 0.0; // virus's location in the x dimension
-        double mutB = 0.0; // virus's location in the y dimension
-
+    private Biology.MutationVector updateAntigenicPhenotype(int mutationIndexSite, String wildTypeAminoAcid, String mutantAminoAcid) {
         if (!wildTypeAminoAcid.equals(mutantAminoAcid)) {
             // get indices for the matrix based on the wild type and mutant amino acids
             // matrix i,j correspond with the String "ACDEFGHIKLMNPQRSTWYV"
@@ -317,13 +286,18 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
             int nSiteMutationVectors = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(mutantAminoAcid);
 
             // Move virus using precomputed x and y coordinates
-            double[] mutations = Biology.SiteMutationVectors.VECTORS.getVector(mutationIndexSite, mSiteMutationVectors,
+            Biology.MutationVector mutations = Biology.SiteMutationVectors.VECTORS.getVector(mutationIndexSite, mSiteMutationVectors,
                     nSiteMutationVectors); // use matrix at site # where mutation is occurring
-            mutA = getTraitA() + mutations[0]; // mutations[0] = r * cos(theta) represents where to move virus in the x dimension
-            mutB = getTraitB() + mutations[1]; // mutations[1] = r * sin(theta) represents where to move virus in the y dimension
+
+            // getTraitA and getTraitB represents the current position of the virus
+            // mutations.mutA = r * cos(theta) represents where to move virus in the x dimension
+            // mutations.mutB = r * sin(theta) represents where to move virus in the y dimension
+            return new Biology.MutationVector(getTraitA() + mutations.mutA, getTraitB() + mutations.mutB);
         }
 
-        return new double[] { mutA, mutB };
+        // mutA: virus's location in the x dimension
+        // mutB: virus's location in the y dimension
+        return new Biology.MutationVector(0.0, 0.0);
     }
 
     // Mutates nucleotide sequence at given nucleotideMutationIndex with given char
@@ -352,7 +326,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
 
         if (SANITY_TEST) {
             // (proteinMutationIndex + 1) to show one-based numbering
-            TestGeometricSeqPhenotype.mutations
+            TestGeometricSeqPhenotype.codonMutations
                     .print((nucleotideMutationIndex + 1) + "," + wildTypeCodon + "," + mutantCodon + ",");
         }
 

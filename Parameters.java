@@ -270,6 +270,22 @@ public class Parameters {
 			if (map.get("fixedStep") != null) {
 				fixedStep = (boolean) map.get("fixedStep");
 			}
+			if (map.get("epitopeSites") != null) {
+				String epitopeSitesFile = ((String) map.get("epitopeSites"));
+				epitopeSites = readEpitopeSitesFile(inPath + epitopeSitesFile);
+			}
+			if (map.get("meanStepEpitope") != null) {
+				meanStepEpitope = (double) map.get("meanStepEpitope");
+			}
+			if (map.get("sdStepEpitope") != null) {
+				sdStepEpitope = (double) map.get("sdStepEpitope");
+			}
+			if (map.get("transitionTransversionRatio") != null) {
+				transitionTransversionRatio = (double) map.get("transitionTransversionRatio");
+			}
+			if (map.get("predefinedVectors") != null) {
+				predefinedVectors = (boolean) map.get("predefinedVectors");
+			}
 			if (map.get("startingSequence") != null) {
 				String startingSequenceFile = ((String) map.get("startingSequence"));
 				startingSequence = readStartingSequenceFile(inPath + startingSequenceFile);
@@ -292,19 +308,6 @@ public class Parameters {
 						}
 					}
 				}
-			}
-			if (map.get("epitopeSites") != null) {
-				String epitopeSitesFile = ((String) map.get("epitopeSites"));
-				epitopeSites = readEpitopeSitesFile(inPath + epitopeSitesFile);
-			}
-			if (map.get("meanStepEpitope") != null) {
-				meanStepEpitope = (double) map.get("meanStepEpitope");
-			}
-			if (map.get("sdStepEpitope") != null) {
-				sdStepEpitope = (double) map.get("sdStepEpitope");
-			}
-			if (map.get("transitionTransversionRatio") != null) {
-				transitionTransversionRatio = (double) map.get("transitionTransversionRatio");
 			}
 			if (map.get("DMSFile") != null) {
 				DMSFile = (String) map.get("DMSFile");
@@ -329,9 +332,6 @@ public class Parameters {
 									+ dmsDataLineCount);
 					throw new IOException();
 				}
-			}
-			if (map.get("predefinedVectors") != null) {
-				predefinedVectors = (boolean) map.get("predefinedVectors");
 			}
 		} catch (IOException e) {
 			System.out.println("Cannot load parameters.yml, using defaults");
