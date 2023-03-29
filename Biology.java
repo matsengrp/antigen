@@ -357,6 +357,12 @@ public class Biology {
         }
     }
 
+    /**
+     * <b>MutationVector</b> stores a mutation vector's x and y coordinates
+     * and, optionally, direction and magnitude.
+     *
+     * @author Thien Tran
+     */
     public static class MutationVector {
         public double mutA;
         public double mutB;

@@ -238,66 +238,55 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
             mutantAminoAcid = wildTypeMutantAminoAcids[1];
         }
 
-        int proteinMutationIndex = nucleotideMutationIndex / 3; // site # where mutation is occurring {0, . . ., total
-                                                                // number of sites - 1}
-
-        // Update the x and y coordinates of the virus in antigenic space
-        Biology.MutationVector vector;
-        if (Parameters.predefinedVectors) {
-            vector = updateAntigenicPhenotype(proteinMutationIndex, wildTypeAminoAcid, mutantAminoAcid);
-        } else {
-            boolean isEpitopeSite = Biology.SiteMutationVectors.VECTORS.getEpitopeSites().contains(proteinMutationIndex);
-            vector = Biology.MutationVector.calculateMutation(isEpitopeSite);
-            // TODO:
-//            if (SANITY_TEST && isEpitopeSite) {
-//                TestGeometricSeqPhenotype.randomMutationsDistribution
-//                        .print("" + wildTypeAminoAcid + proteinMutationIndex + mutantAminoAcid + "," + vector.r + "," + vector.theta + '\n');
-//            }
-        }
-
-        // Update the virus's nucleotide sequence by introducing the mutation from above
         char[] copyNucleotideSequence = Arrays.copyOf(this.nucleotideSequence, Parameters.startingSequence.length());
-        copyNucleotideSequence[nucleotideMutationIndex] = mutantNucleotide;
+
+        // site # where mutation is occurring {0, . . ., total number of sites - 1}
+        int proteinMutationIndex = nucleotideMutationIndex / 3;
+        boolean isEpitopeSite = Biology.SiteMutationVectors.VECTORS.getEpitopeSites().contains(proteinMutationIndex);
 
         // Determine whether the mutation occurred in an epitope or non-epitope site,
-        // and update
-        // the counts of epitope and non-epitope mutations accordingly
+        // and update the counts of epitope and non-epitope mutations accordingly
         int eMutationNew = this.epitopeMutationCount;
         int neMutationNew = this.nonepitopeMutationCount;
-        if (Biology.SiteMutationVectors.VECTORS.getEpitopeSites().contains(proteinMutationIndex)) {
+        if (isEpitopeSite) {
             eMutationNew += 1;
         } else {
             neMutationNew += 1;
         }
 
-        checkRep();
-        Phenotype mutP = new GeometricSeqPhenotype(vector.mutA, vector.mutB, copyNucleotideSequence, eMutationNew, neMutationNew);
-        return mutP;
-    }
-
-    // Updates a virus's location in antigenic space upon a mutation by taking the
-    // vector giving the virus's current location and then summing it with a
-    // precomputed vector that gives the antigenic effect of the mutation
-    private Biology.MutationVector updateAntigenicPhenotype(int mutationIndexSite, String wildTypeAminoAcid, String mutantAminoAcid) {
-        if (!wildTypeAminoAcid.equals(mutantAminoAcid)) {
-            // get indices for the matrix based on the wild type and mutant amino acids
-            // matrix i,j correspond with the String "ACDEFGHIKLMNPQRSTWYV"
-            int mSiteMutationVectors = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(wildTypeAminoAcid);
-            int nSiteMutationVectors = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(mutantAminoAcid);
-
-            // Move virus using precomputed x and y coordinates
-            Biology.MutationVector mutations = Biology.SiteMutationVectors.VECTORS.getVector(mutationIndexSite, mSiteMutationVectors,
-                    nSiteMutationVectors); // use matrix at site # where mutation is occurring
-
-            // getTraitA and getTraitB represents the current position of the virus
-            // mutations.mutA = r * cos(theta) represents where to move virus in the x dimension
-            // mutations.mutB = r * sin(theta) represents where to move virus in the y dimension
-            return new Biology.MutationVector(getTraitA() + mutations.mutA, getTraitB() + mutations.mutB);
+        // Synonymous mutations don't require updates to the nucleotide sequence, so return early
+        if (wildTypeAminoAcid.equals(mutantAminoAcid)) {
+            return new GeometricSeqPhenotype(getTraitA(), getTraitB(), copyNucleotideSequence,
+                                             eMutationNew, neMutationNew);
         }
 
-        // mutA: virus's location in the x dimension
-        // mutB: virus's location in the y dimension
-        return new Biology.MutationVector(0.0, 0.0);
+        // Determine how much to move the x and y coordinates of the virus in antigenic space
+        Biology.MutationVector vector;
+        if (Parameters.predefinedVectors) {
+            // Move using predefined vectors
+            vector = getAntigenicPhenotypeUpdate(proteinMutationIndex, wildTypeAminoAcid, mutantAminoAcid);
+        } else {
+            // Move using random vectors
+            // Note, reversions will not be taken into account
+            vector = Biology.MutationVector.calculateMutation(isEpitopeSite);
+
+            if (SANITY_TEST && isEpitopeSite) {
+                TestGeometricSeqPhenotype.randomMutationsDistribution
+                        .print("" + wildTypeAminoAcid + proteinMutationIndex + mutantAminoAcid +
+                               "," + vector.r + "," + vector.theta + '\n');
+            }
+        }
+
+        // Update the virus's nucleotide sequence by introducing the mutation from above
+        copyNucleotideSequence[nucleotideMutationIndex] = mutantNucleotide;
+
+        checkRep();
+        // Update the virus's location in antigenic space upon a mutation by taking the
+        // vector giving the virus's current location (getTraitA() and getTraitB())
+        // and then summing it with a precomputed or random vector (vector.mutA and vector.mutB)
+        // that gives the antigenic effect of the mutation.
+        return new GeometricSeqPhenotype(getTraitA() + vector.mutA, getTraitB() + vector.mutB,
+                                         copyNucleotideSequence, eMutationNew, neMutationNew);
     }
 
     // Mutates nucleotide sequence at given nucleotideMutationIndex with given char
@@ -307,19 +296,21 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
     // package private helper method so that the updating of the nucleotide sequence
     // can be tested in TestGeometricSeqPhenotype.java
     String[] mutateHelper(int nucleotideMutationIndex, char mutantNucleotide) {
-        int nucleotideMutationCodonIndex = nucleotideMutationIndex % 3; // index of nucleotide being mutated in codon
-                                                                        // {0, 1, 2}
-        int proteinMutationIndex = nucleotideMutationIndex / 3; // protein site # where mutation is occurring {0, . . .,
-                                                                // total number of sites - 1}
-        int nucleotideMutationFirstCodonIndex = 3 * proteinMutationIndex; // start index of nucleotide being mutated in
-                                                                          // codon {0, 3, 6, . . .}
+        // Index of nucleotide being mutated codon {0, 1, 2}
+        int nucleotideMutationCodonIndex = nucleotideMutationIndex % 3;
+
+        // Protein site # where mutation is occurring {0, . . ., total number of sites - 1}
+        int proteinMutationIndex = nucleotideMutationIndex / 3;
+
+        // Start index of nucleotide being mutated in codon {0, 3, 6, . . .}
+        int nucleotideMutationFirstCodonIndex = 3 * proteinMutationIndex;
 
         String wildTypeCodon = "" + this.nucleotideSequence[nucleotideMutationFirstCodonIndex] +
-                this.nucleotideSequence[nucleotideMutationFirstCodonIndex + 1] +
-                this.nucleotideSequence[nucleotideMutationFirstCodonIndex + 2];
+                               this.nucleotideSequence[nucleotideMutationFirstCodonIndex + 1] +
+                               this.nucleotideSequence[nucleotideMutationFirstCodonIndex + 2];
         String wildTypeAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(wildTypeCodon);
 
-        // get new codon after mutation occurs
+        // Get new codon after mutation occurs
         StringBuilder mutantCodon = new StringBuilder(wildTypeCodon);
         mutantCodon.setCharAt(nucleotideMutationCodonIndex, mutantNucleotide);
         String mutantAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(mutantCodon.toString());
@@ -331,6 +322,23 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         }
 
         return new String[] { wildTypeAminoAcid, mutantAminoAcid };
+    }
+
+    // Get the precomputed vector that gives the antigenic effect of the mutation
+    private Biology.MutationVector getAntigenicPhenotypeUpdate(int mutationIndexSite, String wildTypeAminoAcid, String mutantAminoAcid) {
+        // Get indices for the matrix based on the wild type and mutant amino acids
+        // matrix i,j correspond with the String "ACDEFGHIKLMNPQRSTWYV"
+        int mSiteMutationVectors = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(wildTypeAminoAcid);
+        int nSiteMutationVectors = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().indexOf(mutantAminoAcid);
+
+        // Move virus using precomputed x and y coordinates
+        // Use matrix at site # where mutation is occurring
+        Biology.MutationVector mutations = Biology.SiteMutationVectors.VECTORS.getVector(mutationIndexSite, mSiteMutationVectors,
+                                                                                         nSiteMutationVectors);
+
+        // mutations.mutA = r * cos(theta) represents how much to move the virus in the x dimension
+        // mutations.mutB = r * sin(theta) represents how much to move the virus in the y dimension
+        return new Biology.MutationVector(mutations.mutA, mutations.mutB);
     }
 
     /**
@@ -345,8 +353,9 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
      */
     public String toString() {
         String fullString = String.format("%s, %.4f, %.4f, %d, %d", String.valueOf(this.nucleotideSequence),
-                this.getTraitA(),
-                this.getTraitB(), this.epitopeMutationCount, this.nonepitopeMutationCount);
+                            this.getTraitA(), this.getTraitB(),
+                            this.epitopeMutationCount, this.nonepitopeMutationCount);
+
         return fullString;
     }
 
