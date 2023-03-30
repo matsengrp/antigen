@@ -238,7 +238,10 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
             mutantAminoAcid = wildTypeMutantAminoAcids[1];
         }
 
+        // Make a copy of the nucleotide sequence, since Java uses references for arrays
         char[] copyNucleotideSequence = Arrays.copyOf(this.nucleotideSequence, Parameters.startingSequence.length());
+        // Update the virus's nucleotide sequence by introducing the mutation from above
+        copyNucleotideSequence[nucleotideMutationIndex] = mutantNucleotide;
 
         // site # where mutation is occurring {0, . . ., total number of sites - 1}
         int proteinMutationIndex = nucleotideMutationIndex / 3;
@@ -254,7 +257,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
             neMutationNew += 1;
         }
 
-        // Synonymous mutations don't require updates to the nucleotide sequence, so return early
+        // Synonymous mutations don't require updates to the location of the virus in antigenic space, so return early
         if (wildTypeAminoAcid.equals(mutantAminoAcid)) {
             return new GeometricSeqPhenotype(getTraitA(), getTraitB(), copyNucleotideSequence,
                                              eMutationNew, neMutationNew);
@@ -276,9 +279,6 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
                                "," + vector.r + "," + vector.theta + '\n');
             }
         }
-
-        // Update the virus's nucleotide sequence by introducing the mutation from above
-        copyNucleotideSequence[nucleotideMutationIndex] = mutantNucleotide;
 
         checkRep();
         // Update the virus's location in antigenic space upon a mutation by taking the
