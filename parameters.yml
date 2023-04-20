@@ -4,7 +4,7 @@
 
 # simulation parameters
 burnin: 0                                   # days to wait before logging output 
-endDay: 200                                # number of days to simulate
+endDay: 1000                                # number of days to simulate
 deltaT: 0.1                                 # number of days to move forward in a single timestep
 printStep: 50                               # print to out.timeseries every X days
 tipSamplingRate: 0.0002                     # store X samples per deme per day
@@ -55,22 +55,23 @@ demeOffsets: [0., 0., 0.5]                  # seasonal offset relative to the ye
 
 # immune parameters  
 phenotypeSpace: "geometricSeq"              # options include: geometric, geometric3d, geometric10d, sequence, geometricSeq
-muPhenotype: 0.005                          # in mutations per individual per day
+muPhenotype: 0.05                          # in mutations per individual per day
 waning: false                               # whether to allow waning of host immunity
 waningRate: 0.01                            # rate per day of a host removing a random phenotype from their immune history
 
 smithConversion: 0.1                        # multiplier to distance to give cross-immunity
 homologousImmunity: 0.95                    # immunity raised to antigenically identical virus
 initialTraitA: -6.                          # value in dimension 1 for initial host immunity
-meanStep: 0.0001                            # mean mutation size for non-epitopes
-sdStep: 0.0001                              # standard deviation of mutation size for non-epitopes
+meanStep: 0.00001                            # mean mutation size for non-epitopes
+sdStep: 0.00001                              # standard deviation of mutation size for non-epitopes
 mut2D: false                                # whether to mutate in a full 360 degree arc
 fixedStep: false                            # whether to fix step size, i.e. ignore sdStep
 
 # sequence-specific parameters
 startingSequence: "startingSequence.fasta"  # the fasta file of the starting sequence of a Virus (must be divisible by 3 and cannot contain stop codon)
 epitopeSites: "epitopeSites.txt"            # the txt file of the epitope sites in the sequence
-meanStepEpitope: 5.0                        # mean mutation size for epitopes
-sdStepEpitope: 1.0                          # standard deviation of mutation size for epitopes
+predefinedVectors: false                     # whether to use predefined vectors for mutations
+meanStepEpitope: 0.3                        # mean mutation size for epitopes
+sdStepEpitope: 0.3                          # standard deviation of mutation size for epitopes
 transitionTransversionRatio: 5.0            # transition/transversion rate ratio, k
 DMSFile:                                    # name of DMS csv file: must have 21 columns (site number and amino acid preferences ordered alphabetically) and rows must be in sequential order and equal the number of amino acid sites in the virus sequence

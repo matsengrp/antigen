@@ -77,17 +77,20 @@ public class Parameters {
 	public static double initialTraitA = -6; // value in dimension 1 for initial host immunity
 	public static double meanStep = 0.3; // mean mutation size for non-epitopes
 	public static double sdStep = 0.3; // standard deviation of mutation size for non-epitopes
-	public static double meanStepEpitope = 0.3; // mean mutation size for epitopes
-	public static double sdStepEpitope = 0.3; // standard deviation of mutation size for epitopes
-	public static int[] epitopeSites = {}; // epitope sites of virus (valid inputs are between 1 and
-											// startingSequence.length() / 3)
-	public static double transitionTransversionRatio = 5.0; // transition/transversion rate ratio, k
 	public static boolean mut2D = false; // whether to mutate in a full 360 degree arc
 	public static boolean fixedStep = false; // whether to fix mutation step size
+
+	// parameters specific to GeometricSeqPhenotype
 	public static String startingSequence = "AGAGTCTAGTCC"; // default starting sequence
+	public static int[] epitopeSites = {}; // epitope sites of virus (valid inputs are between 1 and
+	                                       // startingSequence.length() / 3)
+	public static boolean predefinedVectors = true;
+	public static double meanStepEpitope = 0.3; // mean mutation size for epitopes
+	public static double sdStepEpitope = 0.3; // standard deviation of mutation size for epitopes
+	public static double transitionTransversionRatio = 5.0; // transition/transversion rate ratio, k
 	public static String DMSFile = null; // name of DMS csv file: must have 21 columns (site number and amino acid
-											// preferences ordered alphabetically) and rows must equal the number of
-											// amino acid sites in the virus sequence)
+	                                     // preferences ordered alphabetically) and rows must equal the number of
+	                                     // amino acid sites in the virus sequence)
 
 	// measured in years, starting at burnin
 	public static double getDate() {
@@ -127,7 +130,12 @@ public class Parameters {
 			input.close();
 
 			System.out.println("Loading parameters from parameters.yml");
-
+			if (map.get("outPath") != null) {
+				outPath = (String) map.get("outPath");
+			}
+			if (map.get("outPrefix") != null) {
+				outPrefix = (String) map.get("outPrefix");
+			}
 			if (map.get("burnin") != null) {
 				burnin = (int) map.get("burnin");
 			}
@@ -296,6 +304,9 @@ public class Parameters {
 				String epitopeSitesFile = ((String) map.get("epitopeSites"));
 				epitopeSites = readEpitopeSitesFile(inPath + epitopeSitesFile);
 			}
+			if (map.get("predefinedVectors") != null) {
+				predefinedVectors = (boolean) map.get("predefinedVectors");
+			}
 			if (map.get("meanStepEpitope") != null) {
 				meanStepEpitope = (double) map.get("meanStepEpitope");
 			}
@@ -336,6 +347,7 @@ public class Parameters {
 
 	// Returns String of the starting sequence given the fasta file
 	private static String readStartingSequenceFile(String startingSequenceFile) throws FileNotFoundException {
+		// Parse the fasta file to get a sequence of nucleotides
 		StringBuilder startingSequenceSB = new StringBuilder();
 		Scanner startingSequenceScanner = new Scanner(new File(startingSequenceFile));
 		startingSequenceScanner.nextLine(); // read header >
@@ -354,6 +366,7 @@ public class Parameters {
 	}
 
 	// Returns int[] of the epitope sites given the txt file
+	// of site numbers seperated by commas
 	private static int[] readEpitopeSitesFile(String epitopeSitesFile) throws FileNotFoundException {
 		Scanner epitopeSitesScanner = new Scanner(new File(epitopeSitesFile));
 		String epitopeSitesLine = epitopeSitesScanner.nextLine();

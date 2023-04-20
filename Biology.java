@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -244,7 +245,7 @@ public class Biology {
 
         private final int totalSites = Parameters.startingSequence.length() / 3;
 
-        public final Map<Integer, double[][][]> siteMutationVectors;
+        public final Map<Integer, MutationVector[][]> siteMutationVectors;
         public final HashSet<Integer> epitopeSites;
         public final String[] stringOutputCSV = new String[totalSites]; // String[] to create CSV from
 
@@ -274,73 +275,36 @@ public class Biology {
             // j: index of mutant amino acid
             // ACDEFGHIKLMNPQRSTWYV 0 -> A, 1 -> C, 2 -> D, etc.
             int matrixSize = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
-            Map<Integer, double[][][]> currentSiteMutationVectors  = new HashMap<>();
+            Map<Integer, MutationVector[][]> currentSiteMutationVectors  = new HashMap<>();
 
             // Cycle over each site in the protein sequence and create a 2D array
             for (int nucleotideSiteNumber = 0; nucleotideSiteNumber < Parameters.startingSequence.length() / 3; nucleotideSiteNumber += 1) {
                 String currentStringOutputCSV = "mutation,r,theta\n";
 
-                double[][][] currentSiteMutationMatrix = new double[matrixSize][matrixSize][];
+                MutationVector[][] currentSiteMutationMatrix = new MutationVector[matrixSize][matrixSize];
 
                 // Create 2D where rows are wild type amino acids and columns are mutant amino acids
                 for (int wildTypeIndex = 0; wildTypeIndex < matrixSize; wildTypeIndex++) {
 
                     for (int mutationIndex = 0; mutationIndex < matrixSize; mutationIndex++) {
                         if (mutationIndex < wildTypeIndex) { // update lower and upper triangle in this branch.
-                            // direction of mutation
-                            double theta;
-                            if (Parameters.mut2D) {
-                                theta = Random.nextDouble(0, 2 * Math.PI);
-                            } else {
-                                if (Random.nextBoolean(0.5)) {
-                                    theta = 0;
-                                } else {
-                                    theta = Math.PI;
-                                }
-                            }
-
-                            // size of mutation
-                            double r;
-                            double alpha;
-                            double beta;
-
-                            double meanStep;
-                            double sdStep;
-                            if (this.epitopeSites.contains(nucleotideSiteNumber)) {
-                                // epitope sites
-                                meanStep = Parameters.meanStepEpitope;
-                                sdStep = Parameters.sdStepEpitope;
-                            } else {
-                                // non-epitope sites
-                                meanStep = Parameters.meanStep;
-                                sdStep = Parameters.sdStep;
-                            }
-
-                            r = meanStep;
-                            if (!Parameters.fixedStep) {
-                                alpha = (meanStep * meanStep) / (sdStep * sdStep);
-                                beta = (sdStep * sdStep) / meanStep;
-                                r = Random.nextGamma(alpha, beta);
-                            }
-
-                            // create antigenic phenotype by computing the x and y coordinates (mutA and mutB) of the virus in antigenic space
-                            double mutA = r * Math.cos(theta);
-                            double mutB = r * Math.sin(theta);
+                            boolean isEpitopeSite = this.epitopeSites.contains(nucleotideSiteNumber);
+                            MutationVector mut = MutationVector.calculateMutation(isEpitopeSite);
 
                             // add vector=(mutA, mutB) to mutations_i,j, where
                             // mutA is the x-coordinate
                             // mutB is the y-coordinate
                             // mutations is the 2D array that corresponds to the current amino acid site
-                            currentSiteMutationMatrix[wildTypeIndex][mutationIndex] = new double[]{mutA, mutB};
+                            currentSiteMutationMatrix[wildTypeIndex][mutationIndex] = new MutationVector(mut.mutA, mut.mutB);
 
                             // add vector=(-mutA, -mutB) to mutations_j,i
-                            currentSiteMutationMatrix[mutationIndex][wildTypeIndex] = new double[]{-1 * mutA, -1 * mutB};
+                            currentSiteMutationMatrix[mutationIndex][wildTypeIndex] = new MutationVector(-1 * mut.mutA, -1 * mut.mutB);
 
                             // amino acid mutation notation
                             // wild type amino acid + site # + mutant amino acid
                             currentStringOutputCSV += "" + Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().charAt(wildTypeIndex) +
                                       nucleotideSiteNumber + Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().charAt(mutationIndex) +
-                                      "," + r + "," + theta + '\n';
+                                      "," + mut.r + "," + mut.theta + '\n';
                         }
                     }
                 }
@@ -360,7 +324,7 @@ public class Biology {
          * @param nSiteMutationVectors the index (within Parameters.AMINO_ACIDS) that represent the mutant amino acid
          * @return a vector to represent the change in Euclidean space
          */
-        public double[] getVector(int mutationIndexSite, int mSiteMutationVectors, int nSiteMutationVectors) {
+        public MutationVector getVector(int mutationIndexSite, int mSiteMutationVectors, int nSiteMutationVectors) {
             return this.siteMutationVectors.get(mutationIndexSite)[mSiteMutationVectors][nSiteMutationVectors];
         }
 
@@ -379,7 +343,7 @@ public class Biology {
          *
          * @return site's matrices
          */
-        public Map<Integer, double[][][]> getMatrices() {
+        public Map<Integer, MutationVector[][]> getMatrices() {
             return this.siteMutationVectors;
         }
 
@@ -390,6 +354,75 @@ public class Biology {
          */
         public HashSet getEpitopeSites() {
             return this.epitopeSites;
+        }
+    }
+
+    /**
+     * <b>MutationVector</b> stores a mutation vector's x and y coordinates
+     * and, optionally, direction and magnitude.
+     *
+     * @author Thien Tran
+     */
+    public static class MutationVector {
+        public double mutA;
+        public double mutB;
+        public double theta;
+        public double r;
+
+        public MutationVector(double mutA, double mutB) {
+            this.mutA = mutA;
+            this.mutB = mutB;
+        }
+
+        public MutationVector(double mutA, double mutB, double theta, double r) {
+            this.mutA = mutA;
+            this.mutB = mutB;
+            this.theta = theta;
+            this.r = r;
+        }
+
+        public static MutationVector calculateMutation(boolean isEpitopeSite) {
+            // direction of mutation
+            double theta;
+            if (Parameters.mut2D) {
+                theta = Random.nextDouble(0, 2 * Math.PI);
+            } else {
+                if (Random.nextBoolean(0.5)) {
+                    theta = 0;
+                } else {
+                    theta = Math.PI;
+                }
+            }
+
+            // size of mutation
+            double r;
+            double alpha;
+            double beta;
+
+            double meanStep;
+            double sdStep;
+            if (isEpitopeSite) {
+                // epitope sites
+                meanStep = Parameters.meanStepEpitope;
+                sdStep = Parameters.sdStepEpitope;
+            } else {
+                // non-epitope sites
+                meanStep = Parameters.meanStep;
+                sdStep = Parameters.sdStep;
+            }
+
+            r = meanStep;
+            if (!Parameters.fixedStep) {
+                alpha = (meanStep * meanStep) / (sdStep * sdStep);
+                beta = (sdStep * sdStep) / meanStep;
+                r = Random.nextGamma(alpha, beta);
+            }
+
+            // create antigenic phenotype by computing the x and y coordinates (mutA and mutB) of the virus in antigenic space
+            double mutA = r * Math.cos(theta);
+            double mutB = r * Math.sin(theta);
+
+            return new MutationVector(mutA, mutB, theta, r);
         }
     }
 }

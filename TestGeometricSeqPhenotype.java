@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -268,10 +267,14 @@ public class TestGeometricSeqPhenotype {
         // Initialize static parameters to test different distributions
         Parameters.load();
         Parameters.initialize();
+        if (!Parameters.predefinedVectors) {
+            System.out.println("Parameters.predefinedVectors is false");
+            return;
+        }
         new File("testGeometricSeqPhenotype/valuesGammaDistribution").mkdirs();
 
         String[] values = Biology.SiteMutationVectors.VECTORS.getStringOutputCSV();
-        Map<Integer, double[][][]> matrices = Biology.SiteMutationVectors.VECTORS.getMatrices();
+        Map<Integer, Biology.MutationVector[][]> matrices = Biology.SiteMutationVectors.VECTORS.getMatrices();
 
         for (int i = 0; i < values.length; i++) {
             String value = values[i];
@@ -279,37 +282,62 @@ public class TestGeometricSeqPhenotype {
                     "testGeometricSeqPhenotype/valuesGammaDistribution/0_site" + i + ".csv");
             output.println(value);
 
-            double[][][] matrix = matrices.get(i);
+            Biology.MutationVector[][] matrix = matrices.get(i);
             System.out.println("Matrix " + i);
             for (int j = 0; j < Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().length(); j++) {
                 for (int k = 0; k < Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().length(); k++) {
-                    // Nulls are along the diagonal
-                    System.out.print(Arrays.toString(matrix[j][k]));
+                    if (j != k) {
+                        Biology.MutationVector mutationVector = matrix[j][k];
+                        System.out.print("[" + mutationVector.mutA + "," + mutationVector.mutB + "]");
+                    } else {
+                        // The diagonal represents synonymous mutations, so
+                        // print [0.0, 0.0]
+                        System.out.print("[" + 0.0 + "," + 0.0 + "]");
+                    }
                 }
                 System.out.println();
             }
         }
 
-        // Run: python testGammaDistribution.py for each i such that "0_site" + i +
-        // ".csv"
+        // Run: python testGammaDistribution.py
+        // for each i such that "0_site" + i + ".csv"
     }
 
     /**
-     * PrintStream (mutations.csv) to print wild type and mutant nucleotide pairs
-     * to.
+     * PrintStream (codonMutations.csv) to print
+     * wild type and mutant nucleotide pairs to.
      */
-    public static PrintStream mutations;
+    public static PrintStream codonMutations;
 
     static {
         try {
             if (GeometricSeqPhenotype.SANITY_TEST) {
-                mutations = new PrintStream("mutations.csv");
-                mutations.println("siteN,wildCodon,mutantCodon,pairWildMutantN,wildAA,mutantAA,cycle,id");
+                codonMutations = new PrintStream("testGeometricSeqPhenotype/codonMutations.csv");
+                codonMutations.println("siteN,wildCodon,mutantCodon,pairWildMutantN,wildAA,mutantAA,cycle,id");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
         // Run: python testTransitionTransversion.py
+    }
+
+    /**
+     * PrintStream (randomMutationsDistribution.csv) to print each vector movement
+     * calculated by the mutate function to when Parameters.predefinedVectors == false.
+     */
+    public static PrintStream randomMutationsDistribution;
+
+    static {
+        try {
+            if (GeometricSeqPhenotype.SANITY_TEST && !Parameters.predefinedVectors) {
+                randomMutationsDistribution = new PrintStream("testGeometricSeqPhenotype/randomMutationsDistribution.csv");
+                randomMutationsDistribution.println("mutation,r,theta");
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        // Run: python testGammaDistribution.py
     }
 }
