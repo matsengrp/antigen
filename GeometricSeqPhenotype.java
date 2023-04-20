@@ -46,7 +46,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
     /**
      *
      */
-    public static final boolean SANITY_TEST = true;
+    public static final boolean SANITY_TEST = false;
 
     /**
      * Run expensive tests iff DEBUG == true.

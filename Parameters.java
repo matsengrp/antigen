@@ -130,7 +130,12 @@ public class Parameters {
 			input.close();
 
 			System.out.println("Loading parameters from parameters.yml");
-
+			if (map.get("outPath") != null) {
+				outPath = (String) map.get("outPath");
+			}
+			if (map.get("outPrefix") != null) {
+				outPrefix = (String) map.get("outPrefix");
+			}
 			if (map.get("burnin") != null) {
 				burnin = (int) map.get("burnin");
 			}
