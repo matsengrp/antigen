@@ -18,6 +18,16 @@ rate of within deme contact.
 
 ## Running
 
+### Setting up Java on Fred Hutch cluster
+
+
+To load Java 11, run these commands:
+
+	source /app/lmod/lmod/init/profile
+	ml Java/11;
+
+
+
 The program can be compiled with:
 
 	javac *.java
