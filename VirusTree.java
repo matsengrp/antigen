@@ -625,7 +625,7 @@ public class VirusTree {
 	public static void printTips() {
 
 		try {
-			File tipFile = new File(filenameStem + "out.tips");
+			File tipFile = new File(filenameStem + ".tips");
 			tipFile.delete();
 			tipFile.createNewFile();
 			PrintStream tipStream = new PrintStream(tipFile);
@@ -653,7 +653,7 @@ public class VirusTree {
 	public static void printBranches() {
 
 		try {
-			File branchFile = new File(filenameStem + ".branches");
+			File branchFile = new File(filenameStem + "branches");
 			branchFile.delete();
 			branchFile.createNewFile();
 			PrintStream branchStream = new PrintStream(branchFile);
@@ -684,7 +684,7 @@ public class VirusTree {
 			PrintStream fastaStream = new PrintStream(fastaFile);
 			for (int i = 0; i < tips.size(); i++) {
 				Virus v = tips.get(i);
-				printSequence(v.getPhenotype().toString(), fastaStream, i);
+				printSequence(v, fastaStream, i);
 			}
 			fastaStream.close();
 		} catch (IOException ex) {
@@ -694,8 +694,10 @@ public class VirusTree {
 
 	}
 
-	private static void printSequence(String virusPhenotype, PrintStream fastaStream, int fastaSequenceNum) {
-		fastaStream.printf(">seq%d\n", fastaSequenceNum);
+	private static void printSequence(Virus v, PrintStream fastaStream, int fastaSequenceNum) {
+		fastaStream.printf(">seq%d|%f|%s\n", fastaSequenceNum, v.getBirth(), v.getDeme());
+
+		String virusPhenotype = v.getPhenotype().toString();
 		String sequence = virusPhenotype.split(",")[0];
 		String[] sequenceSplit = sequence.split("(?<=\\G.{60})");
 		for (int i = 0; i < sequenceSplit.length; i++) {

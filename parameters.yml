@@ -22,7 +22,7 @@ reducedOutput: false                        # whether to output only out.summary
 detailedOutput: false                       # whether to output out.hosts and out.viruses files enabling checkpointing
 restartFromCheckpoint: false                # whether to load population from out.hosts
 outPath: "output/"
-outPrefix: 'run-'
+outPrefix: 'run-out'
 inPath: "input/"
 
 # metapopulation parameters
