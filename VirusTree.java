@@ -653,7 +653,7 @@ public class VirusTree {
 	public static void printBranches() {
 
 		try {
-			File branchFile = new File(filenameStem + "branches");
+			File branchFile = new File(filenameStem + ".branches");
 			branchFile.delete();
 			branchFile.createNewFile();
 			PrintStream branchStream = new PrintStream(branchFile);
@@ -700,9 +700,10 @@ public class VirusTree {
 		String virusPhenotype = v.getPhenotype().toString();
 		String sequence = virusPhenotype.split(",")[0];
 		String[] sequenceSplit = sequence.split("(?<=\\G.{60})");
-		for (int i = 0; i < sequenceSplit.length; i++) {
-			fastaStream.printf("%s\n", sequenceSplit[i]);
-		}
+		fastaStream.printf("%s\n", sequence);
+		// for (int i = 0; i < sequenceSplit.length; i++) {
+		// 	fastaStream.printf("%s\n", sequenceSplit[i]);
+		// }
 	}
 
 	// assess node in building Newick string
