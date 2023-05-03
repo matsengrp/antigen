@@ -293,7 +293,7 @@ public class Parameters {
 						String triplet = startingSequence.substring(i, i + 3);
 						String translatedAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(triplet);
 
-						if (translatedAminoAcid.equals("STOP")) {
+						if (translatedAminoAcid.equals("STOP") && ( i != startingSequence.length() - 3)) {
 							System.out.println("There should not be a stop codon at site " + (i / 3));
 							throw new IOException();
 						}
