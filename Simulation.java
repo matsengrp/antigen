@@ -457,9 +457,13 @@ public class Simulation {
 		if (!Parameters.reducedOutput) {
 
 			// tip and tree output
+			System.out.println("Writing tips file...");
 			VirusTree.printTips();
+			System.out.println("Writing branches file...");
 			VirusTree.printBranches();
+			System.out.println("Writing FASTA file...");
 			VirusTree.printFASTA();
+			System.out.println("Writing newick tree file...");
 			VirusTree.printNewick();
 
 			// immunity output
