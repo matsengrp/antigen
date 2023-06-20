@@ -159,17 +159,27 @@ public class Simulation {
 		return hp.getRandomHost();
 	}
 
+	// Get average infection risk of a phenotype amongst a given sample size
 	public double getAverageRisk(Phenotype p) {
-
+		double sampleSize = (double) Parameters.fitnessSampleSize;
 		double averageRisk = 0;
-		for (int i = 0; i < 10000; i++) {
+		for (int i = 0; i < Parameters.fitnessSampleSize; i++) {
 			Host h = getRandomHost();
 			Phenotype[] history = h.getHistory();
 			averageRisk += p.riskOfInfection(history);
 		}
-		averageRisk /= 10000.0;
+		averageRisk /= sampleSize;
 		return averageRisk;
 
+	}
+
+	// Loop through virus tree and calculate average infection risk
+	public void setFitnessValues() {
+		for (Virus v : VirusTree.getTips()){
+			Phenotype p = v.getPhenotype();
+			double risk = getAverageRisk(p);
+			v.setFitness(risk);
+		}
 	}
 
 	public void printImmunity() {
@@ -447,6 +457,9 @@ public class Simulation {
 			VirusTree.rotate();
 			VirusTree.flip();
 		}
+
+		// Assign fitness value estimates.
+		setFitnessValues();
 
 
 		// Summary
