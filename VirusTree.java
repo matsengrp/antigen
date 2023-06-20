@@ -631,16 +631,16 @@ public class VirusTree {
 			PrintStream tipStream = new PrintStream(tipFile);
 			if (Parameters.phenotypeSpace.equals("geometricSeq")) {
 				tipStream.printf(
-						"\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", "name",
+						"\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", "name",
 						"year", "trunk", "tip", "mark", "location", "layout", "nucleotideSequence", "ag1", "ag2",
-						"epitopeMutationCount", "nonepitopeMutationCount");
+						"epitopeMutationCount", "nonepitopeMutationCount,", "fitness");
 			} else {
-				tipStream.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", "name", "year",
-						"trunk", "tip", "mark", "location", "layout", "ag1", "ag2");
+				tipStream.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", "name", "year",
+						"trunk", "tip", "mark", "location", "layout", "ag1", "ag2", "fitness");
 			}
 			for (Virus v : tips) {
-				tipStream.printf("\"%s\",%.4f,%d,%d,%d,%d,%.4f,%s\n", v, v.getBirth(), v.isTrunk() ? 1 : 0,
-						v.isTip() ? 1 : 0, v.isMarked() ? 1 : 0, v.getDeme(), v.getLayout(), v.getPhenotype());
+				tipStream.printf("\"%s\",%.4f,%d,%d,%d,%d,%.4f,%s,%.4f\n", v, v.getBirth(), v.isTrunk() ? 1 : 0,
+						v.isTip() ? 1 : 0, v.isMarked() ? 1 : 0, v.getDeme(), v.getLayout(), v.getPhenotype(), v.getFitness());
 			}
 			tipStream.close();
 		} catch (IOException ex) {
@@ -695,7 +695,7 @@ public class VirusTree {
 	}
 
 	private static void printSequence(Virus v, PrintStream fastaStream, int fastaSequenceNum) {
-		fastaStream.printf(">seq%d|%f|%s\n", fastaSequenceNum, v.getBirth(), Parameters.demeNames[v.getDeme()]);
+		fastaStream.printf(">seq%d|%f|%s|%f\n", fastaSequenceNum, v.getBirth(), Parameters.demeNames[v.getDeme()], v.getFitness());
 
 		String virusPhenotype = v.getPhenotype().toString();
 		String sequence = virusPhenotype.split(",")[0];
