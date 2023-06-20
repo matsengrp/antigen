@@ -17,7 +17,7 @@ public class HostPopulation {
 	private double tmrca;
 	private double netau;	
 	private double serialInterval;
-	private double antigenicDiversity;		
+	private double antigenicDiversity;
 	
 	private int newContacts;
 	private int newRecoveries;

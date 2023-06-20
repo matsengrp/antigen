@@ -6,7 +6,6 @@ import java.io.*;
 import com.javamex.classmexer.*;
 
 public class Simulation {
-
 	// fields
 	private List<HostPopulation> demes = new ArrayList<>();
 	private double diversity;
@@ -26,14 +25,15 @@ public class Simulation {
 	private List<Double> rList = new ArrayList<>();
 	private List<Double> casesList = new ArrayList<>();
 
+
+
 	// constructor
 	public Simulation() {
 		for (int i = 0; i < Parameters.demeCount; i++) {
 			HostPopulation hp;
 			if (Parameters.restartFromCheckpoint) {
 				hp = new HostPopulation(i, true);
-			}
-			else {
+			} else {
 				hp = new HostPopulation(i);
 			}
 			demes.add(hp);
@@ -457,12 +457,17 @@ public class Simulation {
 		if (!Parameters.reducedOutput) {
 
 			// tip and tree output
+			System.out.println("Writing tips file...");
 			VirusTree.printTips();
+			System.out.println("Writing branches file...");
 			VirusTree.printBranches();
+			System.out.println("Writing FASTA file...");
+			VirusTree.printFASTA();
+			System.out.println("Writing newick tree file...");
 			VirusTree.printNewick();
 
 			// immunity output
-			if (Parameters.phenotypeSpace.equals("geometric")) {
+			if (Parameters.phenotypeSpace.equals("geometric") || Parameters.phenotypeSpace.equals("geometricSeq")) {
 				VirusTree.updateRange();
 				VirusTree.printRange();
 				if (Parameters.immunityReconstruction) {
@@ -481,7 +486,7 @@ public class Simulation {
 	private void writeDataCSV() throws FileNotFoundException {
 		// Creates csv file from the most recent out.timeseries (i.e., not from example/out.timeseries)
 		Scanner input = new Scanner(new File("out.timeseries"));
-		PrintStream output = new PrintStream(new File("out_timeseries.csv"));
+		PrintStream output = new PrintStream("out_timeseries.csv");
 
 		// Check for next line
 		while(input.hasNextLine()) {
