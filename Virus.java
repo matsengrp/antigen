@@ -9,6 +9,7 @@ public class Virus {
 	private Phenotype phenotype;
 	private double birth;		// measured in years relative to burnin
 	private int deme;
+	private double fitness; 	// average risk of infection of 100,000 hosts
 	
 	// additional reconstruction fields
 	private boolean marked;
@@ -87,6 +88,12 @@ public class Virus {
 	}
 	public void incrementCoverage() {
 		coverage++;
+	}
+	public double getFitness(){
+		return fitness;
+	}
+	public void setFitness(double f){
+		fitness = f;
 	}
 	
 	// add virus node as child if does not already exist
