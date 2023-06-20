@@ -35,6 +35,7 @@ public class Parameters {
 	public static String outPath = "output/"; // path to dump output files.
 	public static String outPrefix = "run-"; // suffix for output files.
 	public static String inPath = "input/"; // path to dump output files.
+	public static int fitnessSampleSize = 10000; // number of random hosts to sample for average infection risk
 
 	// metapopulation parameters
 	public static int demeCount = 3;
@@ -339,6 +340,9 @@ public class Parameters {
 									+ dmsDataLineCount);
 					throw new IOException();
 				}
+			}
+			if (map.get("fitnessSampleSize") != null) {
+				fitnessSampleSize = (int) map.get("fitnessSampleSize");
 			}
 		} catch (IOException e) {
 			System.out.println("Cannot load parameters.yml, using defaults");

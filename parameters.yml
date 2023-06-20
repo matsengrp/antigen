@@ -7,6 +7,7 @@ burnin: 0                                   # days to wait before logging output
 endDay: 1000                                # number of days to simulate
 deltaT: 0.1                                 # number of days to move forward in a single timestep
 printStep: 50                               # print to out.timeseries every X days
+fitnessSampleSize: 100000                   # number of random hosts to sample for average infection risk 
 tipSamplingRate: 0.0002                     # store X samples per deme per day
 tipSamplesPerDeme: 2000                     # cap number of samples per deme
 tipSamplingProportional: true               # whether to sample proportional to prevalence
