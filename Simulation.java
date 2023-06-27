@@ -173,14 +173,6 @@ public class Simulation {
 
 	}
 
-	// Loop through virus tree and calculate average infection risk
-	public void setFitnessValues() {
-		for (Virus v : VirusTree.getTips()){
-			Phenotype p = v.getPhenotype();
-			double risk = getAverageRisk(p);
-			v.setFitness(risk);
-		}
-	}
 
 	public void printImmunity() {
 
@@ -458,8 +450,6 @@ public class Simulation {
 			VirusTree.flip();
 		}
 
-		// Assign fitness value estimates.
-		setFitnessValues();
 
 
 		// Summary
