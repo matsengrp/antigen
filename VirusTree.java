@@ -695,7 +695,7 @@ public class VirusTree {
 	}
 
 	private static void printSequence(Virus v, PrintStream fastaStream, int fastaSequenceNum) {
-		fastaStream.printf(">seq%d|%f|%s|%f\n", fastaSequenceNum, v.getBirth(), Parameters.demeNames[v.getDeme()], v.getFitness());
+		fastaStream.printf(">seq%d|%f|%f\n", fastaSequenceNum, v.getBirth(), v.getFitness());
 
 		String virusPhenotype = v.getPhenotype().toString();
 		String sequence = virusPhenotype.split(",")[0];
