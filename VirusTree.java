@@ -633,7 +633,7 @@ public class VirusTree {
 				tipStream.printf(
 						"\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", "name",
 						"year", "trunk", "tip", "mark", "location", "layout", "nucleotideSequence", "ag1", "ag2",
-						"epitopeMutationCount", "nonepitopeMutationCount,", "fitness");
+						"epitopeMutationCount", "nonepitopeMutationCount", "fitness");
 			} else {
 				tipStream.printf("\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", "name", "year",
 						"trunk", "tip", "mark", "location", "layout", "ag1", "ag2", "fitness");
@@ -660,9 +660,9 @@ public class VirusTree {
 			for (Virus v : postOrderNodes()) {
 				if (v.getParent() != null) {
 					Virus vp = v.getParent();
-					branchStream.printf("{\"%s\",%.4f,%d,%d,%d,%d,%.4f,%s}\t", v, v.getBirth(), v.isTrunk() ? 1 : 0,
+					branchStream.printf("{\"%s\",%.4f,%.4f,%d,%d,%d,%d,%.4f,%s}\t", v, v.getBirth(), v.getFitness(), v.isTrunk() ? 1 : 0,
 							v.isTip() ? 1 : 0, v.isMarked() ? 1 : 0, v.getDeme(), v.getLayout(), v.getPhenotype());
-					branchStream.printf("{\"%s\",%.4f,%d,%d,%d,%d,%.4f,%s}\t", vp, vp.getBirth(), vp.isTrunk() ? 1 : 0,
+					branchStream.printf("{\"%s\",%.4f,%.4f,%d,%d,%d,%d,%.4f,%s}\t", vp, vp.getBirth(), vp.getFitness(), vp.isTrunk() ? 1 : 0,
 							vp.isTip() ? 1 : 0, v.isMarked() ? 1 : 0, vp.getDeme(), vp.getLayout(), vp.getPhenotype());
 					branchStream.printf("%d\n", vp.getCoverage());
 				}
