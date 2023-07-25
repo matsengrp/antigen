@@ -350,7 +350,7 @@ public class HostPopulation {
 				Host iH = infecteds.get(index);			
 				Host sH = susceptibles.get(sndex);						
 				Virus v = iH.getInfection();
-								
+					
 				// attempt infection
 				Phenotype p = v.getPhenotype();		
 				Phenotype[] history = sH.getHistory();
@@ -360,6 +360,11 @@ public class HostPopulation {
 					removeSusceptible(sndex);
 					infecteds.add(sH);
 					cases++;
+				}
+				// If there is not fitness, assign now.
+				if (v.getFitness() == 0.0) {
+					double risk = getAverageRisk(p);
+					v.setFitness(risk);
 				}
 			
 			}
@@ -461,7 +466,10 @@ public class HostPopulation {
 			if (getI()>0) {
 				int index = getRandomI();
 				Host h = infecteds.get(index);
-				h.mutate();
+				Virus v = h.mutate();
+				Phenotype p = v.getPhenotype();
+				double risk = getAverageRisk(p);
+				v.setFitness(risk);
 			}
 		}			
 	}	
