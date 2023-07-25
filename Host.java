@@ -85,8 +85,9 @@ public class Host {
 	}
 
 	// make a new virus with the mutated phenotype
-	public void mutate() {
+	public Virus mutate() {
 		infection = infection.mutate();
+		return infection;
 	}
 
 	// remove random phenotype from host's immune profile, do nothing if empty
