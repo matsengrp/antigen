@@ -74,4 +74,5 @@ predefinedVectors: false                     # whether to use predefined vectors
 meanStepEpitope: 0.3                        # mean mutation size for epitopes
 sdStepEpitope: 0.3                          # standard deviation of mutation size for epitopes
 transitionTransversionRatio: 5.0            # transition/transversion rate ratio, k
+nonEpitopeAcceptance: 1.0                   # probability of accepting a non-epitope mutation
 DMSFile:                                    # name of DMS csv file: must have 21 columns (site number and amino acid preferences ordered alphabetically) and rows must be in sequential order and equal the number of amino acid sites in the virus sequence

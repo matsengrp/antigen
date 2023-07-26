@@ -247,6 +247,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         int proteinMutationIndex = nucleotideMutationIndex / 3;
         boolean isEpitopeSite = Biology.SiteMutationVectors.VECTORS.getEpitopeSites().contains(proteinMutationIndex);
 
+
         // Determine whether the mutation occurred in an epitope or non-epitope site,
         // and update the counts of epitope and non-epitope mutations accordingly
         int eMutationNew = this.epitopeMutationCount;
@@ -254,6 +255,11 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         if (isEpitopeSite) {
             eMutationNew += 1;
         } else {
+            // If non-epitope site, return this exact phenotype with probability Parameters.nonEpitopeAcceptance
+            double rejectionProb = Random.nextDouble(); // Uniform draw from 0.0 to 1.0
+            if (rejectionProb > Parameters.nonEpitopeAcceptance){
+                return this;
+            }
             neMutationNew += 1;
         }
 
