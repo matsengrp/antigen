@@ -35,6 +35,7 @@ public class Parameters {
 	public static String outPath = "output/"; // path to dump output files.
 	public static String outPrefix = "run-"; // suffix for output files.
 	public static String inPath = "input/"; // path to dump output files.
+	public static int fitnessSampleSize = 10000; // number of random hosts to sample for average infection risk
 
 	// metapopulation parameters
 	public static int demeCount = 3;
@@ -91,6 +92,7 @@ public class Parameters {
 	public static String DMSFile = null; // name of DMS csv file: must have 21 columns (site number and amino acid
 	                                     // preferences ordered alphabetically) and rows must equal the number of
 	                                     // amino acid sites in the virus sequence)
+	public static double nonEpitopeAcceptance = 1.0; // probability of accepting a non-epitope mutation
 
 	// measured in years, starting at burnin
 	public static double getDate() {
@@ -316,6 +318,9 @@ public class Parameters {
 			if (map.get("transitionTransversionRatio") != null) {
 				transitionTransversionRatio = (double) map.get("transitionTransversionRatio");
 			}
+			if (map.get("nonEpitopeAcceptance") != null){
+				nonEpitopeAcceptance = (double) map.get("nonEpitopeAcceptance");
+			}
 			if (map.get("DMSFile") != null) {
 				DMSFile = (String) map.get("DMSFile");
 
@@ -339,6 +344,9 @@ public class Parameters {
 									+ dmsDataLineCount);
 					throw new IOException();
 				}
+			}
+			if (map.get("fitnessSampleSize") != null) {
+				fitnessSampleSize = (int) map.get("fitnessSampleSize");
 			}
 		} catch (IOException e) {
 			System.out.println("Cannot load parameters.yml, using defaults");

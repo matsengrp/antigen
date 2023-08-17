@@ -350,7 +350,7 @@ public class HostPopulation {
 				Host iH = infecteds.get(index);			
 				Host sH = susceptibles.get(sndex);						
 				Virus v = iH.getInfection();
-								
+					
 				// attempt infection
 				Phenotype p = v.getPhenotype();		
 				Phenotype[] history = sH.getHistory();
@@ -360,6 +360,11 @@ public class HostPopulation {
 					removeSusceptible(sndex);
 					infecteds.add(sH);
 					cases++;
+				}
+				// If there is not fitness, assign now.
+				if (v.getFitness() == 0.0) {
+					double risk = getAverageRisk(p);
+					v.setFitness(risk);
 				}
 			
 			}
@@ -461,13 +466,31 @@ public class HostPopulation {
 			if (getI()>0) {
 				int index = getRandomI();
 				Host h = infecteds.get(index);
-				h.mutate();
+				Virus v = h.mutate();
+				Phenotype p = v.getPhenotype();
+				double risk = getAverageRisk(p);
+				v.setFitness(risk);
 			}
 		}			
 	}	
 	
+	// Get average infection risk of a phenotype amongst a given sample size
+	private double getAverageRisk(Phenotype p) {
+		double sampleSize = (double) Parameters.fitnessSampleSize;
+		double averageRisk = 0;
+		for (int i = 0; i < Parameters.fitnessSampleSize; i++) {
+			Host h = getRandomHost();
+			Phenotype[] history = h.getHistory();
+			averageRisk += p.riskOfInfection(history);
+		}
+		averageRisk /= sampleSize;
+		return averageRisk;
+
+	}
+
 	// draw a Poisson distributed number of samples and add them to the VirusSample
 	// only sample after burnin is completed
+	// assign fitness values.
 	public void sample() {
 		if (getI()>0 && Parameters.day >= Parameters.burnin) {
 		
@@ -481,6 +504,9 @@ public class HostPopulation {
 				int index = getRandomI();
 				Host h = infecteds.get(index);
 				Virus v = h.getInfection();
+				Phenotype p = v.getPhenotype();
+				double risk = getAverageRisk(p);
+				v.setFitness(risk);
 				VirusTree.add(v);
 			}	
 		}
