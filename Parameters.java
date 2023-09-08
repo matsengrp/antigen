@@ -85,9 +85,15 @@ public class Parameters {
 	public static String startingSequence = "AGAGTCTAGTCC"; // default starting sequence
 	public static int[] epitopeSites = {}; // epitope sites of virus (valid inputs are between 1 and
 	                                       // startingSequence.length() / 3)
+	public static int[] epitopeSitesLow = {};
+	public static int[] epitopeSitesHigh = {};
 	public static boolean predefinedVectors = true;
 	public static double meanStepEpitope = 0.3; // mean mutation size for epitopes
 	public static double sdStepEpitope = 0.3; // standard deviation of mutation size for epitopes
+	public static double meanStepEpitopeLow = 0.3; // mean mutation size for epitopes
+	public static double sdStepEpitopeLow = 0.3; // standard deviation of mutation size for epitopes
+	public static double meanStepEpitopeHigh = 0.3; // mean mutation size for epitopes
+	public static double sdStepEpitopeHigh = 0.3; // standard deviation of mutation size for epitopes
 	public static double transitionTransversionRatio = 5.0; // transition/transversion rate ratio, k
 	public static String DMSFile = null; // name of DMS csv file: must have 21 columns (site number and amino acid
 	                                     // preferences ordered alphabetically) and rows must equal the number of
@@ -306,6 +312,14 @@ public class Parameters {
 				String epitopeSitesFile = ((String) map.get("epitopeSites"));
 				epitopeSites = readEpitopeSitesFile(inPath + epitopeSitesFile);
 			}
+			if (map.get("epitopeSitesLow") != null) {
+				String epitopeSitesFile = ((String) map.get("epitopeSitesLow"));
+				epitopeSitesLow = readEpitopeSitesFile(inPath + epitopeSitesFile);
+			}
+			if (map.get("epitopeSitesHigh") != null) {
+				String epitopeSitesFile = ((String) map.get("epitopeSitesHigh"));
+				epitopeSitesHigh = readEpitopeSitesFile(inPath + epitopeSitesFile);
+			}
 			if (map.get("predefinedVectors") != null) {
 				predefinedVectors = (boolean) map.get("predefinedVectors");
 			}
@@ -314,6 +328,18 @@ public class Parameters {
 			}
 			if (map.get("sdStepEpitope") != null) {
 				sdStepEpitope = (double) map.get("sdStepEpitope");
+			}
+			if (map.get("meanStepEpitopeLow") != null) {
+				meanStepEpitopeLow = (double) map.get("meanStepEpitopeLow");
+			}
+			if (map.get("sdStepEpitopeLow") != null) {
+				sdStepEpitopeLow = (double) map.get("sdStepEpitopeLow");
+			}
+			if (map.get("meanStepEpitopeHigh") != null) {
+				meanStepEpitopeHigh = (double) map.get("meanStepEpitopeHigh");
+			}
+			if (map.get("sdStepEpitopeHigh") != null) {
+				sdStepEpitopeHigh = (double) map.get("sdStepEpitopeHigh");
 			}
 			if (map.get("transitionTransversionRatio") != null) {
 				transitionTransversionRatio = (double) map.get("transitionTransversionRatio");

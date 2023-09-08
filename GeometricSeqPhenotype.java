@@ -46,7 +46,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
     /**
      *
      */
-    public static final boolean SANITY_TEST = false;
+    public static final boolean SANITY_TEST = true;
 
     /**
      * Run expensive tests iff DEBUG == true.
@@ -246,6 +246,8 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         // site # where mutation is occurring {0, . . ., total number of sites - 1}
         int proteinMutationIndex = nucleotideMutationIndex / 3;
         boolean isEpitopeSite = Biology.SiteMutationVectors.VECTORS.getEpitopeSites().contains(proteinMutationIndex);
+        boolean isEpitopeSiteLow = Biology.SiteMutationVectors.VECTORS.getEpitopeSitesLow().contains(proteinMutationIndex);
+        boolean isEpitopeSiteHigh = Biology.SiteMutationVectors.VECTORS.getEpitopeSitesHigh().contains(proteinMutationIndex);
 
 
         // Determine whether the mutation occurred in an epitope or non-epitope site,
@@ -277,7 +279,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         } else {
             // Move using random vectors
             // Note, reversions will not be taken into account
-            vector = Biology.MutationVector.calculateMutation(isEpitopeSite);
+            vector = Biology.MutationVector.calculateMutation(isEpitopeSite, isEpitopeSiteLow, isEpitopeSiteHigh);
 
             if (SANITY_TEST && isEpitopeSite) {
                 TestGeometricSeqPhenotype.randomMutationsDistribution
