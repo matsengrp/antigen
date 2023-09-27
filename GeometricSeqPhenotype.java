@@ -46,7 +46,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
     /**
      *
      */
-    public static final boolean SANITY_TEST = true;
+    public static final boolean SANITY_TEST = false;
 
     /**
      * Run expensive tests iff DEBUG == true.
@@ -254,11 +254,14 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         // and update the counts of epitope and non-epitope mutations accordingly
         int eMutationNew = this.epitopeMutationCount;
         int neMutationNew = this.nonepitopeMutationCount;
+        double rejectionProb = Random.nextDouble(); // Uniform draw from 0.0 to 1.0
         if (isEpitopeSite) {
+            if (rejectionProb > Parameters.epitopeAcceptance){
+                return this;
+            }
             eMutationNew += 1;
         } else {
-            // If non-epitope site, return this exact phenotype with probability Parameters.nonEpitopeAcceptance
-            double rejectionProb = Random.nextDouble(); // Uniform draw from 0.0 to 1.0
+            // If non-epitope site, return this exact phenotype with probability Parameters.nonEpitopeAcceptance  
             if (rejectionProb > Parameters.nonEpitopeAcceptance){
                 return this;
             }

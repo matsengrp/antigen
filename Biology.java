@@ -426,15 +426,17 @@ public class Biology {
             double meanStep;
             double sdStep;
             if (isEpitopeSite) {
-                // epitope sites
-                meanStep = Parameters.meanStepEpitope;
-                sdStep = Parameters.sdStepEpitope;
-            } else if (isEpitopeSiteLow) {
-                meanStep = Parameters.meanStepEpitopeLow;
-                sdStep = Parameters.sdStepEpitopeLow;
-            } else if (isEpitopeSiteHigh) {
-                meanStep = Parameters.meanStepEpitopeHigh;
-                sdStep = Parameters.sdStepEpitopeHigh;
+                // determine if epitope site is low or high distribution or neither
+                if (isEpitopeSiteLow) {
+                    meanStep = Parameters.meanStepEpitopeLow;
+                    sdStep = Parameters.sdStepEpitopeLow;
+                } else if (isEpitopeSiteHigh) {
+                    meanStep = Parameters.meanStepEpitopeHigh;
+                    sdStep = Parameters.sdStepEpitopeHigh;
+                } else {
+                    meanStep = Parameters.meanStepEpitope;
+                    sdStep = Parameters.sdStepEpitope;
+                }
             } else {
                 // non-epitope sites
                 meanStep = Parameters.meanStep;

@@ -39,7 +39,7 @@ I (@zorian15) have found that I sometimes need to specify all of the `.jar` file
 
 Then to run:
 
-	java -XX:+UseSerialGC -Xmx1G Antigen
+	java -XX:+UseSerialGC -Xmx32G Antigen
 	
 A transportable jar file can be created with:
 

@@ -99,6 +99,7 @@ public class Parameters {
 	                                     // preferences ordered alphabetically) and rows must equal the number of
 	                                     // amino acid sites in the virus sequence)
 	public static double nonEpitopeAcceptance = 1.0; // probability of accepting a non-epitope mutation
+	public static double epitopeAcceptance = 1.0; // probability of accepting an epitope mutation
 
 	// measured in years, starting at burnin
 	public static double getDate() {
@@ -346,6 +347,9 @@ public class Parameters {
 			}
 			if (map.get("nonEpitopeAcceptance") != null){
 				nonEpitopeAcceptance = (double) map.get("nonEpitopeAcceptance");
+			}
+			if (map.get("epitopeAcceptance") != null){
+				epitopeAcceptance = (double) map.get("epitopeAcceptance");
 			}
 			if (map.get("DMSFile") != null) {
 				DMSFile = (String) map.get("DMSFile");
