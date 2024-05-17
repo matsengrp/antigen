@@ -94,6 +94,11 @@ public class Parameters {
 	                                     // amino acid sites in the virus sequence)
 	public static double nonEpitopeAcceptance = 1.0; // probability of accepting a non-epitope mutation
 
+	// host immunity parameters
+	public static boolean sampleHostImmunity = false; // whether to sample host immunity
+	public static int printHostImmunityStep = 100; // print host immunity every printHostImmunity days
+	public static int[] hostImmunitySamplesPerDeme = { 100, 100, 100 }; // number of hosts to sample for immunity
+
 	// measured in years, starting at burnin
 	public static double getDate() {
 		return (day - (double) burnin) / 365.0;
@@ -347,6 +352,15 @@ public class Parameters {
 			}
 			if (map.get("fitnessSampleSize") != null) {
 				fitnessSampleSize = (int) map.get("fitnessSampleSize");
+			}
+			if (map.get("sampleHostImmunity") != null) {
+				sampleHostImmunity = (boolean) map.get("sampleHostImmunity");
+			}
+			if (map.get("printHostImmunityStep") != null) {
+				printHostImmunityStep = (int) map.get("printHostImmunityStep");
+			}
+			if (map.get("hostImmunitySamplesPerDeme") != null) {
+				hostImmunitySamplesPerDeme = toIntArray((List<Integer>) map.get("hostImmunitySamplesPerDeme"));
 			}
 		} catch (IOException e) {
 			System.out.println("Cannot load parameters.yml, using defaults");
