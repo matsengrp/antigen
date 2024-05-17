@@ -4,7 +4,7 @@
 
 # simulation parameters
 burnin: 0                                   # days to wait before logging output 
-endDay: 600                                # number of days to simulate
+endDay: 200                                # number of days to simulate
 deltaT: 0.1                                 # number of days to move forward in a single timestep
 printStep: 50                               # print to out.timeseries every X days
 fitnessSampleSize: 100                   # number of random hosts to sample for average infection risk 
@@ -25,12 +25,15 @@ restartFromCheckpoint: false                # whether to load population from ou
 outPath: "output/"
 outPrefix: 'run-out'
 inPath: "input/"
+sampleHostImmunity: true                    # whether to sample host immunity throughout the simulation
+printHostImmunityStep: 50                  # how often to print host immunity (ever X days)
+
 
 # metapopulation parameters
 demeCount: 3                                # number of demes
 demeNames: ["north", "tropics", "south"]    # deme names
 initialNs: [1000000, 1000000, 1000000]      # inital deme population sizes
-    
+hostImmunitySamplesPerDeme: [10, 10, 10]    # how many hosts to sample for host immunity    
                                             # host parameters   
 birthRate: 0.000091                         # in births per individual per day, 1/30 years = 0.000091
 deathRate: 0.000091                         # in deaths per individual per day, 1/30 years = 0.000091
