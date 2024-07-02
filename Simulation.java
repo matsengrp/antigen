@@ -220,6 +220,16 @@ public class Simulation {
 
 	}
 
+	public void printHostImmuneHistories(PrintStream historyStream){
+		// For each deme, print the name, and the immune histories of hosts
+		for (int i = 0; i < Parameters.demeCount; i++) {
+			HostPopulation hp = demes.get(i);
+			int n = Parameters.hostImmunitySamplesPerDeme[i];
+			hp.printHostImmuneHistories(historyStream, n);
+
+		}
+			
+	}
 	public void makeTrunk() {
 		for (int i = 0; i < Parameters.demeCount; i++) {
 			HostPopulation hp = demes.get(i);
@@ -389,6 +399,10 @@ public class Simulation {
 
 			File outDirs = new File(Parameters.outPath);
 			outDirs.mkdirs();
+			File historyFile = new File("out.histories");
+			historyFile.delete();
+			historyFile.createNewFile();
+			PrintStream historyStream = new PrintStream(historyFile);
 			File seriesFile = new File("out.timeseries");
 			seriesFile.delete();
 			seriesFile.createNewFile();
@@ -408,6 +422,15 @@ public class Simulation {
 					resetCases();
 				}
 
+				// print immunity if needed
+				if (Parameters.sampleHostImmunity && Parameters.day % (double) Parameters.printHostImmunityStep < Parameters.deltaT) {
+					// Test print
+					System.out.println("Immunity sample being taken...");
+					historyStream.printf("date:\t" + "%.2f\n", Parameters.day);
+					printHostImmuneHistories(historyStream);
+					
+				}
+
 				if (getI()==0) {
 					if (Parameters.repeatSim) {
 						reset();
@@ -425,6 +448,7 @@ public class Simulation {
 			}
 
 			seriesStream.close();
+			historyStream.close();
 
 			writeDataCSV();
 		} catch(IOException ex) {
