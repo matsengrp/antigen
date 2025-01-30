@@ -112,10 +112,15 @@ public class Host {
 		return immuneHistory;
 	}
 
-	public void printHistory() {
+	public void printHistoryCoordinates(PrintStream stream) {
 		for (Phenotype phenotype : immuneHistory) {
-			System.out.println(phenotype);
+			// get traitA and traitB from phenotype
+			String[] p = phenotype.toString().split(",");
+			String traitA = p[1];
+			String traitB = p[2];
+			stream.print("(" + traitA + "," + traitB + ")");
 		}
+		stream.println();
 	}
 
 	public void printInfection(PrintStream stream) {

@@ -618,6 +618,15 @@ public class HostPopulation {
 		
 	}
 	
+	public void printHostImmuneHistories(PrintStream stream, int n){
+		// grab n random hosts and print their immune histories
+		for (int i = 0; i < n; i++) {
+			Host h = getRandomHost();
+			stream.print(name + ":");
+			h.printHistoryCoordinates(stream);
+		}
+	}
+	
 	public void printHostPopulation(PrintStream stream) {
 		
 		// step through susceptibles and print
