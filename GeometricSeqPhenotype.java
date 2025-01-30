@@ -44,6 +44,18 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
     private int nonepitopeMutationCount;
 
     /**
+     * The number of low-distribution epitope mutations this GeometricSequencePhenotype has accumualted 
+     * since the root of the tree.
+     */
+    private int lowEpitopeMutationCount;
+
+    /**
+     * The number of high-distribution non-epitope mutations this GeometricSequencePhenotype has accumualted 
+     * since the root of the tree.
+     */
+    private int highEpitopeMutationCount;
+
+    /**
      *
      */
     public static final boolean SANITY_TEST = false;
@@ -85,6 +97,8 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         this.nucleotideSequence = Parameters.startingSequence.toCharArray();
         this.epitopeMutationCount = 0;
         this.nonepitopeMutationCount = 0;
+        this.lowEpitopeMutationCount = 0;
+        this.highEpitopeMutationCount = 0;
         checkRep();
     }
 
@@ -137,18 +151,24 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
      *                         GeometricSeqPhenotype is from startingSequence
      * @param nE               the number of non-epitope mutations from
      *                         startingSequence is from startingSequence
+     * @param nLE              the number of low-distribution epitope mutations from
+     *                         startingSequence
+     * @param nHE              the number of high-distribution non-epitope mutations
+     *                         from startingSequence
      * @requires nucleotideSequence != null && nucleotideSequence.length() > 0 &&
      *           nucleotideSequence.length() % 3 == 0
      * @effects Constructs a new GeometricSeqPhenotype that has a starting sequence
      *          and GeometricPhenotype with the data content of the given
      *          parameters.
      */
-    public GeometricSeqPhenotype(double tA, double tB, char[] startingSequence, int e, int nE) {
+    public GeometricSeqPhenotype(double tA, double tB, char[] startingSequence, int e, int nE, int nLE, int nHE) {
         this.traitA = tA;
         this.traitB = tB;
         this.nucleotideSequence = startingSequence;
         this.epitopeMutationCount = e;
         this.nonepitopeMutationCount = nE;
+        this.lowEpitopeMutationCount = nLE;
+        this.highEpitopeMutationCount = nHE;
         checkRep();
     }
 
@@ -246,17 +266,30 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         // site # where mutation is occurring {0, . . ., total number of sites - 1}
         int proteinMutationIndex = nucleotideMutationIndex / 3;
         boolean isEpitopeSite = Biology.SiteMutationVectors.VECTORS.getEpitopeSites().contains(proteinMutationIndex);
+        boolean isEpitopeSiteLow = Biology.SiteMutationVectors.VECTORS.getEpitopeSitesLow().contains(proteinMutationIndex);
+        boolean isEpitopeSiteHigh = Biology.SiteMutationVectors.VECTORS.getEpitopeSitesHigh().contains(proteinMutationIndex);
 
 
         // Determine whether the mutation occurred in an epitope or non-epitope site,
         // and update the counts of epitope and non-epitope mutations accordingly
         int eMutationNew = this.epitopeMutationCount;
         int neMutationNew = this.nonepitopeMutationCount;
+        int lowEpitopeMutationCountNew = this.lowEpitopeMutationCount;
+        int highEpitopeMutationCountNew = this.highEpitopeMutationCount;
+        double rejectionProb = Random.nextDouble(); // Uniform draw from 0.0 to 1.0
         if (isEpitopeSite) {
+            if (rejectionProb > Parameters.epitopeAcceptance){
+                return this;
+            }
+            if (isEpitopeSiteLow){
+                lowEpitopeMutationCountNew += 1;
+            }
+            if (isEpitopeSiteHigh){
+                highEpitopeMutationCountNew += 1;
+            }
             eMutationNew += 1;
         } else {
-            // If non-epitope site, return this exact phenotype with probability Parameters.nonEpitopeAcceptance
-            double rejectionProb = Random.nextDouble(); // Uniform draw from 0.0 to 1.0
+            // If non-epitope site, return this exact phenotype with probability Parameters.nonEpitopeAcceptance  
             if (rejectionProb > Parameters.nonEpitopeAcceptance){
                 return this;
             }
@@ -266,7 +299,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         // Synonymous mutations don't require updates to the location of the virus in antigenic space, so return early
         if (wildTypeAminoAcid.equals(mutantAminoAcid)) {
             return new GeometricSeqPhenotype(getTraitA(), getTraitB(), copyNucleotideSequence,
-                                             eMutationNew, neMutationNew);
+                                             eMutationNew, neMutationNew, lowEpitopeMutationCountNew, highEpitopeMutationCountNew);
         }
 
         // Determine how much to move the x and y coordinates of the virus in antigenic space
@@ -277,7 +310,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         } else {
             // Move using random vectors
             // Note, reversions will not be taken into account
-            vector = Biology.MutationVector.calculateMutation(isEpitopeSite);
+            vector = Biology.MutationVector.calculateMutation(isEpitopeSite, isEpitopeSiteLow, isEpitopeSiteHigh);
 
             if (SANITY_TEST && isEpitopeSite) {
                 TestGeometricSeqPhenotype.randomMutationsDistribution
@@ -292,7 +325,7 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         // and then summing it with a precomputed or random vector (vector.mutA and vector.mutB)
         // that gives the antigenic effect of the mutation.
         return new GeometricSeqPhenotype(getTraitA() + vector.mutA, getTraitB() + vector.mutB,
-                                         copyNucleotideSequence, eMutationNew, neMutationNew);
+                                         copyNucleotideSequence, eMutationNew, neMutationNew, lowEpitopeMutationCountNew, highEpitopeMutationCountNew);
     }
 
     // Mutates nucleotide sequence at given nucleotideMutationIndex with given char
@@ -352,15 +385,15 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
      * and cumulative number of epitope and non-epitope mutations in its
      * evolutionary history
      * Valid example outputs include "ACG, 0.0, 0.0, 0, 0" and "ACGTGTACGTGT, 2.3,
-     * 8.9, 40, 10".
+     * 8.9, 40, 10, 5, 5".
      *
      * @return the String representation of the GeometricSeqPhenotype represented by
      *         this.
      */
     public String toString() {
-        String fullString = String.format("%s, %.4f, %.4f, %d, %d", String.valueOf(this.nucleotideSequence),
+        String fullString = String.format("%s, %.4f, %.4f, %d, %d, %d, %d", String.valueOf(this.nucleotideSequence),
                             this.getTraitA(), this.getTraitB(),
-                            this.epitopeMutationCount, this.nonepitopeMutationCount);
+                            this.epitopeMutationCount, this.nonepitopeMutationCount, this.lowEpitopeMutationCount, this.highEpitopeMutationCount);
 
         return fullString;
     }

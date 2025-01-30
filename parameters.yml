@@ -74,9 +74,17 @@ fixedStep: false                            # whether to fix step size, i.e. ign
 # sequence-specific parameters
 startingSequence: "startingSequence.fasta"  # the fasta file of the starting sequence of a Virus (must be divisible by 3 and cannot contain stop codon)
 epitopeSites: "epitopeSites.txt"            # the txt file of the epitope sites in the sequence
+# epitopeSitesLow: "epitopeSitesLow.txt"            # the txt file of the epitope sites in the sequence
+# epitopeSitesHigh: "epitopeSitesHigh.txt"            # the txt file of the epitope sites in the sequence
+# proportionHighSites: 0.1                    # the proportion of epitope sites that are placed into the "high" distribution
 predefinedVectors: false                     # whether to use predefined vectors for mutations
 meanStepEpitope: 0.3                        # mean mutation size for epitopes
 sdStepEpitope: 0.3                          # standard deviation of mutation size for epitopes
+meanStepEpitopeLow: 0.3                        # mean mutation size for epitopes
+sdStepEpitopeLow: 0.3                          # standard deviation of mutation size for epitopes
+meanStepEpitopeHigh: 0.3                        # mean mutation size for epitopes
+sdStepEpitopeHigh: 0.3                          # standard deviation of mutation size for epitopes
 transitionTransversionRatio: 5.0            # transition/transversion rate ratio, k
 nonEpitopeAcceptance: 1.0                   # probability of accepting a non-epitope mutation
+epitopeAcceptance: 1.0                      # probability of accepting an epitope mutation
 DMSFile:                                    # name of DMS csv file: must have 21 columns (site number and amino acid preferences ordered alphabetically) and rows must be in sequential order and equal the number of amino acid sites in the virus sequence

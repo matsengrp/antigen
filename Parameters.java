@@ -85,14 +85,22 @@ public class Parameters {
 	public static String startingSequence = "AGAGTCTAGTCC"; // default starting sequence
 	public static int[] epitopeSites = {}; // epitope sites of virus (valid inputs are between 1 and
 	                                       // startingSequence.length() / 3)
+	public static int[] epitopeSitesLow = {};
+	public static int[] epitopeSitesHigh = {};
+	public static double proportionHighSites = 0.2; // proportion of epitope sites that are high in mutation step size distribution
 	public static boolean predefinedVectors = true;
 	public static double meanStepEpitope = 0.3; // mean mutation size for epitopes
 	public static double sdStepEpitope = 0.3; // standard deviation of mutation size for epitopes
+	public static double meanStepEpitopeLow = 0.3; // mean mutation size for epitopes
+	public static double sdStepEpitopeLow = 0.3; // standard deviation of mutation size for epitopes
+	public static double meanStepEpitopeHigh = 0.3; // mean mutation size for epitopes
+	public static double sdStepEpitopeHigh = 0.3; // standard deviation of mutation size for epitopes
 	public static double transitionTransversionRatio = 5.0; // transition/transversion rate ratio, k
 	public static String DMSFile = null; // name of DMS csv file: must have 21 columns (site number and amino acid
 	                                     // preferences ordered alphabetically) and rows must equal the number of
 	                                     // amino acid sites in the virus sequence)
 	public static double nonEpitopeAcceptance = 1.0; // probability of accepting a non-epitope mutation
+	public static double epitopeAcceptance = 1.0; // probability of accepting an epitope mutation
 
 	// host immunity parameters
 	public static boolean sampleHostImmunity = false; // whether to sample host immunity
@@ -311,6 +319,33 @@ public class Parameters {
 				String epitopeSitesFile = ((String) map.get("epitopeSites"));
 				epitopeSites = readEpitopeSitesFile(inPath + epitopeSitesFile);
 			}
+			// Here, define low and high sites based on a user-defined parameter called "proportionHighSites"
+			if (map.get("proportionHighSites") != null) {
+				proportionHighSites = (double) map.get("proportionHighSites");
+				int numHighSites = (int) Math.round(epitopeSites.length * proportionHighSites);
+				int numLowSites = epitopeSites.length - numHighSites;
+				epitopeSitesHigh = new int[numHighSites];
+				epitopeSitesLow = new int[numLowSites];
+				int highIdx = 0;
+				int lowIdx = 0;
+				for (int i = 0; i < epitopeSites.length; i++) {
+					if (i < epitopeSites.length * proportionHighSites) {
+						epitopeSitesHigh[highIdx] = epitopeSites[i];
+						highIdx +=1;
+					} else {
+						epitopeSitesLow[lowIdx] = epitopeSites[i];
+						lowIdx +=1;
+					}
+				}
+			}
+			if (map.get("epitopeSitesLow") != null) {
+				String epitopeSitesFile = ((String) map.get("epitopeSitesLow"));
+				writeEpitopeSitesFile(inPath + epitopeSitesFile, epitopeSitesLow);
+			}
+			if (map.get("epitopeSitesHigh") != null) {
+				String epitopeSitesFile = ((String) map.get("epitopeSitesHigh"));
+				writeEpitopeSitesFile(inPath + epitopeSitesFile, epitopeSitesHigh);
+			}
 			if (map.get("predefinedVectors") != null) {
 				predefinedVectors = (boolean) map.get("predefinedVectors");
 			}
@@ -320,11 +355,26 @@ public class Parameters {
 			if (map.get("sdStepEpitope") != null) {
 				sdStepEpitope = (double) map.get("sdStepEpitope");
 			}
+			if (map.get("meanStepEpitopeLow") != null) {
+				meanStepEpitopeLow = (double) map.get("meanStepEpitopeLow");
+			}
+			if (map.get("sdStepEpitopeLow") != null) {
+				sdStepEpitopeLow = (double) map.get("sdStepEpitopeLow");
+			}
+			if (map.get("meanStepEpitopeHigh") != null) {
+				meanStepEpitopeHigh = (double) map.get("meanStepEpitopeHigh");
+			}
+			if (map.get("sdStepEpitopeHigh") != null) {
+				sdStepEpitopeHigh = (double) map.get("sdStepEpitopeHigh");
+			}
 			if (map.get("transitionTransversionRatio") != null) {
 				transitionTransversionRatio = (double) map.get("transitionTransversionRatio");
 			}
 			if (map.get("nonEpitopeAcceptance") != null){
 				nonEpitopeAcceptance = (double) map.get("nonEpitopeAcceptance");
+			}
+			if (map.get("epitopeAcceptance") != null){
+				epitopeAcceptance = (double) map.get("epitopeAcceptance");
 			}
 			if (map.get("DMSFile") != null) {
 				DMSFile = (String) map.get("DMSFile");
@@ -393,6 +443,7 @@ public class Parameters {
 	// of site numbers seperated by commas
 	private static int[] readEpitopeSitesFile(String epitopeSitesFile) throws FileNotFoundException {
 		Scanner epitopeSitesScanner = new Scanner(new File(epitopeSitesFile));
+		// Q for @thienktran: What if there are multiple lines? Should I make a note in the README to not have any new line characters in the file?
 		String epitopeSitesLine = epitopeSitesScanner.nextLine();
 
 		// Split epitope sites by ","
@@ -405,6 +456,27 @@ public class Parameters {
 		}
 
 		return epitopeSitesInt;
+	}
+
+	private static void writeEpitopeSitesFile(String outFile, int[] epitopeSites) {
+		try {
+			File out = new File(outFile);
+			if (!out.exists()) {
+				out.createNewFile();
+			}
+			FileWriter writer = new FileWriter(outFile);
+			for (int i = 0; i < epitopeSites.length; i++) {
+				if (i == epitopeSites.length) {
+					writer.write(epitopeSites[i]);
+				}
+				else {
+					writer.write(epitopeSites[i] + ",");
+				}
+			}
+			writer.close();
+		} catch (IOException e) {
+			System.out.println("Cannot write " + outFile);
+		}
 	}
 
 	private static int[] toIntArray(List<Integer> list) {

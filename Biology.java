@@ -247,6 +247,8 @@ public class Biology {
 
         public final Map<Integer, MutationVector[][]> siteMutationVectors;
         public final HashSet<Integer> epitopeSites;
+        public final HashSet<Integer> epitopeSitesLow;
+        public final HashSet<Integer> epitopeSitesHigh;
         public final String[] stringOutputCSV = new String[totalSites]; // String[] to create CSV from
 
         SiteMutationVectors() {
@@ -269,6 +271,18 @@ public class Biology {
             }
             this.epitopeSites = epitopeSitesSet;
 
+            HashSet<Integer> epitopeSitesSetLow = new HashSet<>();
+            for (int i = 0; i < Parameters.epitopeSitesLow.length; i++) {
+                epitopeSitesSetLow.add(Parameters.epitopeSitesLow[i] - 1); // Allow users to index starting at 1, but store values starting at 0
+            }
+            this.epitopeSitesLow = epitopeSitesSetLow;
+
+            HashSet<Integer> epitopeSitesSetHigh = new HashSet<>();
+            for (int i = 0; i < Parameters.epitopeSitesHigh.length; i++) {
+                epitopeSitesSetHigh.add(Parameters.epitopeSitesHigh[i] - 1); // Allow users to index starting at 1, but store values starting at 0
+            }
+            this.epitopeSitesHigh = epitopeSitesSetHigh;
+
             // Create a mapping of site # to 2D array of vectors
             // mutations: 2D Array
             // i: index of wild type amino acid
@@ -289,7 +303,9 @@ public class Biology {
                     for (int mutationIndex = 0; mutationIndex < matrixSize; mutationIndex++) {
                         if (mutationIndex < wildTypeIndex) { // update lower and upper triangle in this branch.
                             boolean isEpitopeSite = this.epitopeSites.contains(nucleotideSiteNumber);
-                            MutationVector mut = MutationVector.calculateMutation(isEpitopeSite);
+                            boolean isEpitopeSiteLow = this.epitopeSitesLow.contains(nucleotideSiteNumber);
+                            boolean isEpitopeSiteHigh = this.epitopeSitesLow.contains(nucleotideSiteNumber);
+                            MutationVector mut = MutationVector.calculateMutation(isEpitopeSite, isEpitopeSiteLow, isEpitopeSiteHigh);
 
                             // add vector=(mutA, mutB) to mutations_i,j, where
                             // mutA is the x-coordinate
@@ -355,6 +371,14 @@ public class Biology {
         public HashSet getEpitopeSites() {
             return this.epitopeSites;
         }
+
+        public HashSet getEpitopeSitesLow() {
+            return this.epitopeSitesLow;
+        }
+
+        public HashSet getEpitopeSitesHigh() {
+            return this.epitopeSitesHigh;
+        }
     }
 
     /**
@@ -381,7 +405,7 @@ public class Biology {
             this.r = r;
         }
 
-        public static MutationVector calculateMutation(boolean isEpitopeSite) {
+        public static MutationVector calculateMutation(boolean isEpitopeSite, boolean isEpitopeSiteLow, boolean isEpitopeSiteHigh) {
             // direction of mutation
             double theta;
             if (Parameters.mut2D) {
@@ -402,9 +426,17 @@ public class Biology {
             double meanStep;
             double sdStep;
             if (isEpitopeSite) {
-                // epitope sites
-                meanStep = Parameters.meanStepEpitope;
-                sdStep = Parameters.sdStepEpitope;
+                // determine if epitope site is low or high distribution or neither
+                if (isEpitopeSiteLow) {
+                    meanStep = Parameters.meanStepEpitopeLow;
+                    sdStep = Parameters.sdStepEpitopeLow;
+                } else if (isEpitopeSiteHigh) {
+                    meanStep = Parameters.meanStepEpitopeHigh;
+                    sdStep = Parameters.sdStepEpitopeHigh;
+                } else {
+                    meanStep = Parameters.meanStepEpitope;
+                    sdStep = Parameters.sdStepEpitope;
+                }
             } else {
                 // non-epitope sites
                 meanStep = Parameters.meanStep;
