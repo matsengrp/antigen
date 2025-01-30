@@ -71,9 +71,9 @@ fixedStep: false                            # whether to fix step size, i.e. ign
 # sequence-specific parameters
 startingSequence: "startingSequence.fasta"  # the fasta file of the starting sequence of a Virus (must be divisible by 3 and cannot contain stop codon)
 epitopeSites: "epitopeSites.txt"            # the txt file of the epitope sites in the sequence
-epitopeSitesLow: "epitopeSitesLow.txt"            # the txt file of the epitope sites in the sequence
-epitopeSitesHigh: "epitopeSitesHigh.txt"            # the txt file of the epitope sites in the sequence
-proportionHighSites: 0.1                    # the proportion of epitope sites that are placed into the "high" distribution
+# epitopeSitesLow: "epitopeSitesLow.txt"            # the txt file of the epitope sites in the sequence
+# epitopeSitesHigh: "epitopeSitesHigh.txt"            # the txt file of the epitope sites in the sequence
+# proportionHighSites: 0.1                    # the proportion of epitope sites that are placed into the "high" distribution
 predefinedVectors: false                     # whether to use predefined vectors for mutations
 meanStepEpitope: 0.3                        # mean mutation size for epitopes
 sdStepEpitope: 0.3                          # standard deviation of mutation size for epitopes
