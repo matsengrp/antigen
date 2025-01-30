@@ -350,6 +350,7 @@ public class Parameters {
 					throw new IOException();
 				}
 			}
+      // Parameters for host sampling and fitness calculations
 			if (map.get("fitnessSampleSize") != null) {
 				fitnessSampleSize = (int) map.get("fitnessSampleSize");
 			}
@@ -362,6 +363,7 @@ public class Parameters {
 			if (map.get("hostImmunitySamplesPerDeme") != null) {
 				hostImmunitySamplesPerDeme = toIntArray((List<Integer>) map.get("hostImmunitySamplesPerDeme"));
 			}
+
 		} catch (IOException e) {
 			System.out.println("Cannot load parameters.yml, using defaults");
 		}
