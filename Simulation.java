@@ -425,7 +425,6 @@ public class Simulation {
 				// print immunity if needed
 				if (Parameters.sampleHostImmunity && Parameters.day % (double) Parameters.printHostImmunityStep < Parameters.deltaT) {
 					// Test print
-					System.out.println("Immunity sample being taken...");
 					historyStream.printf("date:\t" + "%.2f\n", Parameters.day);
 					printHostImmuneHistories(historyStream);
 					

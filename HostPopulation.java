@@ -21,6 +21,7 @@ public class HostPopulation {
 	
 	private int newContacts;
 	private int newRecoveries;
+	private double contactRate;
 		
 	// construct population, using Virus v as initial infection
 	public HostPopulation(int d) {
@@ -335,6 +336,7 @@ public class HostPopulation {
 	public void recordContacts() {
 		// each infected makes I->S contacts on a per-day rate of beta * S/N
 		double totalContactRate = getI() * getPrS() * Parameters.beta * Parameters.getSeasonality(deme) * Parameters.deltaT;
+		contactRate = totalContactRate;
 		newContacts = Random.nextPoisson(totalContactRate);			
 	}
 
@@ -619,6 +621,8 @@ public class HostPopulation {
 	}
 	
 	public void printHostImmuneHistories(PrintStream stream, int n){
+		//first, print the contact rate
+		stream.printf("contactRate:\t" + "%.4f\n", contactRate);
 		// grab n random hosts and print their immune histories
 		for (int i = 0; i < n; i++) {
 			Host h = getRandomHost();
