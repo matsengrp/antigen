@@ -22,6 +22,8 @@ public class HostPopulation {
 	private int newContacts;
 	private int newRecoveries;
 	private double contactRate;
+	private double fracS;
+	private double seasonality;
 		
 	// construct population, using Virus v as initial infection
 	public HostPopulation(int d) {
@@ -481,7 +483,7 @@ public class HostPopulation {
 		double sampleSize = (double) Parameters.fitnessSampleSize;
 		double averageRisk = 0;
 		for (int i = 0; i < Parameters.fitnessSampleSize; i++) {
-			Host h = getRandomHost();
+			Host h = getRandomHostS();
 			Phenotype[] history = h.getHistory();
 			averageRisk += p.riskOfInfection(history);
 		}
@@ -621,11 +623,15 @@ public class HostPopulation {
 	}
 	
 	public void printHostImmuneHistories(PrintStream stream, int n){
-		//first, print the contact rate
-		stream.printf("contactRate:\t" + "%.4f\n", contactRate);
-		// grab n random hosts and print their immune histories
+		//first, print the seasonality
+		seasonality = Parameters.getSeasonality(deme);
+		fracS = getPrS();
+		stream.printf("seasonality:\t" + "%.4f\n", seasonality);
+		stream.printf("fracSusceptible:\t" + "%.4f\n", fracS); // delete this line after meeting with Hugh
+		stream.printf("contactRate:\t" + "%.4f\n", contactRate); // likely won't need this either
+		// grab n random susceptible hosts and print their immune histories
 		for (int i = 0; i < n; i++) {
-			Host h = getRandomHost();
+			Host h = getRandomHostS();
 			stream.print(name + ":");
 			h.printHistoryCoordinates(stream);
 		}
