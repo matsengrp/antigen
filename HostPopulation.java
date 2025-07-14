@@ -365,8 +365,15 @@ public class HostPopulation {
 				}
 				// If there is not fitness, assign now.
 				if (v.getFitness() == 0.0) {
-					double risk = getAverageRisk(p);
-					v.setFitness(risk);
+					double averageRisk = getAverageRisk(p);
+					double seasonality = Parameters.getSeasonality(deme);
+					double probSusceptible = getPrS();
+					double seasonalFitness = averageRisk * seasonality * probSusceptible;
+					
+					v.setAverageInfectionRisk(averageRisk);
+					v.setDemeSeasonality(seasonality);
+					v.setProbSusceptible(probSusceptible);
+					v.setFitness(seasonalFitness);
 				}
 			
 			}
@@ -470,8 +477,15 @@ public class HostPopulation {
 				Host h = infecteds.get(index);
 				Virus v = h.mutate();
 				Phenotype p = v.getPhenotype();
-				double risk = getAverageRisk(p);
-				v.setFitness(risk);
+				double averageRisk = getAverageRisk(p);
+				double seasonality = Parameters.getSeasonality(deme);
+				double probSusceptible = getPrS();
+				double seasonalFitness = averageRisk * seasonality * probSusceptible;
+				
+				v.setAverageInfectionRisk(averageRisk);
+				v.setDemeSeasonality(seasonality);
+				v.setProbSusceptible(probSusceptible);
+				v.setFitness(seasonalFitness);
 			}
 		}			
 	}	
@@ -507,8 +521,15 @@ public class HostPopulation {
 				Host h = infecteds.get(index);
 				Virus v = h.getInfection();
 				Phenotype p = v.getPhenotype();
-				double risk = getAverageRisk(p);
-				v.setFitness(risk);
+				double averageRisk = getAverageRisk(p);
+				double seasonality = Parameters.getSeasonality(deme);
+				double probSusceptible = getPrS();
+				double seasonalFitness = averageRisk * seasonality * probSusceptible;
+				
+				v.setAverageInfectionRisk(averageRisk);
+				v.setDemeSeasonality(seasonality);
+				v.setProbSusceptible(probSusceptible);
+				v.setFitness(seasonalFitness);
 				VirusTree.add(v);
 			}	
 		}
