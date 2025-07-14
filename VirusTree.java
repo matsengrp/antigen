@@ -639,9 +639,28 @@ public class VirusTree {
 						"trunk", "tip", "mark", "location", "layout", "ag1", "ag2", "fitness", "averageInfectionRisk", "probSusceptible", "demeSeasonality");
 			}
 			for (Virus v : tips) {
-				tipStream.printf("\"%s\",%.4f,%d,%d,%d,%d,%.4f,%s,%.4f,%.4f,%.4f,%.4f\n", v, v.getBirth(), v.isTrunk() ? 1 : 0,
-						v.isTip() ? 1 : 0, v.isMarked() ? 1 : 0, v.getDeme(), v.getLayout(), v.getPhenotype(), v.getFitness(), 
-						v.getAverageInfectionRisk(), v.getProbSusceptible(), v.getDemeSeasonality());
+				if (Parameters.phenotypeSpace.equals("geometricSeq")) {
+					// Parse the phenotype string to extract individual components
+					String phenotypeStr = v.getPhenotype().toString();
+					String[] parts = phenotypeStr.split(", ");
+					String nucleotideSequence = parts[0];
+					String ag1 = parts[1];
+					String ag2 = parts[2];
+					String epitopeMutationCount = parts[3];
+					String nonepitopeMutationCount = parts[4];
+					String lowEpitopeMutationCount = parts[5];
+					String highEpitopeMutationCount = parts[6];
+					
+					tipStream.printf("\"%s\",%.4f,%d,%d,%d,%d,%.4f,\"%s\",%s,%s,%s,%s,%s,%s,%.4f,%.4f,%.4f,%.4f\n", 
+							v, v.getBirth(), v.isTrunk() ? 1 : 0, v.isTip() ? 1 : 0, v.isMarked() ? 1 : 0, 
+							v.getDeme(), v.getLayout(), nucleotideSequence, ag1, ag2, epitopeMutationCount, 
+							nonepitopeMutationCount, lowEpitopeMutationCount, highEpitopeMutationCount, 
+							v.getFitness(), v.getAverageInfectionRisk(), v.getProbSusceptible(), v.getDemeSeasonality());
+				} else {
+					tipStream.printf("\"%s\",%.4f,%d,%d,%d,%d,%.4f,%s,%.4f,%.4f,%.4f,%.4f\n", v, v.getBirth(), v.isTrunk() ? 1 : 0,
+							v.isTip() ? 1 : 0, v.isMarked() ? 1 : 0, v.getDeme(), v.getLayout(), v.getPhenotype(), v.getFitness(), 
+							v.getAverageInfectionRisk(), v.getProbSusceptible(), v.getDemeSeasonality());
+				}
 			}
 			tipStream.close();
 		} catch (IOException ex) {
