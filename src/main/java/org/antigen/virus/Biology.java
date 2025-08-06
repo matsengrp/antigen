@@ -1,7 +1,6 @@
 package org.antigen.virus;
 
 import java.awt.*;
-import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -47,7 +46,7 @@ public class Biology {
                     int numberOfAminoAcids = Biology.AlphabetType.AMINO_ACIDS.getValidCharacters().length();
                     aminoAcidPreference = new double[numberOfAminoAcidSites][numberOfAminoAcids];
 
-                    Scanner dms = new Scanner(new File(Parameters.DMSFile));
+                    Scanner dms = new Scanner(Biology.class.getClassLoader().getResourceAsStream(Parameters.DMSFile));
                     dms.nextLine(); // read header
 
                     for (int i = 0; i < numberOfAminoAcidSites; i++) {

@@ -38,7 +38,6 @@ public class Parameters {
 	public static boolean restartFromCheckpoint = false; // whether to load population from out.hosts
 	public static String outPath = "output/"; // path to dump output files.
 	public static String outPrefix = "run-"; // suffix for output files.
-	public static String inPath = "input/"; // path to dump output files.
 	public static int fitnessSampleSize = 10000; // number of random hosts to sample for average infection risk
 
 	// metapopulation parameters
@@ -144,7 +143,7 @@ public class Parameters {
 
 			org.yaml.snakeyaml.Yaml yaml = new org.yaml.snakeyaml.Yaml();
 			Map map;
-			InputStream input = new FileInputStream(new File("parameters.yml"));
+			InputStream input = Parameters.class.getClassLoader().getResourceAsStream("parameters.yml");
 			map = (Map) yaml.load(input);
 			input.close();
 
@@ -298,7 +297,7 @@ public class Parameters {
 			}
 			if (map.get("startingSequence") != null) {
 				String startingSequenceFile = ((String) map.get("startingSequence"));
-				startingSequence = readStartingSequenceFile(inPath + startingSequenceFile);
+				startingSequence = readStartingSequenceFile(startingSequenceFile);
 
 				// Check that startingSequence is not an empty String and is a multiple of 3.
 				if (phenotypeSpace.equals("geometricSeq")) {
@@ -321,7 +320,7 @@ public class Parameters {
 			}
 			if (map.get("epitopeSites") != null) {
 				String epitopeSitesFile = ((String) map.get("epitopeSites"));
-				epitopeSites = readEpitopeSitesFile(inPath + epitopeSitesFile);
+				epitopeSites = readEpitopeSitesFile(epitopeSitesFile);
 			}
 			// Here, define low and high sites based on a user-defined parameter called "proportionHighSites"
 			if (map.get("proportionHighSites") != null) {
@@ -344,11 +343,11 @@ public class Parameters {
 			}
 			if (map.get("epitopeSitesLow") != null) {
 				String epitopeSitesFile = ((String) map.get("epitopeSitesLow"));
-				writeEpitopeSitesFile(inPath + epitopeSitesFile, epitopeSitesLow);
+				writeEpitopeSitesFile(outPath + epitopeSitesFile, epitopeSitesLow);
 			}
 			if (map.get("epitopeSitesHigh") != null) {
 				String epitopeSitesFile = ((String) map.get("epitopeSitesHigh"));
-				writeEpitopeSitesFile(inPath + epitopeSitesFile, epitopeSitesHigh);
+				writeEpitopeSitesFile(outPath + epitopeSitesFile, epitopeSitesHigh);
 			}
 			if (map.get("predefinedVectors") != null) {
 				predefinedVectors = (boolean) map.get("predefinedVectors");
@@ -388,7 +387,7 @@ public class Parameters {
 				int numberOfSites = startingSequence.length() / 3;
 				int dmsDataLineCount = 0;
 
-				Scanner DMSData = new Scanner(new File(Parameters.DMSFile));
+				Scanner DMSData = new Scanner(Parameters.class.getClassLoader().getResourceAsStream(Parameters.DMSFile));
 				DMSData.nextLine(); // ignore the header
 				while (DMSData.hasNextLine()) {
 					dmsDataLineCount++;
@@ -427,7 +426,7 @@ public class Parameters {
 	private static String readStartingSequenceFile(String startingSequenceFile) throws FileNotFoundException {
 		// Parse the fasta file to get a sequence of nucleotides
 		StringBuilder startingSequenceSB = new StringBuilder();
-		Scanner startingSequenceScanner = new Scanner(new File(startingSequenceFile));
+		Scanner startingSequenceScanner = new Scanner(Parameters.class.getClassLoader().getResourceAsStream(startingSequenceFile));
 		startingSequenceScanner.nextLine(); // read header >
 
 		while (startingSequenceScanner.hasNextLine()) {
@@ -446,7 +445,7 @@ public class Parameters {
 	// Returns int[] of the epitope sites given the txt file
 	// of site numbers seperated by commas
 	private static int[] readEpitopeSitesFile(String epitopeSitesFile) throws FileNotFoundException {
-		Scanner epitopeSitesScanner = new Scanner(new File(epitopeSitesFile));
+		Scanner epitopeSitesScanner = new Scanner(Parameters.class.getClassLoader().getResourceAsStream(epitopeSitesFile));
 		// Q for @thienktran: What if there are multiple lines? Should I make a note in the README to not have any new line characters in the file?
 		String epitopeSitesLine = epitopeSitesScanner.nextLine();
 

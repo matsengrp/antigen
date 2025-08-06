@@ -24,7 +24,6 @@ detailedOutput: false                       # whether to output out.hosts and ou
 restartFromCheckpoint: false                # whether to load population from out.hosts
 outPath: "output/"
 outPrefix: 'run-out'
-inPath: "input/"
 sampleHostImmunity: true                    # whether to sample host immunity throughout the simulation
 printHostImmunityStep: 50                  # how often to print host immunity (ever X days)
 
