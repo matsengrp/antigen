@@ -3,8 +3,13 @@
 /* Moving up to multiple dimensions is non-trivial and requires thought on the implementation */
 /* Multiple Viruses can reference a single Phenotype object */
 
+package org.antigen.phenotype;
+
 import static java.lang.Math.*;
 import java.util.*;
+
+import org.antigen.core.Parameters;
+import org.antigen.core.Random;
 
 public class GeometricPhenotype implements Phenotype {
 

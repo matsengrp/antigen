@@ -1,6 +1,12 @@
 /* Virus infection that has genotype, phenotype and ancestry */
 
+package org.antigen.virus;
+
 import java.util.*;
+
+import org.antigen.core.Parameters;
+import org.antigen.phenotype.Phenotype;
+import org.antigen.phenotype.PhenotypeFactory;
 
 public class Virus {
 

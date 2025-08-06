@@ -1,6 +1,10 @@
 /* Acts as constructor for Phenotype objects */
 /* A completely static class */
 
+package org.antigen.phenotype;
+
+import org.antigen.core.Parameters;
+
 public class PhenotypeFactory {
 
 	public static String GEOMETRIC = "geometric";

@@ -1,3 +1,5 @@
+package org.antigen.analysis;
+
 import cern.colt.matrix.*;
 import cern.colt.matrix.impl.*;
 import cern.colt.matrix.linalg.*;

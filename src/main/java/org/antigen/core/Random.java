@@ -1,3 +1,5 @@
+package org.antigen.core;
+
 /* Holds random number genator necessities */
 /* Trying to encapsulate this, so the RNG particulars can be changed if necessary */
 /* Completely static class, allows no instances to be instantiated */

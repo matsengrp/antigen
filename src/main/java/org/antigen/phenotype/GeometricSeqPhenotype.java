@@ -1,4 +1,10 @@
+package org.antigen.phenotype;
+
 import java.util.Arrays;
+
+import org.antigen.core.Parameters;
+import org.antigen.core.Random;
+import org.antigen.virus.Biology;
 
 /**
  * <b>GeometricSeqPhenotype</b> stores a Virus's genetic sequence and antigenic
@@ -58,7 +64,6 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
     /**
      *
      */
-    public static final boolean SANITY_TEST = false;
 
     /**
      * Run expensive tests iff DEBUG == true.
@@ -312,11 +317,6 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
             // Note, reversions will not be taken into account
             vector = Biology.MutationVector.calculateMutation(isEpitopeSite, isEpitopeSiteLow, isEpitopeSiteHigh);
 
-            if (SANITY_TEST && isEpitopeSite) {
-                TestGeometricSeqPhenotype.randomMutationsDistribution
-                        .print("" + wildTypeAminoAcid + proteinMutationIndex + mutantAminoAcid +
-                               "," + vector.r + "," + vector.theta + '\n');
-            }
         }
 
         checkRep();
@@ -354,11 +354,6 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         mutantCodon.setCharAt(nucleotideMutationCodonIndex, mutantNucleotide);
         String mutantAminoAcid = Biology.CodonMap.CODONS.getAminoAcid(mutantCodon.toString());
 
-        if (SANITY_TEST) {
-            // (proteinMutationIndex + 1) to show one-based numbering
-            TestGeometricSeqPhenotype.codonMutations
-                    .print((nucleotideMutationIndex + 1) + "," + wildTypeCodon + "," + mutantCodon + ",");
-        }
 
         return new String[] { wildTypeAminoAcid, mutantAminoAcid };
     }

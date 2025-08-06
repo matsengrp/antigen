@@ -1,7 +1,15 @@
 /* A human individual that harbors viruses and immunity */
 
+package org.antigen.host;
+
 import java.io.*;
 import java.util.regex.*;
+
+import org.antigen.core.Parameters;
+import org.antigen.core.Random;
+import org.antigen.phenotype.Phenotype;
+import org.antigen.phenotype.PhenotypeFactory;
+import org.antigen.virus.Virus;
 
 public class Host {
 

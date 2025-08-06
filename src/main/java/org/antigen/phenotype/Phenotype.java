@@ -1,5 +1,7 @@
 /* Interface for Phenotype objects */
 
+package org.antigen.phenotype;
+
 public interface Phenotype {
 
 	// provides the risk of infection (from 0 to 1) of a virus with this phenotype 

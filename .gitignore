@@ -1,5 +1,8 @@
-# For flux repo #
-antigen.jar
+# Maven build directory #
+#########################
+target/
+dependency-reduced-pom.xml
+.m2/
 
 # Compiled source #
 ###################
@@ -10,6 +13,14 @@ antigen.jar
 *.o
 *.so
 
+# Build artifacts #
+###################
+target/*.jar
+out*.jar
+antigen.jar
+*.tmp
+*.bak
+
 # LaTeX intermediaries #
 ########################
 *.aux
@@ -18,12 +29,11 @@ antigen.jar
 *.blg
 *.out
 
-# Packages #
-############
+# Archives (excluding required JARs) #
+######################################
 *.7z
 *.dmg
 *.gz
-*.jar
 *.rar
 *.tar
 *.zip
@@ -38,21 +48,47 @@ antigen.jar
 Icon?
 ehthumbs.db
 Thumbs.db
-/bin/
-/.classpath
-/.project
-.ipynb_checkpoints/
 .nfs*
 
-# IntelliJ generated files #
+# IDE files #
+#############
+# IntelliJ IDEA
+.idea/
 *.iml
-/.idea
+*.iws
+*.ipr
+
+# Eclipse
+.classpath
+.project
+.settings/
+/bin/
+
+# VSCode
+.vscode/
+
+# NetBeans
+nbproject/
+build/
+nbbuild/
+dist/
+nbdist/
+
+# Test and build reports #
+###########################
+surefire-reports/
+target/surefire-reports/
+*.log
+
+# Jupyter notebooks #
+######################
+.ipynb_checkpoints/
 
 # Output files #
-#################
+################
 out*/
 out*
 
 # Claude settings #
+###################
 .claude/
-CLAUDE.md

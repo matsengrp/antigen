@@ -1,9 +1,15 @@
+package org.antigen.core;
+
 /* Simulation functions, holds the host population */
 
 import java.util.*;
 import java.io.*;
 
 import com.javamex.classmexer.*;
+import org.antigen.host.*;
+import org.antigen.virus.*;
+import org.antigen.phenotype.*;
+import org.antigen.analysis.*;
 
 public class Simulation {
 	// fields

@@ -1,8 +1,16 @@
 /* A population of host individuals */
 
+package org.antigen.host;
+
 import java.util.*;
 import java.io.*;
 import java.util.regex.*;
+
+import org.antigen.core.Parameters;
+import org.antigen.core.Random;
+import org.antigen.phenotype.Phenotype;
+import org.antigen.virus.Virus;
+import org.antigen.virus.VirusTree;
 
 public class HostPopulation {
 

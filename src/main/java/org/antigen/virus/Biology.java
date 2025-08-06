@@ -1,9 +1,14 @@
+package org.antigen.virus;
+
 import java.awt.*;
 import java.io.File;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
+
+import org.antigen.core.Parameters;
+import org.antigen.core.Random;
 
 /**
  * A class that allows antigen to model a virus's genetic sequence,
@@ -83,7 +88,7 @@ public class Biology {
          * where each possible mutation is weighted by a pre-defined transition/transversion ratio.
          */
         K80DNAEvolutionModel() {
-            this.transitionTranversionProbability = new HashMap<>()  {{
+            this.transitionTranversionProbability = new HashMap<Character, double[]>()  {{
                 double transition = 0.5 / (Parameters.transitionTransversionRatio + 1.0);
                 double transversion = Parameters.transitionTransversionRatio / (Parameters.transitionTransversionRatio + 1.0);
                 // key: nucleotide
@@ -135,7 +140,7 @@ public class Biology {
         public final Map<String, String> codonMap;
 
         CodonMap() {
-            this.codonMap = new HashMap<>() {{
+            this.codonMap = new HashMap<String, String>() {{
                 put("TTT", "F");
                 put("TTC", "F");
                 put("TTA", "L");

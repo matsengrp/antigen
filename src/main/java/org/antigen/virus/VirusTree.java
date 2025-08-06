@@ -1,7 +1,17 @@
 /* Stores a list of Viruses that have sampled during the course of the simulation */
 
+package org.antigen.virus;
+
 import java.util.*;
 import java.io.*;
+
+import org.antigen.core.Parameters;
+import org.antigen.core.Random;
+import org.antigen.analysis.SimplePCA;
+import org.antigen.phenotype.Phenotype;
+import org.antigen.phenotype.GeometricPhenotype;
+import org.antigen.phenotype.GeometricPhenotype3D;
+import org.antigen.phenotype.GeometricSeqPhenotype;
 
 public class VirusTree {
 

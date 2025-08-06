@@ -1,9 +1,13 @@
+package org.antigen.core;
+
 /* Stores parameters for use across simulation */
 /* Start with parameters in source, implement input file later */
 /* A completely static class.  */
 
 import java.util.*;
 import java.io.*;
+import org.antigen.virus.*;
+import org.antigen.phenotype.*;
 
 public class Parameters {
 	// global parameters

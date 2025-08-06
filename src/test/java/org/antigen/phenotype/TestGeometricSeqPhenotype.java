@@ -1,3 +1,5 @@
+package org.antigen.phenotype;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,6 +14,9 @@ import java.util.Scanner;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
+
+import org.antigen.core.Parameters;
+import org.antigen.virus.Biology;
 
 /**
  * A class for testing the methods in GeometricSeqPhenotype.java
@@ -311,7 +316,7 @@ public class TestGeometricSeqPhenotype {
 
     static {
         try {
-            if (GeometricSeqPhenotype.SANITY_TEST) {
+            if (false) { // Debug code disabled
                 codonMutations = new PrintStream("testGeometricSeqPhenotype/codonMutations.csv");
                 codonMutations.println("siteN,wildCodon,mutantCodon,pairWildMutantN,wildAA,mutantAA,cycle,id");
             }
@@ -330,7 +335,7 @@ public class TestGeometricSeqPhenotype {
 
     static {
         try {
-            if (GeometricSeqPhenotype.SANITY_TEST && !Parameters.predefinedVectors) {
+            if (false && !Parameters.predefinedVectors) { // Debug code disabled
                 randomMutationsDistribution = new PrintStream("testGeometricSeqPhenotype/randomMutationsDistribution.csv");
                 randomMutationsDistribution.println("mutation,r,theta");
             }

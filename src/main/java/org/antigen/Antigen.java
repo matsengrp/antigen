@@ -1,8 +1,11 @@
+package org.antigen;
+
 /* Implements an individual-based model in which the infection's genealogical history is tracked through time */
 
 import java.io.FileNotFoundException;
+import org.antigen.core.*;
 
-class Antigen {
+public class Antigen {
     public static void main(String[] args) throws FileNotFoundException {
 
 		// initialize random number generator
