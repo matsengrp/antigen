@@ -1,7 +1,7 @@
 ## Introduction
 
 Antigen implements an SIR epidemiological model where hosts in a population are infected with
-viruses that have distinct antigenic phenotypes.  Hosts make contacts trasmitting viruses and also
+viruses that have distinct antigenic phenotypes.  Hosts make contacts transmitting viruses and also
 recover from infection.  After recovery, a host remembers the antigenic phenotype it was infected
 with as part of its immune history.  The risk of infection after contact depends on comparing the
 infecting virus's phenotype to the phenotypes in the host immune history.
@@ -42,7 +42,7 @@ A transportable jar file with all dependencies can be created with:
 	
 Then to run from this jar:
 
-	java -jar target/antigen.jar -XX:+UseSerialGC -Xmx1G
+	java -jar target/antigen-prime-with-dependencies.jar -XX:+UseSerialGC -Xmx1G
 
 For development, you can compile and run directly:
 
