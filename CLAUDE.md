@@ -68,13 +68,13 @@ mvn test
 mvn package
 
 # Run simulation (from root directory)
-java -jar target/antigen-1.0-SNAPSHOT-jar-with-dependencies.jar
+java -jar target/antigen-prime-jar-with-dependencies.jar
 
 # With memory allocation
-java -Xmx10G -jar target/antigen-1.0-SNAPSHOT-jar-with-dependencies.jar
+java -Xmx10G -jar target/antigen-prime-jar-with-dependencies.jar
 
 # Run with specific parameters file
-java -Xmx10G -jar target/antigen-1.0-SNAPSHOT-jar-with-dependencies.jar parameters.yml
+java -Xmx10G -jar target/antigen-prime-jar-with-dependencies.jar parameters.yml
 
 # For development - compile and run directly
 mvn compile exec:java -Dexec.mainClass="org.antigen.Antigen"
