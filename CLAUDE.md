@@ -67,14 +67,18 @@ mvn test
 # Create JAR with dependencies
 mvn package
 
+# This creates two JARs:
+# - target/antigen-prime.jar (complete executable with all dependencies)
+# - target/antigen-prime-no-dependencies.jar (classes only, requires classpath)
+
 # Run simulation (from root directory)
-java -jar target/antigen-prime-jar-with-dependencies.jar
+java -jar target/antigen-prime.jar
 
 # With memory allocation
-java -Xmx10G -jar target/antigen-prime-jar-with-dependencies.jar
+java -Xmx10G -jar target/antigen-prime.jar
 
 # Run with specific parameters file
-java -Xmx10G -jar target/antigen-prime-jar-with-dependencies.jar parameters.yml
+java -Xmx10G -jar target/antigen-prime.jar parameters.yml
 
 # For development - compile and run directly
 mvn compile exec:java -Dexec.mainClass="org.antigen.Antigen"

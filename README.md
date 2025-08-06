@@ -39,10 +39,14 @@ To run tests:
 A transportable jar file with all dependencies can be created with:
 
 	mvn package
-	
-Then to run from this jar:
 
-	java -jar target/antigen-prime-with-dependencies.jar -XX:+UseSerialGC -Xmx1G
+This creates two JAR files:
+- `target/antigen-prime.jar` - Complete executable with all dependencies (recommended)
+- `target/antigen-prime-no-dependencies.jar` - Classes only, requires classpath setup
+	
+Then to run from the main jar:
+
+	java -jar target/antigen-prime.jar -XX:+UseSerialGC -Xmx1G
 
 For development, you can compile and run directly:
 
