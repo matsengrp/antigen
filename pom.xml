@@ -110,7 +110,8 @@
     </build>
     
     <!-- Note: classmexer.jar is not available in Maven Central.
-         For memory profiling, it needs to be manually added with:
-         java -javaagent:lib/classmexer.jar ... -->
+         It's bundled in src/main/resources/lib/ and available as a local Maven dependency.
+         For memory profiling, it can be used with:
+         java -javaagent:src/main/resources/lib/classmexer.jar ... -->
     
 </project>

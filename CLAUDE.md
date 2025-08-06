@@ -45,7 +45,9 @@ This workflow ensures proper documentation and tracking of all changes.
 │   │   └── resources/
 │   │       ├── parameters.yml - Main parameter file
 │   │       ├── codon_table.txt - Genetic code reference
-│   │       └── input/ - Additional parameter files
+│   │       ├── input/ - Additional parameter files
+│   │       └── lib/
+│   │           └── classmexer.jar - Memory profiling library
 │   └── test/
 │       └── java/org/antigen/phenotype/
 │           └── TestGeometricSeqPhenotype.java - JUnit tests
@@ -97,7 +99,7 @@ mvn compile exec:java -Dexec.mainClass="org.antigen.Antigen"
 - SnakeYAML - YAML parsing (managed by Maven)
 - CERN Colt library - Scientific computing (managed by Maven) 
 - JUnit - Unit testing framework (managed by Maven)
-- Classmexer - Memory profiling (installed as local Maven dependency)
+- Classmexer - Memory profiling (bundled in `src/main/resources/lib/` and installed as local Maven dependency)
 
 ## Python Scripts
 - `clustering.py` - Analysis scripts
