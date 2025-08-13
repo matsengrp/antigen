@@ -1,7 +1,7 @@
 ## Introduction
 
 Antigen implements an SIR epidemiological model where hosts in a population are infected with
-viruses that have distinct antigenic phenotypes.  Hosts make contacts trasmitting viruses and also
+viruses that have distinct antigenic phenotypes.  Hosts make contacts transmitting viruses and also
 recover from infection.  After recovery, a host remembers the antigenic phenotype it was infected
 with as part of its immune history.  The risk of infection after contact depends on comparing the
 infecting virus's phenotype to the phenotypes in the host immune history.
@@ -28,35 +28,38 @@ To load Java 11, run these commands:
 
 
 
-The program can be compiled with:
+The program can be compiled with Maven:
 
-	javac *.java
+	mvn clean compile
 
+To run tests:
 
-I (@zorian15) have found that I sometimes need to specify all of the `.jar` files in the compilation command to get things to compile completely, this can be done with::
+	mvn test
 
-	javac -classpath ".:lib/classmexer.jar:lib/colt-1.2.0.jar:lib/hamcrest-core-1.3.jar:lib/junit-4.13.1.jar:" *.java
+A transportable jar file with all dependencies can be created with:
 
-Then to run:
+	mvn package
 
-	java -XX:+UseSerialGC -Xmx32G Antigen
+This creates two JAR files:
+- `target/antigen-prime.jar` - Complete executable with all dependencies (recommended)
+- `target/antigen-prime-no-dependencies.jar` - Classes only, requires classpath setup
 	
-A transportable jar file can be created with:
+Then to run from the main jar:
 
-	jar cfe antigen.jar Antigen *.class cern/ org/
-	
-Then to run from this jar:
+	java -jar target/antigen-prime.jar -XX:+UseSerialGC -Xmx1G
 
-	java -jar antigen.jar -XX:+UseSerialGC -Xmx1G Antigen
+For development, you can compile and run directly:
+
+	mvn compile exec:java -Dexec.mainClass="org.antigen.Antigen" -Dexec.args="-XX:+UseSerialGC -Xmx32G"
 	
-This requires Java 1.7 to compile and run. The `-Xmx1G` option is used to increase memory allocation. 
+This requires Java 16 or higher to compile and run. The `-Xmx1G` option is used to increase memory allocation. 
 This may need to be increased further with larger host population sizes. The `-XX:+UseSerialGC` option 
 swaps the default Java garbage collector to something that works much more efficiently for Antigen.
 	
 ## Parameters
 	
-Parameter defaults can be seen in [`Parameters.java`](Parameters.java).  When run, the program looks 
-for the file [`parameters.yml`](parameters.yml) and dynamically loads these in, overwriting defaults.
+Parameter defaults can be seen in [`src/main/java/org/antigen/core/Parameters.java`](src/main/java/org/antigen/core/Parameters.java).  When run, the program looks 
+for the file [`src/main/resources/parameters.yml`](src/main/resources/parameters.yml) and dynamically loads these in, overwriting defaults.
 
 ## Output
 
@@ -84,6 +87,22 @@ simulation.  With the default parameters, VirusTree takes 5.5 MB at the end of a
 may up to 110 MB at the end of the default 20 simulated years.
 
 Memory can be easily profiled by calling `jmap -histo <PID>`.
+
+## Manual Compilation (Alternative)
+
+If Maven is not available, the program can be compiled manually with:
+
+	javac -cp "src/main/java:src/main/resources" src/main/java/org/antigen/*.java src/main/java/org/antigen/*/*.java
+
+Or if you need to specify JAR dependencies explicitly:
+
+	javac -classpath "src/main/java:src/main/resources:~/.m2/repository/colt/colt/1.2.0/colt-1.2.0.jar:~/.m2/repository/org/yaml/snakeyaml/2.0/snakeyaml-2.0.jar" src/main/java/org/antigen/*.java src/main/java/org/antigen/*/*.java
+
+Then to run:
+
+	java -cp "src/main/java:src/main/resources:~/.m2/repository/colt/colt/1.2.0/colt-1.2.0.jar:~/.m2/repository/org/yaml/snakeyaml/2.0/snakeyaml-2.0.jar" -XX:+UseSerialGC -Xmx32G org.antigen.Antigen
+
+Note: Maven is the recommended build method as it handles all dependencies automatically.
 
 -------------------------------------------
 
