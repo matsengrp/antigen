@@ -1,6 +1,10 @@
 # Antigen: Epidemiological Simulation Framework
 
-Antigen is a powerful simulation framework for studying virus evolution and population dynamics in epidemiological contexts. Built for researchers in infectious disease epidemiology, it implements SIR (Susceptible-Infected-Recovered) models with genetic and phenotypic evolution of pathogens.
+Antigen implements an SIR epidemiological model where hosts in a population are infected with
+viruses that have distinct antigenic phenotypes.  Hosts make contacts transmitting viruses and also
+recover from infection.  After recovery, a host remembers the antigenic phenotype it was infected
+with as part of its immune history.  The risk of infection after contact depends on comparing the
+infecting virus's phenotype to the phenotypes in the host immune history.
 
 ## 🦠 What Antigen Does
 
@@ -41,48 +45,38 @@ The simulation will run with default parameters and create output files in the `
 
 ## 📚 Documentation
 
-### For Epidemiologists & Researchers
-- **[Getting Started Guide](docs/user-guide/running-simulations.md)** - Step-by-step simulation workflow
-- **[Epidemiological Model](docs/user-guide/epidemiological-model.md)** - Understanding the SIR framework  
-- **[Parameter Guide](docs/user-guide/parameters-reference.md)** - Configure simulations for your research
-- **[Output Analysis](docs/user-guide/output-analysis.md)** - Interpret and analyze results
-- **[Example Simulations](docs/examples/)** - Common research scenarios
+The program can be compiled with Maven:
 
-### Technical Resources
-- **[Installation Details](docs/installation/)** - Compilation, troubleshooting, system requirements
-- **[API Reference](docs/api-reference/)** - Class documentation for developers
-- **[Development Guide](docs/development/)** - Extending Antigen and contributing
+	mvn clean compile
 
-<!-- ## 🔬 Research Applications
+To run tests:
 
-Antigen is designed for epidemiological research questions such as:
-- **Seasonal influenza dynamics**: Model antigenic drift and vaccine effectiveness
-- **Multi-strain competition**: Study how different virus strains compete and evolve
-- **Population structure effects**: Analyze how geographic structure affects spread
-- **Immune history impact**: Understand how past infections shape future disease risk
-- **Vaccination strategies**: Evaluate intervention timing and coverage -->
+	mvn test
 
-## 💡 Key Features
+A transportable jar file with all dependencies can be created with:
 
-### Epidemiological Model
-- **SIR dynamics** with recovered immunity based on antigenic similarity
-- **Multi-deme populations** with configurable migration rates
-- **Seasonal transmission** patterns with region-specific parameters
-- **Host demographics** including birth, death, and aging processes
+	mvn package
 
-### Virus Evolution
-- **Antigenic phenotypes** in continuous n-dimensional space or sequence-based
-- **Mutation models** with epitope/non-epitope site differences
-- **Phylogenetic tracking** of virus genealogies throughout simulation
-- **Cross-immunity** based on antigenic distance between strains
+This creates two JAR files:
+- `target/antigen-prime.jar` - Complete executable with all dependencies (recommended)
+- `target/antigen-prime-no-dependencies.jar` - Classes only, requires classpath setup
+	
+Then to run from the main jar:
 
-## 📊 Example Output
+	java -jar target/antigen-prime.jar -XX:+UseSerialGC -Xmx1G
 
-Running the default simulation generates epidemiological timeseries showing:
-- Regional infection prevalence and incidence
-- Virus sampling and genetic diversity
-- Phylogenetic relationships between circulating strains
-- Summary statistics of key epidemiological parameters
+For development, you can compile and run directly:
+
+	mvn compile exec:java -Dexec.mainClass="org.antigen.Antigen" -Dexec.args="-XX:+UseSerialGC -Xmx32G"
+	
+This requires Java 16 or higher to compile and run. The `-Xmx1G` option is used to increase memory allocation. 
+This may need to be increased further with larger host population sizes. The `-XX:+UseSerialGC` option 
+swaps the default Java garbage collector to something that works much more efficiently for Antigen.
+	
+## Parameters
+	
+Parameter defaults can be seen in [`src/main/java/org/antigen/core/Parameters.java`](src/main/java/org/antigen/core/Parameters.java).  When run, the program looks 
+for the file [`src/main/resources/parameters.yml`](src/main/resources/parameters.yml) and dynamically loads these in, overwriting defaults.
 
 ## 🏥 Citing Antigen
 
@@ -103,4 +97,23 @@ Copyright Trevor Bedford 2010-2024. Distributed under the GPL v3.
 
 ---
 
-**Quick Links**: [Installation](docs/installation/) | [User Guide](docs/user-guide/) | [Examples](docs/examples/) | [API Reference](docs/api-reference/)
+
+## Manual Compilation (Alternative)
+
+If Maven is not available, the program can be compiled manually with:
+
+	javac -cp "src/main/java:src/main/resources" src/main/java/org/antigen/*.java src/main/java/org/antigen/*/*.java
+
+Or if you need to specify JAR dependencies explicitly:
+
+	javac -classpath "src/main/java:src/main/resources:~/.m2/repository/colt/colt/1.2.0/colt-1.2.0.jar:~/.m2/repository/org/yaml/snakeyaml/2.0/snakeyaml-2.0.jar" src/main/java/org/antigen/*.java src/main/java/org/antigen/*/*.java
+
+Then to run:
+
+	java -cp "src/main/java:src/main/resources:~/.m2/repository/colt/colt/1.2.0/colt-1.2.0.jar:~/.m2/repository/org/yaml/snakeyaml/2.0/snakeyaml-2.0.jar" -XX:+UseSerialGC -Xmx32G org.antigen.Antigen
+
+Note: Maven is the recommended build method as it handles all dependencies automatically.
+
+-------------------------------------------
+
+Copyright Trevor Bedford 2010-2014. Distributed under the GPL v3.
