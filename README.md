@@ -1,4 +1,4 @@
-## Introduction
+# Antigen: Epidemiological Simulation Framework
 
 Antigen implements an SIR epidemiological model where hosts in a population are infected with
 viruses that have distinct antigenic phenotypes.  Hosts make contacts transmitting viruses and also
@@ -6,27 +6,44 @@ recover from infection.  After recovery, a host remembers the antigenic phenotyp
 with as part of its immune history.  The risk of infection after contact depends on comparing the
 infecting virus's phenotype to the phenotypes in the host immune history.
 
-Antigenic phenotype is currently implemented as a *n*-d continuous vector.  Virus mutations move
-phenotype randomly in this *n*-d Euclidean space.  However, other phenotype models may be
-implemented through the Phenotype interface.
+## 🦠 What Antigen Does
 
-Additionally, population structure is implemented in terms of discrete demes.  Contacts within a
-deme occur through standard mass action, while contacts between demes occur at some fraction of the
-rate of within deme contact.
+- **Models virus evolution**: Simulate how viruses evolve over time with antigenic drift and immune escape
+- **Population dynamics**: Track infections across structured populations with multiple demes/regions
+- **Immune history**: Model host immunity based on past infection history and cross-immunity
+- **Phylogenetic tracking**: Generate virus genealogies and sample phylogenetic trees
+- **Flexible phenotypes**: Support multiple phenotype models (geometric, sequence-based)
 
--------------------------------------------
+## 🚀 Quick Start
 
-## Running
+### Prerequisites
+- Java 16 or higher
+- Maven (recommended) or manual Java compilation
 
-### Setting up Java on Fred Hutch cluster
+### Installation & Basic Run
+```bash
+# Clone and navigate to directory
+git clone https://github.com/matsengrp/antigen.git
+cd antigen
 
+# Compile with Maven
+mvn clean compile package
 
-To load Java 11, run these commands:
+# Run simulation (basic)
+java -jar target/antigen-prime.jar
 
-	source /app/lmod/lmod/init/profile
-	ml Java/11;
+# Run with more memory for larger simulations
+java -jar target/antigen-prime.jar -XX:+UseSerialGC -Xmx8G
+```
 
+### Your First Simulation
+The simulation will run with default parameters and create output files in the `output/` directory:
+- `out.timeseries` - Epidemic curves and prevalence over time
+- `out.tips` - Sampled virus genetic and antigenic data  
+- `out.branches` - Phylogenetic relationships between samples
+- `out.summary` - Summary statistics
 
+## 📚 Documentation
 
 The program can be compiled with Maven:
 
@@ -61,32 +78,25 @@ swaps the default Java garbage collector to something that works much more effic
 Parameter defaults can be seen in [`src/main/java/org/antigen/core/Parameters.java`](src/main/java/org/antigen/core/Parameters.java).  When run, the program looks 
 for the file [`src/main/resources/parameters.yml`](src/main/resources/parameters.yml) and dynamically loads these in, overwriting defaults.
 
-## Output
+## 🏥 Citing Antigen
 
-The simulation will output a timeseries of region-specific prevalence and incidence to
-[`out.timeseries`](example/out.timeseries).  It will also sample viruses periodically and output their 
-geographic and antigenic locations to [`out.tips`](example/out.tips) and a tree connecting these samples 
-to [`out.branches`](example/out.branches).  This file contains pairs of viruses, child and parent, 
-representing nodes in a genealogy.  Average values are output to [`out.summary`](example/out.summary).
+If you use Antigen in your research, please cite:
+```
+TBD...
+```
 
-If you have Mathematica, you can generate a number of figures from this output by running the
-notebook [`antigen-analysis.nb`](example/antigen-analysis.nb).
+## 🤝 Contributing & Support
 
-## Memory
+- **Issues & Questions**: [GitHub Issues](https://github.com/matsengrp/antigen/issues)
+- **Feature Requests**: Open an issue with the "enhancement" label
+- **Contributing**: See [Development Guide](docs/development/contributing.md)
 
-The `-Xmx1G` is required, because as an individual-based model, the memory requirements are
-typically quite large. Each host requires a minimum of 40 bytes of memory, plus 8 bytes per
-Phenotype recorded in its immune history.  If the yearly attack rate is 15% and the host life span
-is 30 years, at equilibrium the average size of the immune history will be 4.5 references.  This
-gives memory usage of: population size x 76 bytes.  With 7.5 million hosts (used in the default
-parameters), the equals 570MB.
+## 📄 License
 
-In addition to hosts and immune histories, the simulation tracks the virus genealogy through
-VirusTree.  This is harder to profile, and will continually grow in memory usage throughout the
-simulation.  With the default parameters, VirusTree takes 5.5 MB at the end of a simulated year and
-may up to 110 MB at the end of the default 20 simulated years.
+Copyright Trevor Bedford 2010-2024. Distributed under the GPL v3.
 
-Memory can be easily profiled by calling `jmap -histo <PID>`.
+---
+
 
 ## Manual Compilation (Alternative)
 
