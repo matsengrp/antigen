@@ -88,22 +88,27 @@ public class Biology {
          */
         K80DNAEvolutionModel() {
             this.transitionTranversionProbability = new HashMap<Character, double[]>()  {{
-                double transition = 0.5 / (Parameters.transitionTransversionRatio + 1.0);
-                double transversion = Parameters.transitionTransversionRatio / (Parameters.transitionTransversionRatio + 1.0);
+                // For ratio R, if transversion prob = x, transition prob = Rx
+                // From each nucleotide: 2 transversions + 1 transition
+                // Total: 2x + Rx = 1, so x = 1/(2+R)
+                double transversionProb = 1.0 / (2.0 + Parameters.transitionTransversionRatio);
+                double transitionProb = Parameters.transitionTransversionRatio * transversionProb;
+                
                 // key: nucleotide
-                // value: int[] that gives the probability of being < to the index which corresponds to [A, C, G, T]
+                // value: double[] that gives cumulative probabilities for mutations to [A, C, G, T]
 
-                // Example:
-                // Parameters.transitionTransversionRatio: 5.0
-                // A: {0, 0.5/6, 5.5/6.0, 1.0}
-                // C: {0.5/6.0, 0.5/6.0, 1.0/6.0, 1.0}
-                // G: {5.0/6.0, 5.5/6.0, 5.5/6.0, 1.0}
-                // T: {0.5/6.0, 5.5/6.0, 1.0, 1.0}
+                // Example with transition/transversion ratio = 5.0:
+                // transversionProb = 1/7 ≈ 0.143
+                // transitionProb = 5/7 ≈ 0.714
+                // A can transition to G, transversion to C or T
+                // C can transition to T, transversion to A or G
+                // G can transition to A, transversion to C or T
+                // T can transition to C, transversion to A or G
 
-                put('A', new double[]{0, transition, transition + transversion, 1.0});
-                put('C', new double[]{transition, transition, transition + transition, 1.0});
-                put('G', new double[]{transversion, transversion + transition, transversion + transition, 1.0});
-                put('T', new double[]{transition, transition + transversion, 1.0, 1.0});
+                put('A', new double[]{0, transversionProb, transversionProb + transitionProb, 1.0});
+                put('C', new double[]{transversionProb, transversionProb, transversionProb + transitionProb, 1.0});
+                put('G', new double[]{transitionProb, transitionProb + transversionProb, transitionProb + transversionProb, 1.0});
+                put('T', new double[]{transversionProb, transversionProb + transitionProb, 1.0, 1.0});
             }};
         }
 
