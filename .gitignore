@@ -92,3 +92,6 @@ out*
 # Claude settings #
 ###################
 .claude/
+
+# Markdown files for issues
+issues/
