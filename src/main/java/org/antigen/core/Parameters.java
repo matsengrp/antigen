@@ -85,6 +85,7 @@ public class Parameters {
 
 	// parameters specific to GeometricSeqPhenotype
 	public static String startingSequence = "AGAGTCTAGTCC"; // default starting sequence
+	public static String inPath = "input/"; // path to directory containing relevant input files
 	public static int[] epitopeSites = {}; // epitope sites of virus (valid inputs are between 1 and
 	                                       // startingSequence.length() / 3)
 	public static int[] epitopeSitesLow = {};
@@ -414,6 +415,257 @@ public class Parameters {
 
 		} catch (IOException e) {
 			System.out.println("Cannot load parameters.yml, using defaults");
+		}
+	}
+
+	// Overloaded load method that accepts a filename argument
+	public static void load(String filename) {
+		try {
+			org.yaml.snakeyaml.Yaml yaml = new org.yaml.snakeyaml.Yaml();
+			Map map;
+			
+			// Try to load from file system first
+			java.io.FileInputStream fileInput = new java.io.FileInputStream(filename);
+			map = (Map) yaml.load(fileInput);
+			fileInput.close();
+
+			System.out.println("Loading parameters from file: " + filename);
+			
+			// Apply all the same parameter mappings as the original load() method
+			if (map.get("outPath") != null) {
+				outPath = (String) map.get("outPath");
+			}
+			if (map.get("outPrefix") != null) {
+				outPrefix = (String) map.get("outPrefix");
+			}
+			if (map.get("burnin") != null) {
+				burnin = (int) map.get("burnin");
+			}
+			if (map.get("endDay") != null) {
+				endDay = (int) map.get("endDay");
+			}
+			if (map.get("deltaT") != null) {
+				deltaT = (double) map.get("deltaT");
+			}
+			if (map.get("printStep") != null) {
+				printStep = (int) map.get("printStep");
+			}
+			if (map.get("tipSamplingRate") != null) {
+				tipSamplingRate = (double) map.get("tipSamplingRate");
+			}
+			if (map.get("tipSamplesPerDeme") != null) {
+				tipSamplesPerDeme = (int) map.get("tipSamplesPerDeme");
+			}
+			if (map.get("tipSamplingProportional") != null) {
+				tipSamplingProportional = (boolean) map.get("tipSamplingProportional");
+			}
+			if (map.get("treeProportion") != null) {
+				treeProportion = (double) map.get("treeProportion");
+			}
+			if (map.get("diversitySamplingCount") != null) {
+				diversitySamplingCount = (int) map.get("diversitySamplingCount");
+			}
+			if (map.get("netauWindow") != null) {
+				netauWindow = (int) map.get("netauWindow");
+			}
+			if (map.get("repeatSim") != null) {
+				repeatSim = (boolean) map.get("repeatSim");
+			}
+			if (map.get("immunityReconstruction") != null) {
+				immunityReconstruction = (boolean) map.get("immunityReconstruction");
+			}
+			if (map.get("memoryProfiling") != null) {
+				memoryProfiling = (boolean) map.get("memoryProfiling");
+			}
+			if (map.get("yearsFromMK") != null) {
+				yearsFromMK = (double) map.get("yearsFromMK");
+			}
+			if (map.get("pcaSamples") != null) {
+				pcaSamples = (boolean) map.get("pcaSamples");
+			}
+			if (map.get("reducedOutput") != null) {
+				reducedOutput = (boolean) map.get("reducedOutput");
+			}
+			if (map.get("detailedOutput") != null) {
+				detailedOutput = (boolean) map.get("detailedOutput");
+			}
+			if (map.get("restartFromCheckpoint") != null) {
+				restartFromCheckpoint = (boolean) map.get("restartFromCheckpoint");
+			}
+			if (map.get("demeCount") != null) {
+				demeCount = (int) map.get("demeCount");
+			}
+			if (map.get("demeNames") != null) {
+				demeNames = toStringArray((List<String>) map.get("demeNames"));
+			}
+			if (map.get("initialNs") != null) {
+				initialNs = toIntArray((List<Integer>) map.get("initialNs"));
+			}
+			if (map.get("birthRate") != null) {
+				birthRate = (double) map.get("birthRate");
+			}
+			if (map.get("deathRate") != null) {
+				deathRate = (double) map.get("deathRate");
+			}
+			if (map.get("swapDemography") != null) {
+				swapDemography = (boolean) map.get("swapDemography");
+			}
+			if (map.get("initialI") != null) {
+				initialI = (int) map.get("initialI");
+			}
+			if (map.get("initialDeme") != null) {
+				initialDeme = (int) map.get("initialDeme");
+			}
+			if (map.get("initialPrR") != null) {
+				initialPrR = (double) map.get("initialPrR");
+			}
+			if (map.get("beta") != null) {
+				beta = (double) map.get("beta");
+			}
+			if (map.get("nu") != null) {
+				nu = (double) map.get("nu");
+			}
+			if (map.get("betweenDemePro") != null) {
+				betweenDemePro = (double) map.get("betweenDemePro");
+			}
+			if (map.get("transcendental") != null) {
+				transcendental = (boolean) map.get("transcendental");
+			}
+			if (map.get("immunityLoss") != null) {
+				immunityLoss = (double) map.get("immunityLoss");
+			}
+			if (map.get("initialPrT") != null) {
+				initialPrT = (double) map.get("initialPrT");
+			}
+			if (map.get("demeBaselines") != null) {
+				demeBaselines = toDoubleArray((List<Double>) map.get("demeBaselines"));
+			}
+			if (map.get("demeAmplitudes") != null) {
+				demeAmplitudes = toDoubleArray((List<Double>) map.get("demeAmplitudes"));
+			}
+			if (map.get("demeOffsets") != null) {
+				demeOffsets = toDoubleArray((List<Double>) map.get("demeOffsets"));
+			}
+			if (map.get("phenotypeSpace") != null) {
+				phenotypeSpace = (String) map.get("phenotypeSpace");
+			}
+			if (map.get("muPhenotype") != null) {
+				muPhenotype = (double) map.get("muPhenotype");
+			}
+			if (map.get("waning") != null) {
+				waning = (boolean) map.get("waning");
+			}
+			if (map.get("waningRate") != null) {
+				waningRate = (double) map.get("waningRate");
+			}
+			if (map.get("smithConversion") != null) {
+				smithConversion = (double) map.get("smithConversion");
+			}
+			if (map.get("homologousImmunity") != null) {
+				homologousImmunity = (double) map.get("homologousImmunity");
+			}
+			if (map.get("initialTraitA") != null) {
+				initialTraitA = (double) map.get("initialTraitA");
+			}
+			if (map.get("meanStep") != null) {
+				meanStep = (double) map.get("meanStep");
+			}
+			if (map.get("sdStep") != null) {
+				sdStep = (double) map.get("sdStep");
+			}
+			if (map.get("mut2D") != null) {
+				mut2D = (boolean) map.get("mut2D");
+			}
+			if (map.get("fixedStep") != null) {
+				fixedStep = (boolean) map.get("fixedStep");
+			}
+			if (map.get("startingSequence") != null) {
+				String startingSequenceFile = ((String) map.get("startingSequence"));
+				startingSequence = readStartingSequenceFile(startingSequenceFile);
+
+				// Check that startingSequence is not an empty String and is a multiple of 3.
+				if (phenotypeSpace.equals("geometricSeq")) {
+					if (startingSequence.length() == 0 || startingSequence.length() % 3 != 0) {
+						System.out.println("startingSequence length should be any multiple of 3, except for 0.");
+						if (startingSequence.length() == 0) {
+							System.out.println("In addition, startingSequence should not be empty.");
+						}
+						if (startingSequence.length() % 3 != 0) {
+							System.out.println("In addition, startingSequence should be a multiple of 3.");
+						}
+						if (startingSequence.contains("*")) {
+							throw new IOException();
+						}
+					}
+				}
+			}
+			if (map.get("epitopeSites") != null) {
+				String epitopeSitesFile = ((String) map.get("epitopeSites"));
+				epitopeSites = readEpitopeSitesFile(epitopeSitesFile);
+			}
+			// Here, define low and high sites based on a user-defined parameter called "proportionHighSites"
+			if (map.get("proportionHighSites") != null) {
+				proportionHighSites = (double) map.get("proportionHighSites");
+				int numHighSites = (int) Math.round(epitopeSites.length * proportionHighSites);
+				int numLowSites = epitopeSites.length - numHighSites;
+				epitopeSitesHigh = new int[numHighSites];
+				epitopeSitesLow = new int[numLowSites];
+				int highIdx = 0;
+				int lowIdx = 0;
+				for (int i = 0; i < epitopeSites.length; i++) {
+					if (Random.nextDouble() < proportionHighSites && highIdx < numHighSites) {
+						epitopeSitesHigh[highIdx] = epitopeSites[i];
+						highIdx++;
+					} else if (lowIdx < numLowSites) {
+						epitopeSitesLow[lowIdx] = epitopeSites[i];
+						lowIdx++;
+					} else if (highIdx < numHighSites) {
+						epitopeSitesHigh[highIdx] = epitopeSites[i];
+						highIdx++;
+					}
+				}
+			}
+			if (map.get("inPath") != null) {
+				inPath = (String) map.get("inPath");
+			}
+			if (map.get("meanStepEpitope") != null) {
+				meanStepEpitope = (double) map.get("meanStepEpitope");
+			}
+			if (map.get("sdStepEpitope") != null) {
+				sdStepEpitope = (double) map.get("sdStepEpitope");
+			}
+			if (map.get("transitionTransversionRatio") != null) {
+				transitionTransversionRatio = (double) map.get("transitionTransversionRatio");
+			}
+			if (map.get("predefinedVectors") != null) {
+				predefinedVectors = (boolean) map.get("predefinedVectors");
+			}
+			if (map.get("nonEpitopeAcceptance") != null) {
+				nonEpitopeAcceptance = (double) map.get("nonEpitopeAcceptance");
+			}
+			if (map.get("epitopeAcceptance") != null) {
+				epitopeAcceptance = (double) map.get("epitopeAcceptance");
+			}
+			if (map.get("DMSFile") != null) {
+				DMSFile = (String) map.get("DMSFile");
+			}
+			if (map.get("sampleHostImmunity") != null) {
+				sampleHostImmunity = (boolean) map.get("sampleHostImmunity");
+			}
+			if (map.get("printHostImmunityStep") != null) {
+				printHostImmunityStep = (int) map.get("printHostImmunityStep");
+			}
+			if (map.get("hostImmunitySamplesPerDeme") != null) {
+				hostImmunitySamplesPerDeme = toIntArray((List<Integer>) map.get("hostImmunitySamplesPerDeme"));
+			}
+
+		} catch (Exception e) {
+			System.out.println("Cannot load parameter file: " + filename + ", error: " + e.getMessage());
+			System.out.println("Exception type: " + e.getClass().getSimpleName());
+			e.printStackTrace();
+			System.out.println("Falling back to embedded defaults");
+			// Fall back to the original load() method that uses embedded parameters
+			load();
 		}
 	}
 

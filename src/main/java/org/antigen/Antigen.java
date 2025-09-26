@@ -12,7 +12,15 @@ public class Antigen {
 		cern.jet.random.AbstractDistribution.makeDefaultGenerator();
 		
 		// initialize static parameters
-		Parameters.load();		
+		if (args.length > 0) {
+			// Use command line argument for parameter file
+			System.out.println("Loading parameters from command line argument: " + args[0]);
+			Parameters.load(args[0]);
+		} else {
+			// Fall back to default embedded parameters
+			System.out.println("No parameter file specified, using default embedded parameters.yml");
+			Parameters.load();
+		}
 		Parameters.initialize();
 		
 		// run simulation
