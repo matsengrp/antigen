@@ -38,7 +38,6 @@ public class Parameters {
 	public static boolean restartFromCheckpoint = false; // whether to load population from out.hosts
 	public static String outPath = "output/"; // path to dump output files.
 	public static String outPrefix = "run-"; // suffix for output files.
-	public static int fitnessSampleSize = 10000; // number of random hosts to sample for average infection risk
 
 	// metapopulation parameters
 	public static int demeCount = 3;
@@ -402,10 +401,6 @@ public class Parameters {
 									+ dmsDataLineCount);
 					throw new IOException();
 				}
-			}
-      // Parameters for host sampling and fitness calculations
-			if (map.get("fitnessSampleSize") != null) {
-				fitnessSampleSize = (int) map.get("fitnessSampleSize");
 			}
 			if (map.get("sampleHostImmunity") != null) {
 				sampleHostImmunity = (boolean) map.get("sampleHostImmunity");

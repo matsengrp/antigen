@@ -9,6 +9,7 @@ import org.antigen.core.Parameters;
 import org.antigen.core.Random;
 import org.antigen.phenotype.Phenotype;
 import org.antigen.phenotype.PhenotypeFactory;
+import org.antigen.phenotype.GeometricPhenotype;
 import org.antigen.virus.Virus;
 
 public class Host {
@@ -118,6 +119,23 @@ public class Host {
 	// history methods
 	public Phenotype[] getHistory() {
 		return immuneHistory;
+	}
+
+	public double[] getImmunityCoordinatesCentroid() {
+		if (immuneHistory.length == 0) {
+			return null; // Naive host - no immune experience
+		}
+		
+		// Get the most recent infection (last element in array)
+		Phenotype mostRecent = immuneHistory[immuneHistory.length - 1];
+		
+		if (mostRecent instanceof GeometricPhenotype) {
+			GeometricPhenotype gp = (GeometricPhenotype) mostRecent;
+			return new double[]{gp.getTraitA(), gp.getTraitB()};
+		}
+		
+		// If not a GeometricPhenotype, return default
+		return new double[]{0.0, 0.0};
 	}
 
 	public void printHistoryCoordinates(PrintStream stream) {

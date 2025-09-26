@@ -15,10 +15,6 @@ public class Virus {
 	private Phenotype phenotype;
 	private double birth;		// measured in years relative to burnin
 	private int deme;
-	private double fitness; 	// seasonal fitness (averageInfectionRisk * seasonality * probSusceptible)
-	private double averageInfectionRisk; 	// raw average risk of infection
-	private double probSusceptible; 	// fraction of susceptible hosts in deme
-	private double demeSeasonality; 	// seasonality value for deme
 	
 	// additional reconstruction fields
 	private boolean marked;
@@ -97,30 +93,6 @@ public class Virus {
 	}
 	public void incrementCoverage() {
 		coverage++;
-	}
-	public double getFitness(){
-		return fitness;
-	}
-	public void setFitness(double f){
-		fitness = f;
-	}
-	public double getAverageInfectionRisk(){
-		return averageInfectionRisk;
-	}
-	public void setAverageInfectionRisk(double risk){
-		averageInfectionRisk = risk;
-	}
-	public double getProbSusceptible(){
-		return probSusceptible;
-	}
-	public void setProbSusceptible(double prob){
-		probSusceptible = prob;
-	}
-	public double getDemeSeasonality(){
-		return demeSeasonality;
-	}
-	public void setDemeSeasonality(double seasonality){
-		demeSeasonality = seasonality;
 	}
 	
 	// add virus node as child if does not already exist

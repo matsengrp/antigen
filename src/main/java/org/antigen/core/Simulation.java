@@ -166,46 +166,8 @@ public class Simulation {
 	}
 
 	// Get average infection risk of a phenotype amongst a given sample size
-	public double getAverageRisk(Phenotype p) {
-		double sampleSize = (double) Parameters.fitnessSampleSize;
-		double averageRisk = 0;
-		for (int i = 0; i < Parameters.fitnessSampleSize; i++) {
-			Host h = getRandomHost();
-			Phenotype[] history = h.getHistory();
-			averageRisk += p.riskOfInfection(history);
-		}
-		averageRisk /= sampleSize;
-		return averageRisk;
-
-	}
 
 
-	public void printImmunity() {
-
-		try {
-			File immunityFile = new File("out.immunity");
-			immunityFile.delete();
-			immunityFile.createNewFile();
-			PrintStream immunityStream = new PrintStream(immunityFile);
-
-			for (double x = VirusTree.xMin; x <= VirusTree.xMax; x += 0.5) {
-				for (double y = VirusTree.yMin; y <= VirusTree.yMax; y += 0.5) {
-
-					Phenotype p = PhenotypeFactory.makeArbitaryPhenotype(x,y);
-					double risk = getAverageRisk(p);
-					immunityStream.printf("%.4f,", risk);
-
-				}
-				immunityStream.println();
-			}
-
-			immunityStream.close();
-		} catch(IOException ex) {
-			System.out.println("Could not write to file");
-			System.exit(0);
-		}
-
-	}
 
 	public void printHostPopulation() {
 
@@ -226,15 +188,69 @@ public class Simulation {
 
 	}
 
-	public void printHostImmuneHistories(PrintStream historyStream){
-		// For each deme, print the name, and the immune histories of hosts
-		for (int i = 0; i < Parameters.demeCount; i++) {
-			HostPopulation hp = demes.get(i);
-			int n = Parameters.hostImmunitySamplesPerDeme[i];
-			hp.printHostImmuneHistories(historyStream, n);
-
+	public void printPopulationImmunityCentroids(PrintStream historyStream, int day) {
+		// Write CSV header on first call
+		if (day == 0) {
+			historyStream.println("year,deme,ag1,ag2,naive_fraction,experienced_hosts");
 		}
+		
+		double year = (double) day / 365.0;
+		
+		// Calculate and output individual deme centroids
+		double globalSumAg1 = 0.0;
+		double globalSumAg2 = 0.0;
+		int globalExperiencedHosts = 0;
+		int globalTotalSamples = 0;
+		
+		for (int i = 0; i < Parameters.demeCount; i++) {
+			int nSamples = Parameters.hostImmunitySamplesPerDeme[i];
+			ImmunitySummary summary = demes.get(i).getPopulationImmunitySummary(nSamples);
 			
+			// Output deme-specific data
+			if (summary.hasValidCentroid()) {
+				historyStream.printf("%.4f,%s,%.6f,%.6f,%.4f,%d%n", 
+					year, 
+					Parameters.demeNames[i], 
+					summary.getCentroid()[0], 
+					summary.getCentroid()[1],
+					summary.getNaiveFraction(),
+					summary.getExperiencedHosts());
+			} else {
+				// All hosts are naive in this deme
+				historyStream.printf("%.4f,%s,NaN,NaN,%.4f,%d%n", 
+					year, 
+					Parameters.demeNames[i], 
+					summary.getNaiveFraction(),
+					summary.getExperiencedHosts());
+			}
+			
+			// Accumulate for global centroid (only if valid)
+			if (summary.hasValidCentroid()) {
+				globalSumAg1 += summary.getCentroid()[0] * summary.getExperiencedHosts();
+				globalSumAg2 += summary.getCentroid()[1] * summary.getExperiencedHosts();
+			}
+			globalExperiencedHosts += summary.getExperiencedHosts();
+			globalTotalSamples += summary.getTotalSampled();
+		}
+		
+		// Calculate and output global centroid
+		if (globalExperiencedHosts > 0) {
+			double globalAg1 = globalSumAg1 / globalExperiencedHosts;
+			double globalAg2 = globalSumAg2 / globalExperiencedHosts;
+			double globalNaiveFraction = (double) (globalTotalSamples - globalExperiencedHosts) / globalTotalSamples;
+			
+			historyStream.printf("%.4f,total,%.6f,%.6f,%.4f,%d%n", 
+				year, 
+				globalAg1, 
+				globalAg2,
+				globalNaiveFraction,
+				globalExperiencedHosts);
+		} else {
+			// All sampled hosts are naive globally
+			historyStream.printf("%.4f,total,NaN,NaN,1.0000,%d%n", 
+				year, 
+				globalExperiencedHosts);
+		}
 	}
 	public void makeTrunk() {
 		for (int i = 0; i < Parameters.demeCount; i++) {
@@ -405,7 +421,7 @@ public class Simulation {
 
 			File outDirs = new File(Parameters.outPath);
 			outDirs.mkdirs();
-			File historyFile = new File("out.histories");
+			File historyFile = new File("out.histories.csv");
 			historyFile.delete();
 			historyFile.createNewFile();
 			PrintStream historyStream = new PrintStream(historyFile);
@@ -430,10 +446,7 @@ public class Simulation {
 
 				// print immunity if needed
 				if (Parameters.sampleHostImmunity && Parameters.day % (double) Parameters.printHostImmunityStep < Parameters.deltaT) {
-					// Test print
-					historyStream.printf("date:\t" + "%.2f\n", Parameters.day);
-					printHostImmuneHistories(historyStream);
-					
+					printPopulationImmunityCentroids(historyStream, (int) Parameters.day);
 				}
 
 				if (getI()==0) {
@@ -502,9 +515,6 @@ public class Simulation {
 			if (Parameters.phenotypeSpace.equals("geometric") || Parameters.phenotypeSpace.equals("geometricSeq")) {
 				VirusTree.updateRange();
 				VirusTree.printRange();
-				if (Parameters.immunityReconstruction) {
-					printImmunity();
-				}
 			}
 
 			// detailed output

@@ -371,18 +371,6 @@ public class HostPopulation {
 					infecteds.add(sH);
 					cases++;
 				}
-				// If there is not fitness, assign now.
-				if (v.getFitness() == 0.0) {
-					double averageRisk = getAverageRisk(p);
-					double seasonality = Parameters.getSeasonality(deme);
-					double probSusceptible = getPrS();
-					double seasonalFitness = averageRisk * seasonality * probSusceptible;
-					
-					v.setAverageInfectionRisk(averageRisk);
-					v.setDemeSeasonality(seasonality);
-					v.setProbSusceptible(probSusceptible);
-					v.setFitness(seasonalFitness);
-				}
 			
 			}
 		}		
@@ -484,33 +472,10 @@ public class HostPopulation {
 				int index = getRandomI();
 				Host h = infecteds.get(index);
 				Virus v = h.mutate();
-				Phenotype p = v.getPhenotype();
-				double averageRisk = getAverageRisk(p);
-				double seasonality = Parameters.getSeasonality(deme);
-				double probSusceptible = getPrS();
-				double seasonalFitness = averageRisk * seasonality * probSusceptible;
-				
-				v.setAverageInfectionRisk(averageRisk);
-				v.setDemeSeasonality(seasonality);
-				v.setProbSusceptible(probSusceptible);
-				v.setFitness(seasonalFitness);
 			}
 		}			
 	}	
 	
-	// Get average infection risk of a phenotype amongst a given sample size
-	private double getAverageRisk(Phenotype p) {
-		double sampleSize = (double) Parameters.fitnessSampleSize;
-		double averageRisk = 0;
-		for (int i = 0; i < Parameters.fitnessSampleSize; i++) {
-			Host h = getRandomHost();
-			Phenotype[] history = h.getHistory();
-			averageRisk += p.riskOfInfection(history);
-		}
-		averageRisk /= sampleSize;
-		return averageRisk;
-
-	}
 
 	// draw a Poisson distributed number of samples and add them to the VirusSample
 	// only sample after burnin is completed
@@ -528,16 +493,6 @@ public class HostPopulation {
 				int index = getRandomI();
 				Host h = infecteds.get(index);
 				Virus v = h.getInfection();
-				Phenotype p = v.getPhenotype();
-				double averageRisk = getAverageRisk(p);
-				double seasonality = Parameters.getSeasonality(deme);
-				double probSusceptible = getPrS();
-				double seasonalFitness = averageRisk * seasonality * probSusceptible;
-				
-				v.setAverageInfectionRisk(averageRisk);
-				v.setDemeSeasonality(seasonality);
-				v.setProbSusceptible(probSusceptible);
-				v.setFitness(seasonalFitness);
 				VirusTree.add(v);
 			}	
 		}
@@ -658,6 +613,34 @@ public class HostPopulation {
 			stream.print(name + ":");
 			h.printHistoryCoordinates(stream);
 		}
+	}
+
+	public ImmunitySummary getPopulationImmunitySummary(int n) {
+		double sumTraitA = 0.0;
+		double sumTraitB = 0.0;
+		int experiencedHosts = 0;
+		int naiveHosts = 0;
+		
+		for (int i = 0; i < n; i++) {
+			Host h = getRandomHost();
+			double[] centroid = h.getImmunityCoordinatesCentroid();
+			
+			if (centroid == null) {
+				naiveHosts++;
+			} else {
+				sumTraitA += centroid[0];
+				sumTraitB += centroid[1];
+				experiencedHosts++;
+			}
+		}
+		
+		double[] avgCentroid = experiencedHosts > 0 ? 
+			new double[]{sumTraitA / experiencedHosts, sumTraitB / experiencedHosts} : 
+			new double[]{Double.NaN, Double.NaN};
+			
+		double naiveFraction = (double) naiveHosts / n;
+		
+		return new ImmunitySummary(avgCentroid, naiveFraction, n, experiencedHosts);
 	}
 	
 	public void printHostPopulation(PrintStream stream) {

@@ -4,10 +4,9 @@
 
 # simulation parameters
 burnin: 0                                   # days to wait before logging output 
-endDay: 600                                # number of days to simulate
+endDay: 1825                                # number of days to simulate
 deltaT: 0.1                                 # number of days to move forward in a single timestep
 printStep: 50                               # print to out.timeseries every X days
-fitnessSampleSize: 100                   # number of random hosts to sample for average infection risk 
 tipSamplingRate: 0.0002                     # store X samples per deme per day
 tipSamplesPerDeme: 2000                     # cap number of samples per deme
 tipSamplingProportional: true               # whether to sample proportional to prevalence
@@ -25,14 +24,14 @@ restartFromCheckpoint: false                # whether to load population from ou
 outPath: "output/"
 outPrefix: 'run-out'
 sampleHostImmunity: true                    # whether to sample host immunity throughout the simulation
-printHostImmunityStep: 50                  # how often to print host immunity (ever X days)
+printHostImmunityStep: 365                  # how often to print host immunity (ever X days)
 
 
 # metapopulation parameters
 demeCount: 3                                # number of demes
 demeNames: ["north", "tropics", "south"]    # deme names
 initialNs: [1000000, 1000000, 1000000]      # inital deme population sizes
-hostImmunitySamplesPerDeme: [10, 10, 10]    # how many hosts to sample for host immunity    
+hostImmunitySamplesPerDeme: [100, 100, 100]    # how many hosts to sample for host immunity    
                                             # host parameters   
 birthRate: 0.000091                         # in births per individual per day, 1/30 years = 0.000091
 deathRate: 0.000091                         # in deaths per individual per day, 1/30 years = 0.000091
@@ -58,16 +57,16 @@ demeOffsets: [0., 0., 0.5]                  # seasonal offset relative to the ye
 
 # immune parameters  
 phenotypeSpace: "geometricSeq"              # options include: geometric, geometric3d, geometric10d, sequence, geometricSeq
-muPhenotype: 0.05                          # in mutations per individual per day
+muPhenotype: 0.001                          # in mutations per individual per day
 waning: false                               # whether to allow waning of host immunity
 waningRate: 0.01                            # rate per day of a host removing a random phenotype from their immune history
 
-smithConversion: 0.1                        # multiplier to distance to give cross-immunity
+smithConversion: 0.07                        # multiplier to distance to give cross-immunity
 homologousImmunity: 0.95                    # immunity raised to antigenically identical virus
-initialTraitA: -6.                          # value in dimension 1 for initial host immunity
+initialTraitA: -2.                          # value in dimension 1 for initial host immunity
 meanStep: 0.00001                            # mean mutation size for non-epitopes
 sdStep: 0.00001                              # standard deviation of mutation size for non-epitopes
-mut2D: false                                # whether to mutate in a full 360 degree arc
+mut2D: true                                # whether to mutate in a full 360 degree arc
 fixedStep: false                            # whether to fix step size, i.e. ignore sdStep
 
 # sequence-specific parameters
@@ -75,15 +74,11 @@ startingSequence: "startingSequence.fasta"  # the fasta file of the starting seq
 epitopeSites: "epitopeSites.txt"            # the txt file of the epitope sites in the sequence
 # epitopeSitesLow: "epitopeSitesLow.txt"            # the txt file of the epitope sites in the sequence
 # epitopeSitesHigh: "epitopeSitesHigh.txt"            # the txt file of the epitope sites in the sequence
-# proportionHighSites: 0.1                    # the proportion of epitope sites that are placed into the "high" distribution
-predefinedVectors: false                     # whether to use predefined vectors for mutations
-meanStepEpitope: 0.3                        # mean mutation size for epitopes
-sdStepEpitope: 0.3                          # standard deviation of mutation size for epitopes
-meanStepEpitopeLow: 0.3                        # mean mutation size for epitopes
-sdStepEpitopeLow: 0.3                          # standard deviation of mutation size for epitopes
-meanStepEpitopeHigh: 0.3                        # mean mutation size for epitopes
-sdStepEpitopeHigh: 0.3                          # standard deviation of mutation size for epitopes
+# proportionHighSites: 0.1                             # the proportion of epitope sites that are placed into the "high" distribution
+predefinedVectors: false                                 # whether to use predefined vectors for mutations
+meanStepEpitope: 0.6                                    # mean mutation size for epitopes
+sdStepEpitope: 0.4                                      # standard deviation of mutation size for epitopes
 transitionTransversionRatio: 5.0            # transition/transversion rate ratio, k
-nonEpitopeAcceptance: 1.0                   # probability of accepting a non-epitope mutation
+nonEpitopeAcceptance: 0.2                   # probability of accepting a non-epitope mutation
 epitopeAcceptance: 1.0                      # probability of accepting an epitope mutation
 DMSFile:                                    # name of DMS csv file: must have 21 columns (site number and amino acid preferences ordered alphabetically) and rows must be in sequential order and equal the number of amino acid sites in the virus sequence
