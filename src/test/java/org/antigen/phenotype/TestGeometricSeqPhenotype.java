@@ -263,6 +263,49 @@ public class TestGeometricSeqPhenotype {
     }
 
     /**
+     * Test that synonymous mutations do not increment epitope/non-epitope counts.
+     * Non-synonymous mutations should increment counts.
+     */
+    @Test
+    public void testMutationCountsOnlySynonymous() {
+        Parameters.load();
+        Parameters.initialize();
+        // Ensure all mutations accepted
+        Parameters.epitopeAcceptance = 1.0;
+        Parameters.nonEpitopeAcceptance = 1.0;
+
+        // Run multiple mutations and verify count behavior
+        for (int i = 0; i < 100; i++) {
+            GeometricSeqPhenotype original = new GeometricSeqPhenotype();
+            GeometricSeqPhenotype mutant = (GeometricSeqPhenotype) original.mutate();
+
+            // Convert sequences to amino acids to check synonymous/non-synonymous
+            String origSeq = original.getSequence();
+            String mutSeq = mutant.getSequence();
+
+            boolean isSynonymous = true;
+            for (int j = 0; j < origSeq.length(); j += 3) {
+                String origCodon = origSeq.substring(j, j + 3);
+                String mutCodon = mutSeq.substring(j, j + 3);
+                String origAA = Biology.CodonMap.CODONS.codonMap.get(origCodon.toUpperCase());
+                String mutAA = Biology.CodonMap.CODONS.codonMap.get(mutCodon.toUpperCase());
+                if (!origAA.equals(mutAA)) {
+                    isSynonymous = false;
+                    break;
+                }
+            }
+
+            int totalMutationCount = mutant.getEpitopeMutationCount() + mutant.getNonEpitopeMutationCount();
+
+            if (isSynonymous) {
+                assertEquals("Synonymous mutation should not increment counts", 0, totalMutationCount);
+            } else {
+                assertEquals("Non-synonymous mutation should increment count by 1", 1, totalMutationCount);
+            }
+        }
+    }
+
+    /**
      * Test gamma distribution matrix generation (without file output).
      * Verifies that mutation vectors can be generated and accessed properly.
      */
