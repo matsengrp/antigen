@@ -206,6 +206,14 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         return String.valueOf(this.nucleotideSequence);
     }
 
+    public int getEpitopeMutationCount() {
+        return this.epitopeMutationCount;
+    }
+
+    public int getNonEpitopeMutationCount() {
+        return this.nonepitopeMutationCount;
+    }
+
     /**
      * Return the (Euclidean) distance between this GeometricSeqPhenotype and p in
      * Euclidean space
@@ -275,36 +283,40 @@ public class GeometricSeqPhenotype extends GeometricPhenotype {
         boolean isEpitopeSiteHigh = Biology.SiteMutationVectors.VECTORS.getEpitopeSitesHigh().contains(proteinMutationIndex);
 
 
-        // Determine whether the mutation occurred in an epitope or non-epitope site,
-        // and update the counts of epitope and non-epitope mutations accordingly
+        // Synonymous mutations don't change counts or antigenic space, return early
+        if (wildTypeAminoAcid.equals(mutantAminoAcid)) {
+            return new GeometricSeqPhenotype(getTraitA(), getTraitB(), copyNucleotideSequence,
+                                             this.epitopeMutationCount, this.nonepitopeMutationCount,
+                                             this.lowEpitopeMutationCount, this.highEpitopeMutationCount);
+        }
+
+        // Apply acceptance/rejection filter based on site type
+        double rejectionProb = Random.nextDouble(); // Uniform draw from 0.0 to 1.0
+        if (isEpitopeSite) {
+            if (rejectionProb > Parameters.epitopeAcceptance) {
+                return this;
+            }
+        } else {
+            if (rejectionProb > Parameters.nonEpitopeAcceptance) {
+                return this;
+            }
+        }
+
+        // Update counts only for non-synonymous mutations
         int eMutationNew = this.epitopeMutationCount;
         int neMutationNew = this.nonepitopeMutationCount;
         int lowEpitopeMutationCountNew = this.lowEpitopeMutationCount;
         int highEpitopeMutationCountNew = this.highEpitopeMutationCount;
-        double rejectionProb = Random.nextDouble(); // Uniform draw from 0.0 to 1.0
         if (isEpitopeSite) {
-            if (rejectionProb > Parameters.epitopeAcceptance){
-                return this;
-            }
-            if (isEpitopeSiteLow){
+            if (isEpitopeSiteLow) {
                 lowEpitopeMutationCountNew += 1;
             }
-            if (isEpitopeSiteHigh){
+            if (isEpitopeSiteHigh) {
                 highEpitopeMutationCountNew += 1;
             }
             eMutationNew += 1;
         } else {
-            // If non-epitope site, return this exact phenotype with probability Parameters.nonEpitopeAcceptance  
-            if (rejectionProb > Parameters.nonEpitopeAcceptance){
-                return this;
-            }
             neMutationNew += 1;
-        }
-
-        // Synonymous mutations don't require updates to the location of the virus in antigenic space, so return early
-        if (wildTypeAminoAcid.equals(mutantAminoAcid)) {
-            return new GeometricSeqPhenotype(getTraitA(), getTraitB(), copyNucleotideSequence,
-                                             eMutationNew, neMutationNew, lowEpitopeMutationCountNew, highEpitopeMutationCountNew);
         }
 
         // Determine how much to move the x and y coordinates of the virus in antigenic space
