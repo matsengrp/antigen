@@ -7,7 +7,7 @@
     <modelVersion>4.0.0</modelVersion>
     
     <groupId>org.antigen</groupId>
-    <artifactId>antigen</artifactId>
+    <artifactId>antigen-prime</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     

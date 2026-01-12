@@ -1,6 +1,6 @@
 # Parameters Reference Guide
 
-This guide explains all parameters available in Antigen, organized by functional category. Parameters are configured in the `src/main/resources/parameters.yml` file, which overrides default values defined in the code.
+This guide explains all parameters available in antigen-prime, organized by functional category. Parameters are configured in the `src/main/resources/parameters.yml` file, which overrides default values defined in the code.
 
 ## Simulation Control Parameters
 

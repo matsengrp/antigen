@@ -1,4 +1,4 @@
-# Antigen: Epidemiological Simulation Framework
+# antigen-prime: Epidemiological Simulation Framework
 
 Antigen implements an SIR epidemiological model where hosts in a population are infected with
 viruses that have distinct antigenic phenotypes.  Hosts make contacts transmitting viruses and also
@@ -23,8 +23,8 @@ infecting virus's phenotype to the phenotypes in the host immune history.
 ### Installation & Basic Run
 ```bash
 # Clone and navigate to directory
-git clone https://github.com/matsengrp/antigen.git
-cd antigen
+git clone https://github.com/matsengrp/antigen-prime.git
+cd antigen-prime
 
 # Compile with Maven
 mvn clean compile package
@@ -87,7 +87,7 @@ TBD...
 
 ## 🤝 Contributing & Support
 
-- **Issues & Questions**: [GitHub Issues](https://github.com/matsengrp/antigen/issues)
+- **Issues & Questions**: [GitHub Issues](https://github.com/matsengrp/antigen-prime/issues)
 - **Feature Requests**: Open an issue with the "enhancement" label
 - **Contributing**: See [Development Guide](docs/development/contributing.md)
 

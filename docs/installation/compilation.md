@@ -95,7 +95,7 @@ java -cp "src/main/java:src/main/resources:~/.m2/repository/colt/colt/1.2.0/colt
 
 ### Memory Management
 - **`-Xmx8G`**: Sets maximum heap size to 8GB (adjust based on your simulation size)
-- **`-XX:+UseSerialGC`**: Uses serial garbage collector (more efficient for Antigen's memory patterns)
+- **`-XX:+UseSerialGC`**: Uses serial garbage collector (more efficient for antigen-prime's memory patterns)
 
 ### Performance Tuning
 ```bash

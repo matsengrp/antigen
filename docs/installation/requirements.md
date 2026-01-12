@@ -2,7 +2,7 @@
 
 ## Java Requirements
 
-Antigen requires **Java 16 or higher** to compile and run. This is due to specific language features and performance optimizations used in the codebase.
+antigen-prime requires **Java 16 or higher** to compile and run. This is due to specific language features and performance optimizations used in the codebase.
 
 ### Checking Your Java Version
 
@@ -108,7 +108,7 @@ Output size depends on:
 
 ### CPU Requirements
 - **Minimum**: Single-core 2GHz processor
-- **Recommended**: Multi-core processor (Antigen can utilize multiple cores for certain operations)
+- **Recommended**: Multi-core processor (antigen-prime can utilize multiple cores for certain operations)
 
 ### Garbage Collection
 For best performance, use the serial garbage collector:
@@ -116,7 +116,7 @@ For best performance, use the serial garbage collector:
 java -jar antigen-prime.jar -XX:+UseSerialGC -Xmx8G
 ```
 
-This is much more efficient for Antigen's memory allocation patterns than the default parallel collector.
+This is much more efficient for antigen-prime's memory allocation patterns than the default parallel collector.
 
 ## Development Tools (Optional)
 
