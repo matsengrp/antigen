@@ -1,0 +1,33 @@
+site_name: antigen-prime documentation
+site_description: Documentation for antigen-prime, an epidemiological simulation framework for virus evolution and population dynamics.
+repo_url: https://github.com/matsengrp/antigen-prime
+repo_name: matsengrp/antigen-prime
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: teal
+    accent: teal
+
+nav:
+  - Home: index.md
+  - Installation:
+    - Requirements: installation/requirements.md
+    - Compilation: installation/compilation.md
+  - User Guide:
+    - Mutation Model: user-guide/mutation-model.md
+    - Immunity Centroids: user-guide/immunity-centroids.md
+    - Parameters Reference: user-guide/parameters-reference.md
+    - Output Analysis: user-guide/output-analysis.md
+
+markdown_extensions:
+  - pymdownx.arithmatex:
+      generic: true
+  - tables
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+
+extra_javascript:
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
