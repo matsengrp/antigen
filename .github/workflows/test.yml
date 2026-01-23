@@ -18,4 +18,15 @@ jobs:
           java-version: '11'
           cache: 'maven'
 
+      - name: Install classmexer jar
+        run: |
+          mvn install:install-file \
+            -Dfile=src/main/resources/lib/classmexer.jar \
+            -DgroupId=com.javamex \
+            -DartifactId=classmexer \
+            -Dversion=1.0 \
+            -Dpackaging=jar
+
+      - run: mvn spotless:check
+
       - run: mvn test
