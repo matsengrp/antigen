@@ -1,4 +1,4 @@
-# antigen-prime: Epidemiological Simulation Framework
+# antigen-prime: Simulating coupled genetic and antigenic evolution of influenza virus
 
 Antigen implements an SIR epidemiological model where hosts in a population are infected with
 viruses that have distinct antigenic phenotypes.  Hosts make contacts transmitting viruses and also
@@ -47,7 +47,7 @@ See the [full documentation](docs/index.md) for details on the [mutation model](
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Java 16 or higher
+- Java 11 or higher
 - Maven (recommended) or manual Java compilation
 
 ### Installation & Basic Run
@@ -78,6 +78,11 @@ The simulation will run with default parameters and create output files in the `
 The program can be compiled with Maven:
 
 	mvn clean compile
+
+Before pushing any changes, make sure to run the formatter:
+
+	mvn spotless:check
+	mvn spotless:apply
 
 To run tests:
 
