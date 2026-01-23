@@ -14,6 +14,36 @@ infecting virus's phenotype to the phenotypes in the host immune history.
 - **Phylogenetic tracking**: Generate virus genealogies and sample phylogenetic trees
 - **Flexible phenotypes**: Support multiple phenotype models (geometric, sequence-based)
 
+## Key Extensions in antigen-prime
+
+antigen-prime extends the original [antigen](https://github.com/trvrb/antigen) simulator with two major features:
+
+### Coupled Genetic and Antigenic Evolution
+
+Each virus carries both a nucleotide sequence and coordinates in antigenic space. Mutations follow the K80 model (transition/transversion ratio = 5.0) and their antigenic effects depend on mutation type:
+
+| Mutation Type | Antigenic Effect |
+|---------------|------------------|
+| Synonymous | No movement |
+| Non-synonymous at epitope site | Large movement (~0.6 AU mean) |
+| Non-synonymous at non-epitope site | Minimal movement (~1e-5 AU mean) |
+
+This links sequence evolution to antigenic phenotype under selection from host immunity.
+
+### Host Immunity Centroid Sampling
+
+antigen-prime periodically samples host immune histories and computes population-level immunity centroids—the average antigenic position of recent infections across sampled hosts. Output to `out.histories.csv`:
+
+```csv
+year,deme,ag1,ag2,naive_fraction,experienced_hosts
+0.0,north,-6.0,0.0,0.498,5019
+1.0,north,-2.5,-0.01,0.212,7883
+```
+
+These centroids enable downstream fitness calculations for sampled tips over the duration of the simulation.
+
+See the [full documentation](docs/index.md) for details on the [mutation model](docs/user-guide/mutation-model.md) and [immunity centroids](docs/user-guide/immunity-centroids.md).
+
 ## 🚀 Quick Start
 
 ### Prerequisites
