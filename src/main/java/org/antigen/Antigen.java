@@ -6,20 +6,17 @@ import java.io.FileNotFoundException;
 import org.antigen.core.*;
 
 public class Antigen {
-    public static void main(String[] args) throws FileNotFoundException {
+  public static void main(String[] args) throws FileNotFoundException {
 
-		// initialize random number generator
-		cern.jet.random.AbstractDistribution.makeDefaultGenerator();
-		
-		// initialize static parameters
-		Parameters.load();		
-		Parameters.initialize();
-		
-		// run simulation
-		Simulation sim = new Simulation();
-		sim.run();	
-		
-	}
-   	
+    // initialize random number generator
+    cern.jet.random.AbstractDistribution.makeDefaultGenerator();
+
+    // initialize static parameters
+    Parameters.load();
+    Parameters.initialize();
+
+    // run simulation
+    Simulation sim = new Simulation();
+    sim.run();
+  }
 }
-
